@@ -1,6 +1,8 @@
 # Memory Capsule
 
-A cross-platform (iOS, Android, Web) app for capturing, organizing, and sharing personal life stories as multimedia “capsules.” Built with Expo (React Native + Web) and Firebase for seamless media storage and privacy control.
+A cross-platform (iOS, Android, Web) app for capturing, organizing, and sharing
+personal life stories as multimedia “capsules.” Built with Expo (React Native +
+Web) and Firebase for seamless media storage and privacy control.
 
 ## Features
 - Guided storytelling prompts (text, audio, photo, video)
@@ -24,20 +26,19 @@ A cross-platform (iOS, Android, Web) app for capturing, organizing, and sharing 
 - TypeScript
 
 ## Getting Started
-1. **Clone the repo:**  
-   `git clone https://github.com/yourusername/memory-capsule.git`
-2. **Install dependencies:**  
-   `npm install`
-3. **Start the app:**  
-   `expo start`
-4. **Configure Firebase:**  
-   Add your Firebase config to `config/firebase.js` or as environment variables.
+1. **Install dependencies:** `npm install`
+2. **Start the app:** `npm start`
+3. **Configure Firebase:** create a `.env` file or use environment variables with
+   your Firebase credentials (see `src/config/firebase.ts`).
 
+The project uses Expo, so it can run on iOS, Android, or the web from a single
+codebase. Future features such as AI-assisted prompts and export functionality
+will plug into the modular folder structure under `src/features`.
 
 ## License
 [MIT License](LICENSE)
 
 ---
 
-**Contact:**  
-Created by [Sean at Memoria Films](https://memoriafilms.com/)  
+**Contact:**
+Created by [Sean at Memoria Films](https://memoriafilms.com/)

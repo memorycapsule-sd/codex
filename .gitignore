@@ -1,0 +1,12 @@
+node_modules/
+.expo/
+.expo-shared/
+.env
+
+# Build outputs
+*.log
+dist/
+build/
+
+# macOS
+.DS_Store
