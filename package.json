@@ -8,7 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build": "expo build",
-    "test": "jest"
+    "test": "jest-expo"
   },
   "dependencies": {
     "expo": "^49.0.0",
