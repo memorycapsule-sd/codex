@@ -1,0 +1,249 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/6.6.3/wavesurfer.min.js"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>
+        tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#7C67CB",
+        "secondary": "#F5B0CB",
+        "accent": "#FFD166",
+        "light": "#F9F7FF",
+        "dark": "#3D3A50"
+      },
+      "fontFamily": {
+        "sans": [
+          "Nunito",
+          "sans-serif"
+        ]
+      }
+    },
+    "fontFamily": {
+      "sans": [
+        "Inter",
+        "sans-serif"
+      ]
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap" /><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-sans bg-light text-dark">
+    <div id="mobile-container" class="max-w-md mx-auto h-[844px] bg-white relative overflow-hidden shadow-xl rounded-3xl">
+        <!-- Media Recorder Screen -->
+        <div id="media-recorder-screen" class="h-full bg-white flex flex-col">
+            <!-- Header -->
+            <div id="header" class="px-6 pt-12 pb-4 border-b border-gray-100 flex items-center justify-between">
+                <button id="back-button" class="w-10 h-10 rounded-full bg-light flex items-center justify-center">
+                    <i class="fa-solid fa-arrow-left text-dark"></i>
+                </button>
+                <h1 class="text-xl font-bold text-dark">Record Your Memory</h1>
+                <div class="w-10"></div> <!-- Spacer for alignment -->
+            </div>
+            
+            <!-- Content Area -->
+            <div id="content-area" class="flex-1 px-6 py-4 overflow-y-auto">
+                <!-- Prompt Display -->
+                <div id="prompt-display" class="mb-5 bg-light rounded-xl p-4">
+                    <p class="text-sm text-gray-500 mb-1">PROMPT:</p>
+                    <p class="text-base font-medium">Describe a childhood memory that shaped who you are today. What happened and how did it influence you?</p>
+                </div>
+                
+                <!-- Media Type Selector -->
+                <div id="media-type-selector" class="flex border-b border-gray-100 mb-5">
+                    <button id="video-btn" class="flex-1 py-3 text-primary font-medium border-b-2 border-primary">
+                        <i class="fa-solid fa-video mr-1"></i> Video
+                    </button>
+                    <button id="audio-btn" class="flex-1 py-3 text-gray-400 font-medium">
+                        <i class="fa-solid fa-microphone mr-1"></i> Audio
+                    </button>
+                    <button id="text-btn" class="flex-1 py-3 text-gray-400 font-medium">
+                        <i class="fa-solid fa-pen-to-square mr-1"></i> Text
+                    </button>
+                </div>
+                
+                <!-- Video Recording Interface -->
+                <div id="video-interface" class="mb-5">
+                    <div id="video-preview" class="w-full aspect-[4/3] bg-gray-900 rounded-xl flex items-center justify-center overflow-hidden relative mb-3">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <img class="w-full h-full object-cover opacity-90" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg" alt="Video preview" />
+                            <div class="absolute top-4 right-4 bg-red-500 rounded-full w-3 h-3 animate-pulse"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Camera Controls -->
+                    <div id="camera-controls" class="flex justify-between items-center mb-5">
+                        <button id="flip-camera" class="w-12 h-12 rounded-full bg-light flex items-center justify-center">
+                            <i class="fa-solid fa-camera-rotate text-dark"></i>
+                        </button>
+                        <button id="flash-toggle" class="w-12 h-12 rounded-full bg-light flex items-center justify-center">
+                            <i class="fa-solid fa-bolt text-dark"></i>
+                        </button>
+                        <button id="filter-button" class="w-12 h-12 rounded-full bg-light flex items-center justify-center">
+                            <i class="fa-solid fa-wand-magic-sparkles text-dark"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Audio Recording Interface (Hidden by default) -->
+                <div id="audio-interface" class="mb-5 hidden">
+                    <div id="audio-visualization" class="w-full h-40 bg-light rounded-xl p-4 mb-3 flex items-center justify-center">
+                        <div id="waveform" class="w-full h-24"></div>
+                    </div>
+                </div>
+                
+                <!-- Text Entry Interface (Hidden by default) -->
+                <div id="text-interface" class="mb-5 hidden">
+                    <div class="w-full bg-light rounded-xl p-4 mb-3">
+                        <textarea id="text-entry" class="w-full h-40 bg-transparent resize-none outline-none" placeholder="Type your memory here..."></textarea>
+                    </div>
+                    
+                    <!-- Text Formatting Options -->
+                    <div id="formatting-options" class="flex space-x-3 mb-3">
+                        <button class="w-9 h-9 rounded-lg bg-light flex items-center justify-center">
+                            <i class="fa-solid fa-bold text-dark"></i>
+                        </button>
+                        <button class="w-9 h-9 rounded-lg bg-light flex items-center justify-center">
+                            <i class="fa-solid fa-italic text-dark"></i>
+                        </button>
+                        <button class="w-9 h-9 rounded-lg bg-light flex items-center justify-center">
+                            <i class="fa-solid fa-underline text-dark"></i>
+                        </button>
+                        <button class="w-9 h-9 rounded-lg bg-light flex items-center justify-center">
+                            <i class="fa-solid fa-list-ul text-dark"></i>
+                        </button>
+                        <button class="w-9 h-9 rounded-lg bg-light flex items-center justify-center">
+                            <i class="fa-solid fa-list-ol text-dark"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Recording Timer -->
+                <div id="recording-timer" class="flex items-center justify-center mb-5">
+                    <div class="flex items-center space-x-2 bg-light px-4 py-2 rounded-full">
+                        <div class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></div>
+                        <span id="timer-display" class="font-mono font-medium">00:32</span>
+                    </div>
+                </div>
+                
+                <!-- Recording Controls -->
+                <div id="recording-controls" class="flex items-center justify-center space-x-6 mb-5">
+                    <button id="cancel-btn" class="w-14 h-14 rounded-full bg-light flex items-center justify-center">
+                        <i class="fa-solid fa-xmark text-dark text-xl"></i>
+                    </button>
+                    <button id="record-btn" class="w-20 h-20 rounded-full bg-red-500 flex items-center justify-center border-4 border-white shadow-lg">
+                        <div class="w-8 h-8 bg-white rounded-sm"></div>
+                    </button>
+                    <button id="pause-btn" class="w-14 h-14 rounded-full bg-light flex items-center justify-center">
+                        <i class="fa-solid fa-pause text-dark text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Bottom Actions -->
+            <div id="bottom-actions" class="px-6 py-4 border-t border-gray-100">
+                <div class="flex space-x-3">
+                    <button id="preview-btn" class="flex-1 py-3.5 bg-light text-dark rounded-xl font-semibold">
+                        Preview
+                    </button>
+                    <button id="save-btn" class="flex-1 py-3.5 bg-primary text-white rounded-xl font-semibold">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize WaveSurfer for audio visualization
+            const wavesurfer = WaveSurfer.create({
+                container: '#waveform',
+                waveColor: '#7C67CB',
+                progressColor: '#F5B0CB',
+                cursorWidth: 0,
+                barWidth: 2,
+                barGap: 3,
+                height: 80,
+                barRadius: 3
+            });
+            
+            // Load demo audio
+            wavesurfer.load('https://wavesurfer-js.org/example/media/demo.wav');
+            
+            // Tab switching functionality
+            const videoBtn = document.getElementById('video-btn');
+            const audioBtn = document.getElementById('audio-btn');
+            const textBtn = document.getElementById('text-btn');
+            
+            const videoInterface = document.getElementById('video-interface');
+            const audioInterface = document.getElementById('audio-interface');
+            const textInterface = document.getElementById('text-interface');
+            
+            videoBtn.addEventListener('click', function() {
+                videoBtn.classList.add('text-primary', 'border-primary', 'border-b-2');
+                audioBtn.classList.remove('text-primary', 'border-primary', 'border-b-2');
+                textBtn.classList.remove('text-primary', 'border-primary', 'border-b-2');
+                
+                videoInterface.classList.remove('hidden');
+                audioInterface.classList.add('hidden');
+                textInterface.classList.add('hidden');
+            });
+            
+            audioBtn.addEventListener('click', function() {
+                audioBtn.classList.add('text-primary', 'border-primary', 'border-b-2');
+                videoBtn.classList.remove('text-primary', 'border-primary', 'border-b-2');
+                textBtn.classList.remove('text-primary', 'border-primary', 'border-b-2');
+                
+                audioInterface.classList.remove('hidden');
+                videoInterface.classList.add('hidden');
+                textInterface.classList.add('hidden');
+            });
+            
+            textBtn.addEventListener('click', function() {
+                textBtn.classList.add('text-primary', 'border-primary', 'border-b-2');
+                videoBtn.classList.remove('text-primary', 'border-primary', 'border-b-2');
+                audioBtn.classList.remove('text-primary', 'border-primary', 'border-b-2');
+                
+                textInterface.classList.remove('hidden');
+                videoInterface.classList.add('hidden');
+                audioInterface.classList.add('hidden');
+            });
+        });
+    </script>
+
+</body></html>
