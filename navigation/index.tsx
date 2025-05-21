@@ -1,9 +1,9 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import OnboardingScreen from '../features/onboarding/OnboardingScreen';
-import DashboardScreen from '../features/capsules/DashboardScreen';
-import CapsuleScreen from '../features/capsules/CapsuleScreen';
+import OnboardingScreen from '../src/features/onboarding/OnboardingScreen';
+import DashboardScreen from '../src/features/capsules/DashboardScreen';
+import CapsuleScreen from '../src/features/capsules/CapsuleScreen';
 
 export type RootStackParamList = {
   Onboarding: undefined;

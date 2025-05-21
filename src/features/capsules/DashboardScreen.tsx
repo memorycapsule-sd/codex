@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Button, FlatList, TouchableOpacity } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../navigation';
+import { RootStackParamList } from '../../../navigation';
 
 interface Capsule {
   id: string;
