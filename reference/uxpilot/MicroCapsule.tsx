@@ -1,0 +1,165 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>
+        tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#7C67CB",
+        "secondary": "#F5B0CB",
+        "accent": "#FFD166",
+        "light": "#F9F7FF",
+        "dark": "#3D3A50"
+      },
+      "fontFamily": {
+        "sans": [
+          "Nunito",
+          "sans-serif"
+        ]
+      }
+    },
+    "fontFamily": {
+      "sans": [
+        "Inter",
+        "sans-serif"
+      ]
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap" /><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-sans bg-light text-dark">
+    <div id="mobile-container" class="max-w-md mx-auto h-[844px] bg-white relative overflow-hidden shadow-xl rounded-3xl">
+        <!-- Micro Prompt Screen -->
+        <div id="micro-prompt-screen" class="h-full bg-white flex flex-col">
+            <!-- Header -->
+            <div id="header" class="px-6 pt-12 pb-4 flex items-center justify-between border-b border-gray-100">
+                <button id="back-button" class="w-10 h-10 flex items-center justify-center rounded-full bg-light">
+                    <i class="fa-solid fa-arrow-left text-dark"></i>
+                </button>
+                <h1 class="text-lg font-bold text-dark">Childhood Memories</h1>
+                <button id="options-button" class="w-10 h-10 flex items-center justify-center rounded-full bg-light">
+                    <i class="fa-solid fa-ellipsis-vertical text-dark"></i>
+                </button>
+            </div>
+            
+            <!-- Progress Indicator -->
+            <div id="progress-indicator" class="px-6 pt-4 pb-2 flex items-center justify-between">
+                <span class="text-sm text-gray-500 font-medium">Prompt 3 of 12</span>
+                <div class="flex space-x-1">
+                    <div class="w-12 h-1.5 rounded-full bg-primary"></div>
+                    <div class="w-12 h-1.5 rounded-full bg-primary"></div>
+                    <div class="w-12 h-1.5 rounded-full bg-primary"></div>
+                    <div class="w-12 h-1.5 rounded-full bg-gray-200"></div>
+                    <div class="w-12 h-1.5 rounded-full bg-gray-200"></div>
+                </div>
+            </div>
+            
+            <!-- Prompt Card -->
+            <div id="prompt-card" class="px-6 py-6">
+                <div class="bg-light rounded-2xl p-6 shadow-sm">
+                    <div class="flex justify-between items-start mb-4">
+                        <h2 class="text-xl font-bold text-dark">Your First Day of School</h2>
+                        <button id="refresh-prompt" class="w-8 h-8 flex items-center justify-center rounded-full bg-white text-primary">
+                            <i class="fa-solid fa-rotate text-sm"></i>
+                        </button>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-4">
+                        Describe your earliest memory of a school day. What were you wearing? How did you feel? Was there a teacher or classmate who made an impression on you?
+                    </p>
+                    
+                    <div class="flex items-center text-xs text-gray-500">
+                        <i class="fa-solid fa-sparkles mr-1 text-accent"></i>
+                        <span>AI-generated prompt</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Response Type Selection -->
+            <div id="response-type" class="px-6 py-4">
+                <h3 class="text-sm font-semibold text-gray-500 mb-3">HOW WOULD YOU LIKE TO RESPOND?</h3>
+                <div class="grid grid-cols-3 gap-3">
+                    <button id="text-response" class="response-type-btn bg-primary/10 p-3 rounded-xl flex flex-col items-center justify-center border-2 border-primary">
+                        <i class="fa-solid fa-align-left text-primary text-lg mb-2"></i>
+                        <span class="text-xs font-medium text-primary">Text</span>
+                    </button>
+                    <button id="audio-response" class="response-type-btn bg-white p-3 rounded-xl flex flex-col items-center justify-center border-2 border-gray-200">
+                        <i class="fa-solid fa-microphone text-gray-400 text-lg mb-2"></i>
+                        <span class="text-xs font-medium text-gray-500">Audio</span>
+                    </button>
+                    <button id="video-response" class="response-type-btn bg-white p-3 rounded-xl flex flex-col items-center justify-center border-2 border-gray-200">
+                        <i class="fa-solid fa-video text-gray-400 text-lg mb-2"></i>
+                        <span class="text-xs font-medium text-gray-500">Video</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Media Upload Section -->
+            <div id="media-upload" class="px-6 py-4">
+                <h3 class="text-sm font-semibold text-gray-500 mb-3">ATTACH MEDIA (OPTIONAL)</h3>
+                <button id="upload-media-btn" class="w-full border-2 border-dashed border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center bg-gray-50">
+                    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                        <i class="fa-solid fa-plus text-primary"></i>
+                    </div>
+                    <p class="text-sm text-gray-500">Upload photos or documents</p>
+                    <span class="text-xs text-gray-400 mt-1">Max 5 files, 20MB each</span>
+                </button>
+            </div>
+            
+            <div class="flex-1"></div>
+            
+            <!-- Navigation Controls -->
+            <div id="prompt-navigation" class="px-6 py-6 border-t border-gray-100">
+                <div class="flex justify-between items-center">
+                    <button id="previous-prompt" class="w-12 h-12 flex items-center justify-center rounded-full bg-light">
+                        <i class="fa-solid fa-chevron-left text-dark"></i>
+                    </button>
+                    
+                    <button id="respond-button" class="flex-1 mx-4 py-3.5 bg-primary text-white rounded-xl font-bold shadow-md shadow-primary/20 flex items-center justify-center">
+                        Start Writing
+                        <i class="fa-solid fa-pen-to-square ml-2"></i>
+                    </button>
+                    
+                    <button id="next-prompt" class="w-12 h-12 flex items-center justify-center rounded-full bg-light">
+                        <i class="fa-solid fa-chevron-right text-dark"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body></html>
