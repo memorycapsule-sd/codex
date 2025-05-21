@@ -6,11 +6,12 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!(?:' +
       'expo' +                      // core expo/*
-      '|expo-status-bar' +          // ← add this
+      '|expo-status-bar' +          // other Expo ESM libs
       '|react-native' +
       '|@react-native' +
       '|@react-navigation' +
-      '|firebase' +
+      '|firebase' +                 // firebase (un-scoped)
+      '|@firebase' +                // ← NEW: scoped @firebase/*
     ')/)'
   ],
 };
