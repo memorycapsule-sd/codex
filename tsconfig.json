@@ -10,7 +10,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "types": ["expo"],
+    "types": ["expo", "jest"],
     "lib": ["es2015", "dom"]
   },
   "include": ["src/**/*", "navigation/**/*", "app/**/*"],
