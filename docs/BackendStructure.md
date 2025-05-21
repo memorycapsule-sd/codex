@@ -38,6 +38,9 @@
 - **Auth checks:** All reads/writes secured via Firebase Auth/Firestore Security Rules.
 - **No server access keys or sensitive data in client code.**
 - **CORS and file size/type restrictions** enforced on uploads.
+<!-- firestore-rules: only authenticated users may read/write their own capsules and responses.
+Capsule docs: /capsules/{capsuleId} (owner, title, createdAt)
+Response docs: /responses/{responseId} (capsuleId, promptId, mediaType, mediaURL, createdAt) -->
 
 ## Cloud Functions (examples for v1)
 - On user creation: initialize user doc, send welcome email (optional).

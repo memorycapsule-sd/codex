@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
@@ -12,7 +12,18 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+const config = firebaseConfig.apiKey
+  ? firebaseConfig
+  : {
+      apiKey: 'test',
+      authDomain: 'test',
+      projectId: 'test',
+      storageBucket: 'test',
+      messagingSenderId: 'test',
+      appId: 'test',
+    };
+
+const app = getApps().length ? getApps()[0] : initializeApp(config);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
