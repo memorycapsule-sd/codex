@@ -17,13 +17,13 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.72.4",
-    "react-native-web": "0.19.10"
+    "react-native-web": "0.19.10",
+     "jest-expo": "^49.0.0"
   },
   "devDependencies": {
     "@testing-library/react-native": "12.2.0",
     "@testing-library/jest-native": "5.4.2",
     "babel-jest": "29.7.0",
-    "jest-expo": "^49.0.0",
     "react-test-renderer": "18.2.0",
     "typescript": "^5.0.4"
   }
