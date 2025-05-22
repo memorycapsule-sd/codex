@@ -10,9 +10,22 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "types": ["expo", "jest"],
-    "lib": ["es2015", "dom"]
+    "types": [
+      "expo",
+      "jest"
+    ],
+    "lib": [
+      "es2015",
+      "dom"
+    ]
   },
-  "include": ["src/**/*", "navigation/**/*", "app/**/*"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src/**/*",
+    "navigation/**/*",
+    "app/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "extends": "expo/tsconfig.base"
 }
