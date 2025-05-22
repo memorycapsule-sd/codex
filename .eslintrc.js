@@ -29,7 +29,7 @@ module.exports = {
   rules: {
     'react/prop-types': 'off', // Using TypeScript types instead
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-unused-vars': ['warn'],
+    '@typescript-eslint/no-unused-vars': ['error'],
     'react-native/no-inline-styles': 'warn',
     'prettier/prettier': 'error'
   }
