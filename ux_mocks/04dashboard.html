@@ -1,0 +1,248 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>
+        tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#7C67CB",
+        "secondary": "#F5B0CB",
+        "accent": "#FFD166",
+        "light": "#F9F7FF",
+        "dark": "#3D3A50"
+      },
+      "fontFamily": {
+        "sans": [
+          "Nunito",
+          "sans-serif"
+        ]
+      }
+    },
+    "fontFamily": {
+      "sans": [
+        "Inter",
+        "sans-serif"
+      ]
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap" /><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-sans bg-light text-dark">
+    <div id="mobile-container" class="max-w-md mx-auto h-[844px] bg-white relative overflow-hidden shadow-xl rounded-3xl">
+        <!-- Main Dashboard/Home Screen -->
+        <div id="dashboard-screen" class="h-full bg-light flex flex-col">
+            <!-- Top Navigation Bar -->
+            <div id="header" class="px-5 py-4 flex items-center justify-between bg-white shadow-sm">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-hourglass-half text-white text-lg"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-primary ml-2">MemoryCapsule</h1>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button id="notifications-btn" class="w-10 h-10 rounded-full bg-light flex items-center justify-center relative">
+                        <i class="fa-regular fa-bell text-dark"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-secondary rounded-full"></span>
+                    </button>
+                    <button id="profile-btn" class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg" alt="Profile" class="w-full h-full object-cover" />
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div id="main-content" class="flex-1 overflow-y-auto">
+                <!-- Sidebar Categories Horizontal Scroll -->
+                <div id="categories-scrollbar" class="px-5 py-4 overflow-x-auto whitespace-nowrap">
+                    <div class="inline-flex space-x-3">
+                        <button class="flex flex-col items-center px-4 py-2 bg-primary text-white rounded-xl">
+                            <i class="fa-solid fa-child-reaching text-lg mb-1"></i>
+                            <span class="text-xs font-medium">Childhood</span>
+                        </button>
+                        <button class="flex flex-col items-center px-4 py-2 bg-white text-dark rounded-xl shadow-sm">
+                            <i class="fa-solid fa-graduation-cap text-lg mb-1"></i>
+                            <span class="text-xs font-medium">Education</span>
+                        </button>
+                        <button class="flex flex-col items-center px-4 py-2 bg-white text-dark rounded-xl shadow-sm">
+                            <i class="fa-solid fa-briefcase text-lg mb-1"></i>
+                            <span class="text-xs font-medium">Career</span>
+                        </button>
+                        <button class="flex flex-col items-center px-4 py-2 bg-white text-dark rounded-xl shadow-sm">
+                            <i class="fa-solid fa-people-roof text-lg mb-1"></i>
+                            <span class="text-xs font-medium">Family</span>
+                        </button>
+                        <button class="flex flex-col items-center px-4 py-2 bg-white text-dark rounded-xl shadow-sm">
+                            <i class="fa-solid fa-plane text-lg mb-1"></i>
+                            <span class="text-xs font-medium">Travel</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Daily Prompt Section -->
+                <div id="daily-prompt-section" class="px-5 mb-6">
+                    <div class="bg-white p-4 rounded-2xl shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <h2 class="text-lg font-semibold">Today's Prompt</h2>
+                            <button class="text-primary text-sm font-medium">Refresh</button>
+                        </div>
+                        <p class="text-gray-700 mb-4">What was your favorite childhood toy and why was it special to you?</p>
+                        <div class="flex space-x-2">
+                            <button class="flex items-center justify-center py-2 px-3 bg-primary/10 text-primary rounded-lg text-sm font-medium">
+                                <i class="fa-solid fa-video mr-1.5"></i>
+                                Video
+                            </button>
+                            <button class="flex items-center justify-center py-2 px-3 bg-primary/10 text-primary rounded-lg text-sm font-medium">
+                                <i class="fa-solid fa-microphone mr-1.5"></i>
+                                Audio
+                            </button>
+                            <button class="flex items-center justify-center py-2 px-3 bg-primary/10 text-primary rounded-lg text-sm font-medium">
+                                <i class="fa-solid fa-pen-to-square mr-1.5"></i>
+                                Text
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Section -->
+                <div id="recent-activity-section" class="px-5 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold">Recent Activity</h2>
+                        <button class="text-primary text-sm font-medium">View All</button>
+                    </div>
+                    <div class="space-y-3">
+                        <div id="activity-item-1" class="bg-white p-3 rounded-xl shadow-sm flex items-center">
+                            <div class="w-14 h-14 bg-secondary/20 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fa-solid fa-image text-secondary text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-medium">First Day at College</h3>
+                                <p class="text-xs text-gray-500">Added 3 photos • 2 days ago</p>
+                            </div>
+                            <button class="w-8 h-8 rounded-full bg-light flex items-center justify-center">
+                                <i class="fa-solid fa-chevron-right text-gray-400 text-xs"></i>
+                            </button>
+                        </div>
+                        <div id="activity-item-2" class="bg-white p-3 rounded-xl shadow-sm flex items-center">
+                            <div class="w-14 h-14 bg-primary/20 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fa-solid fa-microphone text-primary text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-medium">My First Job Interview</h3>
+                                <p class="text-xs text-gray-500">Added audio • 4 days ago</p>
+                            </div>
+                            <button class="w-8 h-8 rounded-full bg-light flex items-center justify-center">
+                                <i class="fa-solid fa-chevron-right text-gray-400 text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline Preview Section -->
+                <div id="timeline-preview-section" class="px-5 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold">Your Timeline</h2>
+                        <button class="text-primary text-sm font-medium">View All</button>
+                    </div>
+                    <div class="relative pl-6 space-y-4">
+                        <!-- Timeline Line -->
+                        <div class="absolute left-2 top-1 bottom-0 w-0.5 bg-gray-200"></div>
+                        
+                        <!-- Timeline Item 1 -->
+                        <div id="timeline-item-1" class="relative">
+                            <div class="absolute left-[-20px] top-1 w-4 h-4 rounded-full bg-accent border-2 border-white"></div>
+                            <div class="bg-white p-3 rounded-xl shadow-sm">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="font-medium">Childhood Home</h3>
+                                    <span class="text-xs text-gray-500">1995</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-2">I lived in a small blue house on Maple Street until I was 12...</p>
+                                <div class="flex space-x-2">
+                                    <span class="px-2 py-0.5 bg-light text-xs rounded-full text-gray-600">Childhood</span>
+                                    <span class="px-2 py-0.5 bg-light text-xs rounded-full text-gray-600">Family</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Timeline Item 2 -->
+                        <div id="timeline-item-2" class="relative">
+                            <div class="absolute left-[-20px] top-1 w-4 h-4 rounded-full bg-secondary border-2 border-white"></div>
+                            <div class="bg-white p-3 rounded-xl shadow-sm">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="font-medium">High School Graduation</h3>
+                                    <span class="text-xs text-gray-500">2008</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-2">The day I graduated from Lincoln High School...</p>
+                                <div class="flex space-x-2">
+                                    <span class="px-2 py-0.5 bg-light text-xs rounded-full text-gray-600">Education</span>
+                                    <span class="px-2 py-0.5 bg-light text-xs rounded-full text-gray-600">Milestone</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Access Floating Button -->
+            <div id="quick-access-btn" class="absolute right-6 bottom-20">
+                <button class="w-14 h-14 rounded-full bg-primary shadow-lg shadow-primary/30 flex items-center justify-center text-white">
+                    <i class="fa-solid fa-plus text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div id="footer" class="bg-white px-5 py-3 flex justify-between items-center border-t border-gray-100">
+                <button class="flex flex-col items-center w-16 text-primary">
+                    <i class="fa-solid fa-house text-lg"></i>
+                    <span class="text-xs mt-1 font-medium">Home</span>
+                </button>
+                <button class="flex flex-col items-center w-16 text-gray-400">
+                    <i class="fa-solid fa-folder text-lg"></i>
+                    <span class="text-xs mt-1">Capsules</span>
+                </button>
+                <button class="flex flex-col items-center w-16 text-gray-400">
+                    <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+                    <span class="text-xs mt-1">Timeline</span>
+                </button>
+                <button class="flex flex-col items-center w-16 text-gray-400">
+                    <i class="fa-solid fa-gear text-lg"></i>
+                    <span class="text-xs mt-1">Settings</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</body></html>

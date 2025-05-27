@@ -1,0 +1,325 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>
+        tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#7C67CB",
+        "secondary": "#F5B0CB",
+        "accent": "#FFD166",
+        "light": "#F9F7FF",
+        "dark": "#3D3A50"
+      },
+      "fontFamily": {
+        "sans": [
+          "Nunito",
+          "sans-serif"
+        ]
+      }
+    },
+    "fontFamily": {
+      "sans": [
+        "Inter",
+        "sans-serif"
+      ]
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap" /><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-sans bg-light text-dark">
+    <div id="mobile-container" class="max-w-md mx-auto h-[844px] bg-white relative overflow-hidden shadow-xl rounded-3xl">
+        <!-- Settings Screen -->
+        <div id="settings-screen" class="h-full bg-light flex flex-col">
+            <!-- Header -->
+            <div id="header" class="px-6 py-4 bg-white border-b border-gray-100 flex items-center justify-between">
+                <div class="flex items-center">
+                    <button id="back-button" class="w-10 h-10 rounded-full flex items-center justify-center text-dark hover:bg-gray-100">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <h1 class="text-xl font-bold ml-2">Settings</h1>
+                </div>
+                <div class="w-10 h-10 rounded-full overflow-hidden">
+                    <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" alt="Profile" class="w-full h-full object-cover" />
+                </div>
+            </div>
+
+            <!-- Settings Content -->
+            <div id="settings-content" class="flex-1 overflow-y-auto px-6 py-4">
+                <!-- Account Management Section -->
+                <div id="account-section" class="mb-6">
+                    <h2 class="text-lg font-semibold mb-3 text-dark">Account</h2>
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div id="profile-info" class="p-4 flex items-center border-b border-gray-100">
+                            <div class="w-12 h-12 rounded-full overflow-hidden mr-3">
+                                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" alt="Profile" class="w-full h-full object-cover" />
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold">Emma Johnson</h3>
+                                <p class="text-sm text-gray-500">emma.johnson@example.com</p>
+                            </div>
+                            <button class="text-primary">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div id="subscription-info" class="p-4 flex items-center justify-between border-b border-gray-100">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-crown text-primary text-sm"></i>
+                                </div>
+                                <span>Premium Subscription</span>
+                            </div>
+                            <button class="text-primary">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div id="password-security" class="p-4 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-lock text-primary text-sm"></i>
+                                </div>
+                                <span>Change Password</span>
+                            </div>
+                            <button class="text-primary">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Preferences -->
+                <div id="notification-section" class="mb-6">
+                    <h2 class="text-lg font-semibold mb-3 text-dark">Notifications</h2>
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div id="push-notifications" class="p-4 flex items-center justify-between border-b border-gray-100">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-bell text-primary text-sm"></i>
+                                </div>
+                                <span>Push Notifications</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" value="" class="sr-only peer" checked="" />
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                        <div id="email-notifications" class="p-4 flex items-center justify-between border-b border-gray-100">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-envelope text-primary text-sm"></i>
+                                </div>
+                                <span>Email Notifications</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" value="" class="sr-only peer" checked="" />
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                        <div id="prompt-reminders" class="p-4 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-clock text-primary text-sm"></i>
+                                </div>
+                                <span>Daily Prompt Reminders</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" value="" class="sr-only peer" />
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Connected Services -->
+                <div id="connected-services-section" class="mb-6">
+                    <h2 class="text-lg font-semibold mb-3 text-dark">Connected Services</h2>
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div id="facebook-connection" class="p-4 flex items-center justify-between border-b border-gray-100">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                    <i class="fa-brands fa-facebook-f text-blue-600 text-sm"></i>
+                                </div>
+                                <span>Facebook</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" value="" class="sr-only peer" checked="" />
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                        <div id="instagram-connection" class="p-4 flex items-center justify-between border-b border-gray-100">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center mr-3">
+                                    <i class="fa-brands fa-instagram text-pink-600 text-sm"></i>
+                                </div>
+                                <span>Instagram</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" value="" class="sr-only peer" checked="" />
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                        <div id="google-photos" class="p-4 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-images text-red-500 text-sm"></i>
+                                </div>
+                                <span>Google Photos</span>
+                            </div>
+                            <button class="px-3 py-1 text-xs text-primary border border-primary rounded-full">
+                                Connect
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy & Security -->
+                <div id="privacy-security-section" class="mb-6">
+                    <h2 class="text-lg font-semibold mb-3 text-dark">Privacy &amp; Security</h2>
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div id="data-privacy" class="p-4 flex items-center justify-between border-b border-gray-100">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-shield-halved text-primary text-sm"></i>
+                                </div>
+                                <span>Data Privacy</span>
+                            </div>
+                            <button class="text-primary">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div id="default-sharing" class="p-4 flex items-center justify-between border-b border-gray-100">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-share-nodes text-primary text-sm"></i>
+                                </div>
+                                <span>Default Sharing Settings</span>
+                            </div>
+                            <button class="text-primary">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div id="two-factor" class="p-4 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-key text-primary text-sm"></i>
+                                </div>
+                                <span>Two-Factor Authentication</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" value="" class="sr-only peer" />
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help & Support -->
+                <div id="help-support-section" class="mb-6">
+                    <h2 class="text-lg font-semibold mb-3 text-dark">Help &amp; Support</h2>
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div id="faq" class="p-4 flex items-center justify-between border-b border-gray-100">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-circle-question text-primary text-sm"></i>
+                                </div>
+                                <span>FAQ</span>
+                            </div>
+                            <button class="text-primary">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div id="contact-support" class="p-4 flex items-center justify-between border-b border-gray-100">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-headset text-primary text-sm"></i>
+                                </div>
+                                <span>Contact Support</span>
+                            </div>
+                            <button class="text-primary">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div id="feedback" class="p-4 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-comment-dots text-primary text-sm"></i>
+                                </div>
+                                <span>Send Feedback</span>
+                            </div>
+                            <button class="text-primary">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="app-info" class="mb-10 text-center">
+                    <p class="text-sm text-gray-400">MemoryCapsule v1.2.3</p>
+                    <button class="mt-2 text-sm text-primary font-medium">Log Out</button>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div id="footer" class="bg-white border-t border-gray-100 px-4 py-3">
+                <div class="flex justify-around items-center">
+                    <button class="flex flex-col items-center justify-center w-16">
+                        <i class="fa-solid fa-house text-gray-400 text-xl"></i>
+                        <span class="text-xs mt-1 text-gray-400">Home</span>
+                    </button>
+                    <button class="flex flex-col items-center justify-center w-16">
+                        <i class="fa-solid fa-clock-rotate-left text-gray-400 text-xl"></i>
+                        <span class="text-xs mt-1 text-gray-400">Timeline</span>
+                    </button>
+                    <button class="flex flex-col items-center justify-center w-16 relative">
+                        <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center -mt-5">
+                            <i class="fa-solid fa-plus text-white text-xl"></i>
+                        </div>
+                    </button>
+                    <button class="flex flex-col items-center justify-center w-16">
+                        <i class="fa-solid fa-box-archive text-gray-400 text-xl"></i>
+                        <span class="text-xs mt-1 text-gray-400">Capsules</span>
+                    </button>
+                    <button class="flex flex-col items-center justify-center w-16">
+                        <i class="fa-solid fa-gear text-primary text-xl"></i>
+                        <span class="text-xs mt-1 text-primary">Settings</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body></html>
