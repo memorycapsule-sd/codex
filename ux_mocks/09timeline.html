@@ -1,0 +1,335 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>
+        tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#7C67CB",
+        "secondary": "#F5B0CB",
+        "accent": "#FFD166",
+        "light": "#F9F7FF",
+        "dark": "#3D3A50"
+      },
+      "fontFamily": {
+        "sans": [
+          "Nunito",
+          "sans-serif"
+        ]
+      }
+    },
+    "fontFamily": {
+      "sans": [
+        "Inter",
+        "sans-serif"
+      ]
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap" /><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-sans bg-light text-dark">
+    <div id="mobile-container" class="max-w-md mx-auto h-[844px] bg-white relative overflow-hidden shadow-xl rounded-3xl">
+        <!-- Timeline View Screen -->
+        <div id="timeline-screen" class="h-full bg-light flex flex-col">
+            <!-- Header -->
+            <div id="header" class="px-6 pt-14 pb-4 bg-white shadow-sm flex items-center justify-between">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-dark">Timeline</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="search-btn" class="w-10 h-10 rounded-full bg-light flex items-center justify-center">
+                        <i class="fa-solid fa-magnifying-glass text-primary"></i>
+                    </button>
+                    <div class="w-9 h-9 rounded-full overflow-hidden">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" alt="Profile" class="w-full h-full object-cover" />
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filter Controls -->
+            <div id="filter-controls" class="px-6 py-4 bg-white">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="relative">
+                        <button class="px-4 py-2 bg-light rounded-lg text-sm font-medium flex items-center">
+                            <span>All Capsules</span>
+                            <i class="fa-solid fa-chevron-down ml-2 text-xs"></i>
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <button class="px-4 py-2 bg-light rounded-lg text-sm font-medium flex items-center">
+                            <i class="fa-regular fa-calendar mr-2"></i>
+                            <span>Date Range</span>
+                            <i class="fa-solid fa-chevron-down ml-2 text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Capsule Categories -->
+                <div id="capsule-categories" class="flex space-x-3 overflow-x-auto py-2">
+                    <div class="flex-shrink-0">
+                        <button class="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium">
+                            All
+                        </button>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <button class="px-4 py-2 bg-light text-dark rounded-full text-sm font-medium">
+                            Childhood
+                        </button>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <button class="px-4 py-2 bg-light text-dark rounded-full text-sm font-medium">
+                            Education
+                        </button>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <button class="px-4 py-2 bg-light text-dark rounded-full text-sm font-medium">
+                            Career
+                        </button>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <button class="px-4 py-2 bg-light text-dark rounded-full text-sm font-medium">
+                            Family
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Timeline Entries -->
+            <div id="timeline-entries" class="flex-1 overflow-y-auto px-6 py-4">
+                <!-- Date Header -->
+                <div id="date-header-1" class="flex items-center mb-4">
+                    <div class="h-px bg-gray-300 flex-grow mr-3"></div>
+                    <h3 class="text-sm font-semibold text-gray-500">May 2023</h3>
+                    <div class="h-px bg-gray-300 flex-grow ml-3"></div>
+                </div>
+                
+                <!-- Entry Card - Video -->
+                <div id="entry-card-1" class="bg-white rounded-xl shadow-sm mb-5 overflow-hidden">
+                    <div class="p-4">
+                        <div class="flex items-start mb-3">
+                            <div class="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center flex-shrink-0 mr-3">
+                                <i class="fa-solid fa-briefcase text-secondary"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Career Milestone</h3>
+                                <p class="text-xs text-gray-500">May 15, 2023</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">
+                            My first day as a team lead was both exciting and nerve-wracking. I remember walking into the office feeling like...
+                        </p>
+                        <div class="relative rounded-lg overflow-hidden mb-2 h-40 bg-gray-100">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fa-solid fa-play text-white text-2xl z-10"></i>
+                            </div>
+                            <div class="absolute inset-0 bg-black/30"></div>
+                            <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/e4420d301d-b3866d5ec5f6fac0a2c4.png" alt="Video thumbnail" class="w-full h-full object-cover" />
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex space-x-1">
+                                <span class="px-2 py-1 bg-light rounded-md text-xs">Career</span>
+                                <span class="px-2 py-1 bg-light rounded-md text-xs">Video</span>
+                            </div>
+                            <button class="w-8 h-8 rounded-full bg-light flex items-center justify-center">
+                                <i class="fa-solid fa-ellipsis-vertical text-gray-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Entry Card - Text -->
+                <div id="entry-card-2" class="bg-white rounded-xl shadow-sm mb-5 overflow-hidden">
+                    <div class="p-4">
+                        <div class="flex items-start mb-3">
+                            <div class="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center flex-shrink-0 mr-3">
+                                <i class="fa-solid fa-graduation-cap text-accent"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">College Memories</h3>
+                                <p class="text-xs text-gray-500">May 10, 2023</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">
+                            The library was always my sanctuary during finals week. I'd find a quiet corner on the third floor where I could spread out my notes and textbooks. The smell of coffee from my thermos mixed with the musty scent of old books created a strangely comforting atmosphere...
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex space-x-1">
+                                <span class="px-2 py-1 bg-light rounded-md text-xs">Education</span>
+                                <span class="px-2 py-1 bg-light rounded-md text-xs">Text</span>
+                            </div>
+                            <button class="w-8 h-8 rounded-full bg-light flex items-center justify-center">
+                                <i class="fa-solid fa-ellipsis-vertical text-gray-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Date Header -->
+                <div id="date-header-2" class="flex items-center mb-4">
+                    <div class="h-px bg-gray-300 flex-grow mr-3"></div>
+                    <h3 class="text-sm font-semibold text-gray-500">April 2023</h3>
+                    <div class="h-px bg-gray-300 flex-grow ml-3"></div>
+                </div>
+                
+                <!-- Entry Card - Audio -->
+                <div id="entry-card-3" class="bg-white rounded-xl shadow-sm mb-5 overflow-hidden">
+                    <div class="p-4">
+                        <div class="flex items-start mb-3">
+                            <div class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0 mr-3">
+                                <i class="fa-solid fa-people-roof text-primary"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Family Vacation</h3>
+                                <p class="text-xs text-gray-500">April 25, 2023</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">
+                            The sound of waves crashing on the shore as the kids played in the sand. This moment was everything...
+                        </p>
+                        <div class="bg-light rounded-lg p-3 mb-2">
+                            <div class="flex items-center">
+                                <button class="w-8 h-8 rounded-full bg-primary flex items-center justify-center mr-3">
+                                    <i class="fa-solid fa-play text-white text-xs"></i>
+                                </button>
+                                <div class="flex-grow">
+                                    <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-primary rounded-full w-1/3"></div>
+                                    </div>
+                                    <div class="flex justify-between mt-1">
+                                        <span class="text-xs text-gray-500">1:23</span>
+                                        <span class="text-xs text-gray-500">3:45</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex space-x-1">
+                                <span class="px-2 py-1 bg-light rounded-md text-xs">Family</span>
+                                <span class="px-2 py-1 bg-light rounded-md text-xs">Audio</span>
+                            </div>
+                            <button class="w-8 h-8 rounded-full bg-light flex items-center justify-center">
+                                <i class="fa-solid fa-ellipsis-vertical text-gray-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Entry Card - Photo Gallery -->
+                <div id="entry-card-4" class="bg-white rounded-xl shadow-sm mb-5 overflow-hidden">
+                    <div class="p-4">
+                        <div class="flex items-start mb-3">
+                            <div class="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center flex-shrink-0 mr-3">
+                                <i class="fa-solid fa-child text-secondary"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Childhood Home</h3>
+                                <p class="text-xs text-gray-500">April 12, 2023</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">
+                            I recently found these old photos of our first family home. The backyard tree where we built that treehouse...
+                        </p>
+                        <div class="grid grid-cols-3 gap-2 mb-2">
+                            <div class="h-20 bg-gray-100 rounded-lg overflow-hidden">
+                                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/e4420d301d-b3866d5ec5f6fac0a2c4.png" alt="Photo 1" class="w-full h-full object-cover" />
+                            </div>
+                            <div class="h-20 bg-gray-100 rounded-lg overflow-hidden">
+                                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/e4420d301d-b3866d5ec5f6fac0a2c4.png" alt="Photo 2" class="w-full h-full object-cover" />
+                            </div>
+                            <div class="h-20 bg-gray-100 rounded-lg overflow-hidden relative">
+                                <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                    <span class="text-white font-medium">+4</span>
+                                </div>
+                                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/e4420d301d-b3866d5ec5f6fac0a2c4.png" alt="Photo 3" class="w-full h-full object-cover" />
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex space-x-1">
+                                <span class="px-2 py-1 bg-light rounded-md text-xs">Childhood</span>
+                                <span class="px-2 py-1 bg-light rounded-md text-xs">Photos</span>
+                            </div>
+                            <button class="w-8 h-8 rounded-full bg-light flex items-center justify-center">
+                                <i class="fa-solid fa-ellipsis-vertical text-gray-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom Navigation -->
+            <div id="footer" class="px-6 py-4 bg-white border-t border-gray-200">
+                <div class="flex items-center justify-between">
+                    <button class="flex flex-col items-center justify-center">
+                        <i class="fa-solid fa-house text-gray-400"></i>
+                        <span class="text-xs mt-1 text-gray-400">Home</span>
+                    </button>
+                    <button class="flex flex-col items-center justify-center">
+                        <i class="fa-solid fa-clock-rotate-left text-primary"></i>
+                        <span class="text-xs mt-1 text-primary">Timeline</span>
+                    </button>
+                    <div class="relative -mt-8">
+                        <button class="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
+                            <i class="fa-solid fa-plus text-white text-xl"></i>
+                        </button>
+                    </div>
+                    <button class="flex flex-col items-center justify-center">
+                        <i class="fa-solid fa-box-archive text-gray-400"></i>
+                        <span class="text-xs mt-1 text-gray-400">Capsules</span>
+                    </button>
+                    <button class="flex flex-col items-center justify-center">
+                        <i class="fa-solid fa-gear text-gray-400"></i>
+                        <span class="text-xs mt-1 text-gray-400">Settings</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Search Overlay (Hidden by default) -->
+            <div id="search-overlay" class="absolute inset-0 bg-white z-10 hidden">
+                <div class="px-6 pt-14 pb-4 flex items-center">
+                    <button class="w-10 h-10 rounded-full bg-light flex items-center justify-center mr-3">
+                        <i class="fa-solid fa-arrow-left text-dark"></i>
+                    </button>
+                    <div class="flex-grow relative">
+                        <input type="text" placeholder="Search memories..." class="w-full py-2 px-4 bg-light rounded-lg text-sm" />
+                        <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body></html>

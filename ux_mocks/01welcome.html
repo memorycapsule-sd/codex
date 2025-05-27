@@ -1,0 +1,132 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>
+        tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#7C67CB",
+        "secondary": "#F5B0CB",
+        "accent": "#FFD166",
+        "light": "#F9F7FF",
+        "dark": "#3D3A50"
+      },
+      "fontFamily": {
+        "sans": [
+          "Nunito",
+          "sans-serif"
+        ]
+      }
+    },
+    "fontFamily": {
+      "sans": [
+        "Inter",
+        "sans-serif"
+      ]
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap" /><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-sans bg-light text-dark">
+    <div id="mobile-container" class="max-w-md mx-auto h-[844px] bg-white relative overflow-hidden shadow-xl rounded-3xl">
+        <!-- Welcome/Onboarding Screen -->
+        <div id="welcome-screen" class="h-full bg-gradient-to-b from-light to-white px-6 py-8 flex flex-col">
+            <!-- Logo and App Name -->
+            <div id="app-branding" class="mt-10 mb-6 text-center">
+                <div class="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-hourglass-half text-white text-3xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-primary">MemoryCapsule</h1>
+                <p class="text-gray-500 mt-1">Preserve your story, your way</p>
+            </div>
+            
+            <!-- Main Illustration -->
+            <div id="main-illustration" class="flex-1 flex items-center justify-center my-4">
+                <img class="w-full h-auto rounded-2xl" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/e4420d301d-b3866d5ec5f6fac0a2c4.png" alt="mobile app onboarding screen showing a stylized memory capsule with photos and memories floating around it, soft color palette, minimalist illustration style" />
+            </div>
+            
+            <!-- Features Overview -->
+            <div id="features-overview" class="grid grid-cols-3 gap-4 mb-8">
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fa-solid fa-pen-to-square text-primary"></i>
+                    </div>
+                    <p class="text-xs font-medium">Guided Prompts</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fa-solid fa-photo-film text-primary"></i>
+                    </div>
+                    <p class="text-xs font-medium">Multi-Media</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fa-solid fa-shield-halved text-primary"></i>
+                    </div>
+                    <p class="text-xs font-medium">Private &amp; Secure</p>
+                </div>
+            </div>
+            
+            <!-- Description -->
+            <div id="app-description" class="mb-8 text-center">
+                <h2 class="text-xl font-semibold mb-3">Capture your life's journey</h2>
+                <p class="text-gray-600 text-sm leading-relaxed">
+                    MemoryCapsule helps you document your life stories through guided prompts and organize them into meaningful collections that you can revisit and share with loved ones.
+                </p>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div id="action-buttons" class="space-y-4 mb-6">
+                <button id="get-started-btn" class="w-full py-4 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/30 flex items-center justify-center">
+                    Get Started
+                    <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+                <p class="text-center text-sm text-gray-500">
+                    Already have an account? <span class="text-primary font-medium cursor-pointer">Sign In</span>
+                </p>
+            </div>
+            
+            <!-- Pagination Dots -->
+            <div id="pagination" class="flex justify-center space-x-2 mb-1">
+                <div class="w-2.5 h-2.5 rounded-full bg-primary"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-gray-300"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-gray-300"></div>
+            </div>
+        </div>
+    </div>
+
+</body></html>

@@ -13,7 +13,7 @@ export default function SignInScreen({ navigation }: NativeStackScreenProps<Root
 
   const handleSignIn = async () => {
     await AuthService.signIn(email, password);
-    navigation.replace('Dashboard');
+    navigation.replace('Main');
   };
 
   return (

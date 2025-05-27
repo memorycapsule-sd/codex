@@ -1,0 +1,204 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>
+        tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#7C67CB",
+        "secondary": "#F5B0CB",
+        "accent": "#FFD166",
+        "light": "#F9F7FF",
+        "dark": "#3D3A50"
+      },
+      "fontFamily": {
+        "sans": [
+          "Nunito",
+          "sans-serif"
+        ]
+      }
+    },
+    "fontFamily": {
+      "sans": [
+        "Inter",
+        "sans-serif"
+      ]
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap" /><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-sans bg-light text-dark">
+    <div id="mobile-container" class="max-w-md mx-auto h-[844px] bg-white relative overflow-hidden shadow-xl rounded-3xl">
+        <!-- Media Editing Screen -->
+        <div id="media-editing-screen" class="h-full bg-white flex flex-col">
+            <!-- Header -->
+            <div id="header" class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <button id="back-button" class="w-10 h-10 rounded-full bg-light flex items-center justify-center">
+                    <i class="fa-solid fa-arrow-left text-dark"></i>
+                </button>
+                <h1 class="text-lg font-bold text-dark">Edit Media</h1>
+                <div class="w-10"></div>
+            </div>
+            
+            <!-- Media Preview -->
+            <div id="media-preview" class="px-6 pt-4 pb-2">
+                <div class="relative w-full h-[240px] bg-gray-100 rounded-xl overflow-hidden">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" alt="Media preview" />
+                    <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/60 to-transparent flex items-center px-4">
+                        <div class="text-white text-sm font-medium">00:45 / 02:30</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Trim Controls -->
+            <div id="trim-controls" class="px-6 py-4">
+                <h2 class="text-sm font-semibold mb-3">Trim Video</h2>
+                <div class="relative h-16 mb-2">
+                    <div class="absolute top-0 left-0 right-0 bottom-0 bg-gray-100 rounded-lg overflow-hidden">
+                        <div class="absolute top-0 bottom-0 left-[10%] right-[30%] bg-primary/20 border-2 border-primary rounded flex items-center justify-between px-1">
+                            <div class="w-1 h-12 bg-primary rounded"></div>
+                            <div class="w-1 h-12 bg-primary rounded"></div>
+                        </div>
+                        <div class="w-full h-full flex">
+                            <div class="w-1/6 h-full bg-gray-200"></div>
+                            <div class="w-1/6 h-full bg-gray-300"></div>
+                            <div class="w-1/6 h-full bg-gray-200"></div>
+                            <div class="w-1/6 h-full bg-gray-300"></div>
+                            <div class="w-1/6 h-full bg-gray-200"></div>
+                            <div class="w-1/6 h-full bg-gray-300"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-500">00:15</span>
+                    <span class="text-xs text-gray-500">02:00</span>
+                </div>
+            </div>
+            
+            <!-- Filter Options -->
+            <div id="filter-options" class="px-6 py-2">
+                <h2 class="text-sm font-semibold mb-3">Filters</h2>
+                <div class="flex space-x-3 overflow-x-auto pb-2">
+                    <div class="flex flex-col items-center">
+                        <div class="w-16 h-16 rounded-lg bg-light border-2 border-primary flex items-center justify-center">
+                            <span class="text-xs">Original</span>
+                        </div>
+                        <span class="text-xs mt-1">Original</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-16 h-16 rounded-lg bg-[#FFE8D6] flex items-center justify-center">
+                            <span class="text-xs">Warm</span>
+                        </div>
+                        <span class="text-xs mt-1">Warm</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-16 h-16 rounded-lg bg-[#E0F7FA] flex items-center justify-center">
+                            <span class="text-xs">Cool</span>
+                        </div>
+                        <span class="text-xs mt-1">Cool</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-16 h-16 rounded-lg bg-[#F5F5F5] flex items-center justify-center">
+                            <span class="text-xs">B&amp;W</span>
+                        </div>
+                        <span class="text-xs mt-1">B&amp;W</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-16 h-16 rounded-lg bg-[#FFF3E0] flex items-center justify-center">
+                            <span class="text-xs">Vintage</span>
+                        </div>
+                        <span class="text-xs mt-1">Vintage</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Text Annotation Tools -->
+            <div id="text-annotation" class="px-6 py-2">
+                <h2 class="text-sm font-semibold mb-3">Text Annotations</h2>
+                <div class="flex space-x-3 mb-3">
+                    <button class="w-10 h-10 rounded-full bg-light flex items-center justify-center">
+                        <i class="fa-solid fa-font text-dark"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-full bg-light flex items-center justify-center">
+                        <i class="fa-solid fa-quote-left text-dark"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-full bg-light flex items-center justify-center">
+                        <i class="fa-solid fa-closed-captioning text-dark"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-full bg-light flex items-center justify-center">
+                        <i class="fa-solid fa-palette text-dark"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-full bg-light flex items-center justify-center">
+                        <i class="fa-solid fa-align-left text-dark"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Metadata Entry -->
+            <div id="metadata-entry" class="px-6 py-2">
+                <h2 class="text-sm font-semibold mb-3">Metadata</h2>
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs text-gray-500 block mb-1">Year</label>
+                        <input type="text" placeholder="e.g. 2015" class="w-full px-4 py-3 bg-light rounded-lg text-sm" />
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500 block mb-1">People</label>
+                        <input type="text" placeholder="Add names separated by commas" class="w-full px-4 py-3 bg-light rounded-lg text-sm" />
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500 block mb-1">Description</label>
+                        <textarea placeholder="Add a description to this memory..." class="w-full px-4 py-3 bg-light rounded-lg text-sm h-20 resize-none"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Save/Discard Options -->
+            <div id="action-buttons" class="px-6 py-4 mt-auto border-t border-gray-100">
+                <div class="flex space-x-3">
+                    <button id="discard-btn" class="flex-1 py-3.5 bg-light text-dark rounded-xl font-semibold border border-gray-200">
+                        Discard
+                    </button>
+                    <button id="save-btn" class="flex-1 py-3.5 bg-primary text-white rounded-xl font-semibold shadow-md shadow-primary/30">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body></html>
