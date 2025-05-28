@@ -1,4 +1,7 @@
 import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 // Hybrid configuration that works in both OpenAI Codex and Windsurf environments
 const firebaseConfig = {
@@ -13,4 +16,12 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-export const firebase = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+
+// Export Firebase services
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
+
+// Export the app instance
+export default app;

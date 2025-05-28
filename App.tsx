@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import Navigation from './navigation';
+import { NavigationContainer } from '@react-navigation/native';
 import { View, Text } from 'react-native';
 
 // Import Firebase configuration
-import { firebase } from './app/config/firebase';
+import app from './app/config/firebase';
+
+// Import Auth Provider and Navigation
+import { AuthProvider } from './src/contexts/AuthContext';
+import AuthNavigationWrapper from './src/navigation/AuthNavigator';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -15,7 +19,7 @@ export default function App() {
   useEffect(() => {
     try {
       // Log to confirm Firebase is initialized
-      console.log('Firebase initialized with app:', firebase.name);
+      console.log('Firebase initialized with app:', app.name);
       setIsLoading(false);
     } catch (error) {
       console.error('Error initializing Firebase:', error);
@@ -44,11 +48,13 @@ export default function App() {
     );
   }
 
-  // Main app with navigation
+  // Main app with authentication flow
   return (
-    <>
-      <Navigation />
-      <StatusBar style="auto" />
-    </>
+    <AuthProvider>
+      <NavigationContainer>
+        <AuthNavigationWrapper />
+        <StatusBar style="auto" />
+      </NavigationContainer>
+    </AuthProvider>
   );
 }

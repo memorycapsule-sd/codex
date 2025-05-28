@@ -86,6 +86,13 @@ const timelineItems: TimelineItem[] = [
 ];
 
 export default function DashboardScreen() {
+  const getCurrentGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   const renderCategoryItem = (category: Category) => (
     <TouchableOpacity
       key={category.id}
@@ -150,23 +157,17 @@ export default function DashboardScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <View style={styles.logo}>
-            <Ionicons name="hourglass-outline" size={20} color={theme.colors.white} />
+          <Text style={styles.greeting}>{getCurrentGreeting()}</Text>
+          <Text style={styles.userName}>Sarah</Text>
+        </View>
+        <TouchableOpacity style={styles.profileButton}>
+          <View style={styles.profileAvatar}>
+            <Text style={styles.profileInitial}>S</Text>
           </View>
-          <Text style={styles.appTitle}>MemoryCapsule</Text>
-        </View>
-        <View style={styles.headerRight}>
-          <TouchableOpacity style={styles.notificationButton}>
-            <Ionicons name="notifications-outline" size={20} color={theme.colors.dark} />
-            <View style={styles.notificationDot} />
+          <TouchableOpacity style={styles.notificationBadge}>
+            <Ionicons name="notifications" size={16} color="#7C67CB" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.profileButton}>
-            <Image
-              source={{ uri: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg' }}
-              style={styles.profileImage}
-            />
-          </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -181,28 +182,33 @@ export default function DashboardScreen() {
 
         {/* Daily Prompt */}
         <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Today's Memory Prompt</Text>
+            <TouchableOpacity>
+              <Text style={styles.refreshButton}>Refresh</Text>
+            </TouchableOpacity>
+          </View>
           <View style={styles.promptCard}>
             <View style={styles.promptHeader}>
-              <Text style={styles.sectionTitle}>Today's Prompt</Text>
-              <TouchableOpacity>
-                <Text style={styles.refreshButton}>Refresh</Text>
-              </TouchableOpacity>
+              <Ionicons name="bulb" size={20} color="#FFD166" />
+              <Text style={styles.promptCategory}>Childhood</Text>
             </View>
             <Text style={styles.promptText}>
-              What was your favorite childhood toy and why was it special to you?
+              What was your favorite game to play during recess in elementary school? 
+              Who did you play with and what made it so special?
             </Text>
             <View style={styles.promptActions}>
               <TouchableOpacity style={styles.promptAction}>
-                <Ionicons name="videocam-outline" size={16} color={theme.colors.primary} />
-                <Text style={styles.promptActionText}>Video</Text>
+                <Ionicons name="mic" size={16} color="#7C67CB" />
+                <Text style={styles.promptActionText}>Record</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.promptAction}>
-                <Ionicons name="mic-outline" size={16} color={theme.colors.primary} />
-                <Text style={styles.promptActionText}>Audio</Text>
+                <Ionicons name="create" size={16} color="#7C67CB" />
+                <Text style={styles.promptActionText}>Write</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.promptAction}>
-                <Ionicons name="create-outline" size={16} color={theme.colors.primary} />
-                <Text style={styles.promptActionText}>Text</Text>
+                <Ionicons name="camera" size={16} color="#7C67CB" />
+                <Text style={styles.promptActionText}>Photo</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -265,54 +271,43 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  logo: {
-    width: 40,
-    height: 40,
-    backgroundColor: theme.colors.primary,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+  greeting: {
+    fontSize: theme.typography.size.lg,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.dark,
   },
-  appTitle: {
-    fontSize: theme.typography.size.xl,
-    fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.primary,
+  userName: {
+    fontSize: theme.typography.size.lg,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.dark,
     marginLeft: theme.spacing.sm,
   },
-  headerRight: {
+  profileButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
   },
-  notificationButton: {
+  profileAvatar: {
     width: 40,
     height: 40,
-    backgroundColor: theme.colors.light,
     borderRadius: 20,
+    backgroundColor: theme.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileInitial: {
+    fontSize: theme.typography.size.xl,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.white,
+  },
+  notificationBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: theme.colors.white,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
-  },
-  notificationDot: {
-    position: 'absolute',
-    top: 4,
-    right: 4,
-    width: 8,
-    height: 8,
-    backgroundColor: theme.colors.secondary,
-    borderRadius: 4,
-  },
-  profileButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: theme.colors.primary,
-    overflow: 'hidden',
-  },
-  profileImage: {
-    width: '100%',
-    height: '100%',
   },
   content: {
     flex: 1,
@@ -385,10 +380,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: theme.spacing.sm,
   },
-  refreshButton: {
+  promptCategory: {
     fontSize: theme.typography.size.sm,
     fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.primary,
+    marginLeft: theme.spacing.xs,
   },
   promptText: {
     fontSize: theme.typography.size.base,
@@ -538,5 +534,10 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: 100,
+  },
+  refreshButton: {
+    fontSize: theme.typography.size.sm,
+    fontWeight: theme.typography.fontWeight.medium,
+    color: theme.colors.primary,
   },
 });

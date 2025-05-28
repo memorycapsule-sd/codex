@@ -6,10 +6,15 @@ import {
   SafeAreaView, 
   ScrollView, 
   TouchableOpacity,
-  Alert
+  Alert,
+  TextInput,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
+import { MediaPicker, AudioRecorder, MediaPreview } from '../components/media';
+import { MediaFile, MediaService } from '../services/media';
+import { useAuth } from '../contexts/AuthContext';
 
 type ResponseType = 'text' | 'audio' | 'video';
 

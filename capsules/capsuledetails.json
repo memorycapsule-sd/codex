@@ -1,0 +1,112 @@
+{
+  "Beginning": [
+    "What\u2019s the story behind your name?",
+    "What is your earliest memory?",
+    "Describe the house you grew up in. What made it feel like home?",
+    "Was there a particular season or moment from your early years that shaped you?"
+  ],
+  "Family": [
+    "What can you tell me about your parents or guardians and the impact they had on you?",
+    "Do you have any siblings? What was your relationship like growing up?",
+    "Who were your closest childhood friends? What did you love doing together?",
+    "Who were your role models growing up? How did they influence you?"
+  ],
+  "Childhood": [
+    "What was school like for you as a child? Any favorite teachers or subjects?",
+    "What were your favorite hobbies or activities growing up?",
+    "What meal, snack, or dish reminds you most of your childhood?",
+    "Did your family have any sayings, traditions, or quirks that you remember fondly?"
+  ],
+  "Adolescence": [
+    "What were your teenage years like? What music, trends, or experiences defined that time for you?",
+    "What was your first job? What did you learn from it?",
+    "What path did you take after high school?",
+    "What was one of your proudest moments during adolescence or early adulthood?"
+  ],
+  "Pursuits": [
+    "What was your experience like in higher education or training after high school?",
+    "What kind of work have you done throughout your life?",
+    "What job, role, or project made you feel most fulfilled or proud?",
+    "In what ways did your work or education shape your identity or relationships?"
+  ],
+  "Connections": [
+    "How did you meet your partner or spouse?",
+    "What relationship in your life has shaped you most \u2014 romantic or otherwise?",
+    "What was it like becoming a parent (or taking on a caregiving role)?",
+    "Are there family traditions, values, or rhythms that you\u2019ve carried forward or created for yourself?"
+  ],
+  "Lessons": [
+    "What\u2019s a challenge or difficult time you\u2019ve faced, and how did you get through it?",
+    "What\u2019s one lesson you wish you\u2019d learned earlier?",
+    "Have you ever made a mistake that taught you something important?",
+    "What does resilience mean to you?"
+  ],
+  "Wisdom": [
+    "How do you want to be remembered by your family and future generations?",
+    "What do you hope the future holds for you and your loved ones?",
+    "If you could give your younger self a piece of advice, what would it be?",
+    "Is there anything else you'd like to share or say to your family?"
+  ],
+  "Bonus": {
+    "Travel": [
+      "What place have you visited that left a lasting impression on you?",
+      "Did you ever take a trip that changed your perspective?",
+      "Is there a place you\u2019ve always wanted to visit but haven\u2019t yet?"
+    ],
+    "Friendship": [
+      "Who\u2019s a friend that made a lifelong impact on you?",
+      "What do you value most in a friendship?",
+      "Have you ever had to let go of a friendship \u2014 and what did you learn?"
+    ],
+    "Faith": [
+      "Has faith or spirituality played a role in your life?",
+      "Were there moments when your beliefs shifted or deepened?",
+      "What spiritual or personal practices bring you peace?"
+    ],
+    "Health": [
+      "What has your relationship with health and wellness looked like over time?",
+      "Have you faced any health challenges that shaped your outlook?",
+      "What do you do today to take care of your body and mind?"
+    ],
+    "Hobbies": [
+      "What\u2019s something you\u2019ve always enjoyed doing just for yourself?",
+      "Did you ever turn a hobby into something more?",
+      "What\u2019s a small passion that\u2019s brought you joy throughout your life?"
+    ],
+    "Money": [
+      "What was your earliest memory about money?",
+      "How did your views on money change over time?",
+      "What role has money played in your decisions or values?"
+    ],
+    "Volunteering": [
+      "Have you ever served a cause or community that mattered deeply to you?",
+      "What\u2019s something you\u2019ve done to help others that you\u2019re proud of?",
+      "How would you like to give back in the future?"
+    ],
+    "Loss": [
+      "Who have you lost that shaped you the most?",
+      "What helped you get through grief or change?",
+      "Is there something you wish you could say to someone who\u2019s no longer here?"
+    ],
+    "Moments": [
+      "What\u2019s a moment you\u2019ll never forget \u2014 big or small?",
+      "What\u2019s the most spontaneous thing you\u2019ve ever done?",
+      "What memory makes you smile every time it comes up?"
+    ],
+    "Creativity": [
+      "Have you ever created something you\u2019re proud of \u2014 a story, meal, project, or space?",
+      "What role has creativity or imagination played in your life?",
+      "Is there a creative outlet you\u2019ve always wanted to try?"
+    ],
+    "Change": [
+      "Have you ever had to reinvent yourself?",
+      "What\u2019s a risk you took that you\u2019re glad you did?",
+      "How do you handle seasons of transition?"
+    ],
+    "Home": [
+      "What does the word \u201chome\u201d mean to you?",
+      "Is there a place that\u2019s always felt like home, even if you didn\u2019t live there long?",
+      "How have the places you\u2019ve lived shaped the way you live today?"
+    ]
+  }
+}

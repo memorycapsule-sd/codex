@@ -2,9 +2,10 @@ import React from 'react';
 import { NavigationContainer, LinkingOptions } from '@react-navigation/native';
 import * as Linking from 'expo-linking';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import WelcomeScreen from '../src/features/onboarding/WelcomeScreen';
-import SignUpScreen from '../src/features/onboarding/SignUpScreen';
-import SignInScreen from '../src/features/onboarding/SignInScreen';
+import WelcomeScreen from '../src/screens/WelcomeScreen';
+import SignUpScreen from '../src/screens/SignUpScreen';
+import SignInScreen from '../src/screens/SignInScreen';
+import ProfileSetupScreen from '../src/screens/ProfileSetupScreen';
 import { TabNavigator } from '../src/navigation/TabNavigator';
 import CapsuleView from '../src/features/capsules/CapsuleView';
 
@@ -12,6 +13,7 @@ export type RootStackParamList = {
   Welcome: undefined;
   SignUp: undefined;
   SignIn: undefined;
+  ProfileSetup: undefined;
   Main: undefined; 
   CapsuleView: { id: string };
 };
@@ -44,6 +46,7 @@ export default function Navigation() {
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
         <Stack.Screen name="SignIn" component={SignInScreen} />
+        <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
         <Stack.Screen name="Main" component={TabNavigator} />
         <Stack.Screen 
           name="CapsuleView" 

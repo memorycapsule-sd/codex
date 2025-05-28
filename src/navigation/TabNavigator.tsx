@@ -6,8 +6,10 @@ import { TabBar } from '../components/navigation/TabBar';
 import DashboardScreen from '../screens/DashboardScreen';
 import TimelineScreen from '../screens/TimelineScreen';
 import CreateScreen from '../screens/CreateScreen';
-import CapsulesScreen from '../screens/CapsulesScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+
+// Import nested navigators
+import { CapsulesNavigator } from './CapsulesNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -42,7 +44,7 @@ export function TabNavigator() {
       />
       <Tab.Screen 
         name="Capsules" 
-        component={CapsulesScreen}
+        component={CapsulesNavigator}
         options={{
           tabBarLabel: 'Capsules',
         }}
