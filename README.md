@@ -36,7 +36,7 @@ Web) and Firebase for seamless media storage and privacy control.
 1. **Install dependencies:** `npm install`
 2. **Start the app:** `npm start`
 3. **Configure Firebase:** create a `.env` file or use environment variables with
-   your Firebase credentials (see `src/config/firebase.ts`).
+   your Firebase credentials (see `app/config/firebase.ts`).
 
 The project uses Expo, so it can run on iOS, Android, or the web from a single
 codebase. Future features such as AI-assisted prompts and export functionality

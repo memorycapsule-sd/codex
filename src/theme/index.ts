@@ -1,7 +1,8 @@
 // Design System based on UX Mocks
 export const colors = {
   // Primary brand colors from UX mocks
-  primary: '#7C67CB',
+  primary: '#42275a', // Updated to match the new gradient start color
+  primaryLight: '#734b6d', // Added the gradient end color
   secondary: '#F5B0CB', 
   accent: '#FFD166',
   light: '#F9F7FF',
@@ -84,6 +85,18 @@ export const typography = {
     normal: 1.5,
     relaxed: 1.75,
   },
+  body: {
+    fontSize: 16,
+    lineHeight: 1.5,
+  },
+  button: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+  },
+  caption: {
+    fontSize: 12,
+    lineHeight: 1.4,
+  },
 };
 
 export const spacing = {
@@ -145,6 +158,31 @@ export const shadows = {
   },
 };
 
+// Gradient definitions for beautiful UI
+export const gradients = {
+  // Original gradients
+  primary: ['#7C67CB', '#9B7EE8'],
+  secondary: ['#F5B0CB', '#FFB8D6'],
+  accent: ['#FFD166', '#FFE099'],
+  background: ['#F9F7FF', '#FFFFFF'],
+  card: ['#FFFFFF', '#F9F7FF'],
+  button: ['#7C67CB', '#6B5BB3'],
+  header: ['#7C67CB', '#8B73D1'],
+  
+  // New gradient options
+  warmSunset: ['#de6262', '#ffb88c'],     // Warm red to orange
+  softPink: ['#ee9ca7', '#ffdde1'],       // Soft pink to light pink
+  oceanBlue: ['#2193b0', '#6dd5ed'],      // Deep blue to light blue
+  peachyPink: ['#ffafbd', '#ffc3a0'],     // Peachy pink to soft peach
+  
+  // Theme combinations
+  memoryTheme: ['#ffafbd', '#ffc3a0'],    // Our chosen main theme
+  accentTheme: ['#42275a', '#734b6d'],    // New deep purple gradient
+  buttonTheme: ['#42275a', '#734b6d'],    // Button gradient updated
+  purpleTheme: ['#42275a', '#734b6d'],    // Deep purple gradient
+  cardTheme: ['#FFFFFF', '#F9F7FF'],      // Card background
+};
+
 export const breakpoints = {
   mobile: 0,
   tablet: 768,
@@ -204,6 +242,7 @@ export const theme = {
   spacing,
   borderRadius,
   shadows,
+  gradients,
   breakpoints,
   layout,
   variants,
