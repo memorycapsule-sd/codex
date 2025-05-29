@@ -1,7 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import { Audio, Video } from 'expo-av';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { storage } from '../../app/config/auth';
+import { storage } from '../../app/config/firebase';
 
 export interface MediaFile {
   id: string;
@@ -72,7 +72,7 @@ export const MediaService = {
           uri: asset.uri,
           filename: asset.fileName || `photo_${Date.now()}.jpg`,
           size: asset.fileSize || 0,
-          mimeType: asset.mimeType || 'image/jpeg',
+          mimeType: 'image/jpeg', // Default MIME type for images
         };
       }
 
@@ -108,7 +108,7 @@ export const MediaService = {
           uri: asset.uri,
           filename: asset.fileName || `image_${Date.now()}.jpg`,
           size: asset.fileSize || 0,
-          mimeType: asset.mimeType || 'image/jpeg',
+          mimeType: 'image/jpeg', // Default MIME type for images
         };
       }
 
@@ -132,7 +132,7 @@ export const MediaService = {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Videos,
         allowsEditing: true,
-        quality: ImagePicker.VideoQuality.High,
+        quality: 1, // High quality (0 to 1)
         videoMaxDuration: 300, // 5 minutes max
       });
 
@@ -145,7 +145,7 @@ export const MediaService = {
           filename: asset.fileName || `video_${Date.now()}.mp4`,
           size: asset.fileSize || 0,
           duration: asset.duration || 0,
-          mimeType: asset.mimeType || 'video/mp4',
+          mimeType: 'video/mp4', // Default MIME type for videos
         };
       }
 
@@ -172,9 +172,9 @@ export const MediaService = {
         playsInSilentModeIOS: true,
       });
 
-      const recording = new Audio.Recording();
-      await recording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
-      await recording.startAsync();
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
       
       return recording;
     } catch (error) {

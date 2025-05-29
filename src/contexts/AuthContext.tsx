@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User } from 'firebase/auth';
+import { User, onAuthStateChanged } from 'firebase/auth';
 import { AuthService } from '../services/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { auth, saveUserToStorage, getUserFromStorage } from '../firebase';
 
 interface AuthContextType {
   user: User | null;
@@ -31,10 +33,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const checkAuthState = async () => {
     try {
       setIsLoading(true);
-      const auth = AuthService.getAuth();
       
-      // Listen for auth state changes
-      const unsubscribe = auth.onAuthStateChanged((user) => {
+      // First check AsyncStorage for existing user
+      const storedUser = await getUserFromStorage();
+      if (storedUser) {
+        console.log('Found user in AsyncStorage:', storedUser.email);
+        // Note: We don't set the user state from storage directly
+        // Only the Firebase Auth state listener should set the user state
+      }
+      
+      // Listen for auth state changes directly using the imported auth instance
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          // Save user to AsyncStorage whenever auth state changes
+          saveUserToStorage(user);
+        }
         setUser(user);
         setIsLoading(false);
       });
