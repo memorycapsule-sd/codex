@@ -1,9 +1,18 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
+import { Auth, getAuth, initializeAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+
+let getReactNativePersistence: any = null;
+if (Platform.OS !== 'web') {
+  try {
+    ({ getReactNativePersistence } = require('firebase/auth/react-native'));
+  } catch {
+    console.warn('Could not load getReactNativePersistence');
+  }
+}
 
 // Hybrid configuration that works in both OpenAI Codex and Windsurf environments
 const firebaseConfig = {
@@ -30,10 +39,20 @@ export const googleAuthConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase Auth with the standard approach
-// We'll manually handle persistence with AsyncStorage
-const auth: Auth = getAuth(app);
-console.log('Firebase Auth initialized');
+let auth: Auth;
+
+if (Platform.OS !== 'web' && getReactNativePersistence) {
+  try {
+    auth = initializeAuth(app, {
+      persistence: getReactNativePersistence(AsyncStorage),
+    });
+    console.log('Firebase Auth initialized for React Native');
+  } catch {
+    auth = getAuth(app);
+  }
+} else {
+  auth = getAuth(app);
+}
 
 // Check if we're running in a React Native environment
 const isReactNative = Platform.OS === 'ios' || Platform.OS === 'android';

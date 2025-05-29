@@ -29,7 +29,10 @@ const initializeFirebase = () => {
   
   try {
     const firebaseApp = require('firebase/app');
-    const firebaseAuth = require('firebase/auth');
+    const firebaseAuth =
+      Platform.OS === 'web'
+        ? require('firebase/auth')
+        : require('firebase/auth/react-native');
     const firebaseFirestore = require('firebase/firestore');
     const firebaseStorage = require('firebase/storage');
     
