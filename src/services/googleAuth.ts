@@ -1,36 +1,47 @@
-import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
-import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
-import { auth } from '../../app/config/firebase';
+import { Platform } from 'react-native';
+import { GoogleAuthProvider, signInWithCredential, Auth, User, UserCredential } from 'firebase/auth';
+import { auth } from '../firebase';
 
-// Complete the auth session for web
+// Google Auth Configuration (from environment variables or defaults)
+const googleAuthConfig = {
+  webClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '660630380757-your-google-client-id.apps.googleusercontent.com',
+  iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID || '660630380757-your-google-client-id.apps.googleusercontent.com',
+  androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID || '660630380757-your-google-client-id.apps.googleusercontent.com',
+  redirectUri: process.env.EXPO_PUBLIC_GOOGLE_REDIRECT_URI || 'https://memory-capsule-codex.firebaseapp.com/__/auth/handler'
+};
+import * as AuthSession from 'expo-auth-session';
+
+// Configure WebBrowser for redirects
 WebBrowser.maybeCompleteAuthSession();
 
-interface GoogleAuthConfig {
-  clientId: string;
-  redirectUri: string;
-}
+// Google OAuth endpoints
+const discovery = {
+  authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
+  tokenEndpoint: 'https://oauth2.googleapis.com/token',
+  revocationEndpoint: 'https://oauth2.googleapis.com/revoke',
+};
 
 interface GoogleAuthResult {
   success: boolean;
-  user?: any;
+  user?: User;
+  userInfo?: {
+    email: string;
+    name: string;
+    picture: string;
+    [key: string]: any;
+  };
   error?: string;
 }
 
 class GoogleAuthService {
-  private config: GoogleAuthConfig;
-
-  constructor() {
-    // Get the Google Client ID from Firebase config or environment
-    const clientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || 
-                    '660630380757-your-google-client-id.apps.googleusercontent.com';
-    
-    this.config = {
-      clientId,
-      redirectUri: AuthSession.makeRedirectUri({
-        scheme: 'com.memorycapsule.app',
-      }),
-    };
+  // Get the appropriate client ID for the current platform
+  private getClientId(): string {
+    return Platform.select({
+      web: googleAuthConfig.webClientId,
+      ios: googleAuthConfig.iosClientId,
+      android: googleAuthConfig.androidClientId,
+    }) || googleAuthConfig.webClientId;
   }
 
   /**
@@ -38,69 +49,62 @@ class GoogleAuthService {
    */
   async signInWithGoogle(): Promise<GoogleAuthResult> {
     try {
-      // Use the discovery document
-      const discovery = {
-        authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
-        tokenEndpoint: 'https://oauth2.googleapis.com/token',
-        revocationEndpoint: 'https://oauth2.googleapis.com/revoke',
-      };
-
+      console.log('Starting Google Sign-In process...');
+      
+      // Create a proper redirect URI
+      const redirectUri = AuthSession.makeRedirectUri({
+        // Use native URI scheme for deep linking
+        // This needs to be registered in app.json
+        scheme: 'exp'
+      });
+      
+      console.log('Using redirect URI:', redirectUri);
+      console.log('Using client ID:', this.getClientId());
+      
       // Create the auth request
       const request = new AuthSession.AuthRequest({
-        clientId: this.config.clientId,
+        clientId: this.getClientId(),
         scopes: ['openid', 'profile', 'email'],
-        responseType: AuthSession.ResponseType.Code,
-        redirectUri: this.config.redirectUri,
-        extraParams: {},
-        state: Math.random().toString(36).substring(2, 15),
+        responseType: AuthSession.ResponseType.Token,
+        redirectUri,
       });
-
-      // Prompt for authentication
+      
+      // Prompt the user to authenticate
+      console.log('Prompting for authentication...');
       const result = await request.promptAsync(discovery);
-
+      console.log('Auth result type:', result.type);
+      
       if (result.type === 'success') {
-        // Exchange the authorization code for tokens
-        const tokenResult = await AuthSession.exchangeCodeAsync(
-          {
-            clientId: this.config.clientId,
-            code: result.params.code,
-            extraParams: {
-              code_verifier: request.codeVerifier || '',
-            },
-            redirectUri: this.config.redirectUri,
-          },
-          discovery
-        );
-
+        console.log('Authentication successful, getting user info...');
+        const { access_token, id_token } = result.params;
+        
         // Get user info from Google
         const userInfoResponse = await fetch('https://www.googleapis.com/userinfo/v2/me', {
-          headers: { Authorization: `Bearer ${tokenResult.accessToken}` },
+          headers: { Authorization: `Bearer ${access_token}` },
         });
         const userInfo = await userInfoResponse.json();
-
+        console.log('User info retrieved:', userInfo.email);
+        
         // Create Firebase credential and sign in
-        const credential = GoogleAuthProvider.credential(tokenResult.idToken);
-        const firebaseResult = await signInWithCredential(auth, credential);
-
+        const credential = GoogleAuthProvider.credential(id_token);
+        const firebaseResult = await signInWithCredential(auth as Auth, credential);
+        
         return {
           success: true,
-          user: {
-            uid: firebaseResult.user.uid,
-            email: firebaseResult.user.email,
-            displayName: firebaseResult.user.displayName,
-            photoURL: firebaseResult.user.photoURL,
-            ...userInfo,
-          },
+          user: firebaseResult.user,
+          userInfo: userInfo, // Store Google user info separately
         };
       } else if (result.type === 'cancel') {
+        console.log('User cancelled the sign-in process');
         return {
           success: false,
           error: 'User cancelled the sign-in process',
         };
       } else {
+        console.error('Authentication failed:', result);
         return {
           success: false,
-          error: 'Authentication failed',
+          error: 'Authentication failed: ' + JSON.stringify(result),
         };
       }
     } catch (error) {
@@ -116,14 +120,17 @@ class GoogleAuthService {
    * Get the redirect URI for configuration
    */
   getRedirectUri(): string {
-    return this.config.redirectUri;
+    return AuthSession.makeRedirectUri({
+      scheme: 'exp'
+    });
   }
 
   /**
    * Check if Google Auth is properly configured
    */
   isConfigured(): boolean {
-    return !!this.config.clientId && this.config.clientId !== '660630380757-your-google-client-id.apps.googleusercontent.com';
+    const clientId = this.getClientId();
+    return !!clientId && clientId !== '660630380757-your-google-client-id.apps.googleusercontent.com';
   }
 }
 

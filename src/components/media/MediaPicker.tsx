@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { MediaService, MediaFile } from '../../services/media';
+import { VideoRecorder } from './VideoRecorder';
 import { theme } from '../../theme';
 
 interface MediaPickerProps {
@@ -29,6 +30,7 @@ export function MediaPicker({
 }: MediaPickerProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showVideoRecorder, setShowVideoRecorder] = useState(false);
 
   const handleMediaSelection = async (type: 'camera-photo' | 'camera-video' | 'gallery' | 'audio') => {
     try {
@@ -42,8 +44,10 @@ export function MediaPicker({
           mediaFile = await MediaService.takePhoto();
           break;
         case 'camera-video':
-          mediaFile = await MediaService.recordVideo();
-          break;
+          // Show the custom video recorder
+          setShowVideoRecorder(true);
+          setIsLoading(false);
+          return;
         case 'gallery':
           mediaFile = await MediaService.pickImage();
           break;
@@ -74,6 +78,15 @@ export function MediaPicker({
     }
   };
 
+  const handleVideoRecorded = (mediaFile: MediaFile) => {
+    setShowVideoRecorder(false);
+    onMediaSelected(mediaFile);
+  };
+
+  const handleVideoRecorderCancel = () => {
+    setShowVideoRecorder(false);
+  };
+
   const getAvailableOptions = () => {
     const options = [];
 
@@ -84,12 +97,14 @@ export function MediaPicker({
           title: 'Take Photo',
           icon: 'camera' as const,
           color: theme.colors.primary,
+          description: 'Capture a photo with your camera',
         },
         {
           id: 'gallery',
           title: 'Choose from Gallery',
           icon: 'images' as const,
           color: theme.colors.secondary,
+          description: 'Select an existing photo',
         }
       );
     }
@@ -100,6 +115,7 @@ export function MediaPicker({
         title: 'Record Video',
         icon: 'videocam' as const,
         color: theme.colors.accent,
+        description: 'Record a video response',
       });
     }
 
@@ -109,6 +125,7 @@ export function MediaPicker({
         title: 'Record Audio',
         icon: 'mic' as const,
         color: theme.colors.primary,
+        description: 'Record an audio response',
       });
     }
 
@@ -157,14 +174,15 @@ export function MediaPicker({
                   style={styles.optionButton}
                   onPress={() => handleMediaSelection(option.id as any)}
                 >
-                  <View style={[styles.optionIcon, { backgroundColor: theme.colors.primary + '20' }]}>
+                  <View style={[styles.optionIcon, { backgroundColor: option.color + '20' }]}>
                     <Ionicons
                       name={option.icon}
                       size={28}
-                      color={theme.colors.primary}
+                      color={option.color}
                     />
                   </View>
                   <Text style={styles.optionText}>{option.title}</Text>
+                  <Text style={styles.optionDescription}>{option.description}</Text>
                   <Ionicons
                     name="chevron-forward"
                     size={20}
@@ -183,6 +201,19 @@ export function MediaPicker({
           </View>
         </View>
       </Modal>
+
+      {/* Video Recorder Modal */}
+      <Modal
+        visible={showVideoRecorder}
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        <VideoRecorder
+          onVideoRecorded={handleVideoRecorded}
+          onCancel={handleVideoRecorderCancel}
+          maxDuration={300} // 5 minutes
+        />
+      </Modal>
     </View>
   );
 }
@@ -199,7 +230,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: theme.colors.primary,
     borderStyle: 'dashed',
-    borderRadius: theme.borderRadius.md,
+    borderRadius: theme.spacing.md,
     backgroundColor: theme.colors.primary + '10',
   },
   pickerButtonText: {
@@ -236,19 +267,15 @@ const styles = StyleSheet.create({
     padding: theme.spacing.sm,
   },
   optionsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: theme.spacing.md,
   },
   optionButton: {
-    flex: 1,
-    minWidth: '45%',
-    aspectRatio: 1,
-    backgroundColor: theme.colors.light,
-    borderRadius: theme.borderRadius.xl,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.lg,
     padding: theme.spacing.lg,
+    ...theme.shadows.sm,
   },
   optionIcon: {
     width: 48,
@@ -256,13 +283,20 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: theme.spacing.sm,
+    marginRight: theme.spacing.md,
   },
   optionText: {
-    fontSize: theme.typography.size.sm,
+    flex: 1,
+    fontSize: theme.typography.size.md,
     fontWeight: theme.typography.fontWeight.medium,
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.xs,
+  },
+  optionDescription: {
+    flex: 1,
+    fontSize: theme.typography.size.sm,
     color: theme.colors.text.secondary,
-    textAlign: 'center',
+    marginRight: theme.spacing.md,
   },
   cancelButton: {
     marginHorizontal: theme.spacing.lg,

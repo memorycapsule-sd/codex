@@ -1,6 +1,6 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut, onAuthStateChanged, User } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { auth } from '../../app/config/firebase';
+import { auth, saveUserToStorage, clearUserFromStorage } from '../firebase';
 import { googleAuthService } from './googleAuth';
 
 export interface UserProfile {
@@ -30,9 +30,9 @@ export const AuthService = {
   async signUp(email: string, password: string) {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      // Store the user ID in AsyncStorage for persistence
-      await AsyncStorage.setItem('userId', userCredential.user.uid);
-      await AsyncStorage.setItem('userEmail', userCredential.user.email || '');
+      
+      // Store the user data in AsyncStorage for persistence
+      await saveUserToStorage(userCredential.user);
       
       // Create initial user profile
       const userProfile: UserProfile = {
@@ -57,9 +57,8 @@ export const AuthService = {
   async signIn(email: string, password: string) {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      // Store the user ID in AsyncStorage for persistence
-      await AsyncStorage.setItem('userId', userCredential.user.uid);
-      await AsyncStorage.setItem('userEmail', userCredential.user.email || '');
+      // Store the user data in AsyncStorage for persistence
+      await saveUserToStorage(userCredential.user);
       return userCredential;
     } catch (error) {
       console.error('Error signing in:', error);
@@ -76,22 +75,21 @@ export const AuthService = {
       
       if (result.success && result.user) {
         // Store the user data in AsyncStorage
-        await AsyncStorage.setItem('userId', result.user.uid);
-        await AsyncStorage.setItem('userEmail', result.user.email || '');
+        await saveUserToStorage(result.user);
         
-        // Create user profile from Google data
+        // Create user profile from Google data and additional userInfo
         const userProfile: UserProfile = {
           uid: result.user.uid,
           email: result.user.email || '',
-          displayName: result.user.displayName || result.user.name,
-          profilePicture: result.user.photoURL || result.user.picture,
+          displayName: result.user.displayName || (result.userInfo?.name || ''),
+          profilePicture: result.user.photoURL || (result.userInfo?.picture || ''),
           createdAt: new Date(),
         };
         
         // Store user profile in AsyncStorage
         await AsyncStorage.setItem('userProfile', JSON.stringify(userProfile));
         
-        return { success: true, user: result.user };
+        return { user: result.user };
       } else {
         throw new Error(result.error || 'Google sign-in failed');
       }
@@ -108,7 +106,8 @@ export const AuthService = {
     try {
       await firebaseSignOut(auth);
       // Clear stored user data
-      await AsyncStorage.multiRemove(['userId', 'userEmail', 'userProfile']);
+      await clearUserFromStorage();
+      await AsyncStorage.removeItem('userProfile');
     } catch (error) {
       console.error('Error signing out:', error);
       throw error;

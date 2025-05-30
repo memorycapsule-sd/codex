@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -13,6 +14,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { theme } from '../theme';
 import { GradientText } from '../components/ui/GradientText';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useAuth } from '../contexts/AuthContext';
 
 type RootStackParamList = {
   Welcome: undefined;
@@ -39,6 +41,8 @@ const features: Feature[] = [
 
 export default function WelcomeScreen() {
   const navigation = useNavigation<NavigationProp>();
+  const { signInWithGoogle } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleGetStarted = () => {
     navigation.navigate('SignUp');
@@ -48,8 +52,17 @@ export default function WelcomeScreen() {
     navigation.navigate('SignIn');
   };
 
-  const handleGoogleSignIn = () => {
-    Alert.alert('Google Sign In', 'Google authentication will be implemented soon');
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsLoading(true);
+      await signInWithGoogle();
+      // Navigation will be handled by the AuthNavigator based on authentication state
+    } catch (error: any) {
+      console.error('Google sign-in error:', error);
+      Alert.alert('Sign In Failed', error.message || 'Failed to sign in with Google');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleAppleSignIn = () => {
@@ -113,6 +126,7 @@ export default function WelcomeScreen() {
           <TouchableOpacity
             onPress={handleGoogleSignIn}
             style={styles.socialButtonContainer}
+            disabled={isLoading}
           >
             <LinearGradient
               colors={theme.gradients.purpleTheme}
@@ -120,8 +134,14 @@ export default function WelcomeScreen() {
               end={{ x: 1, y: 0 }}
               style={[styles.socialButton]}
             >
-              <Ionicons name="logo-google" size={20} color={theme.colors.white} />
-              <Text style={[styles.socialButtonText, styles.gradientButtonText]}>Continue with Google</Text>
+              {isLoading ? (
+                <ActivityIndicator size="small" color={theme.colors.white} />
+              ) : (
+                <Ionicons name="logo-google" size={20} color={theme.colors.white} />
+              )}
+              <Text style={[styles.socialButtonText, styles.gradientButtonText]}>
+                {isLoading ? 'Signing in...' : 'Continue with Google'}
+              </Text>
             </LinearGradient>
           </TouchableOpacity>
 

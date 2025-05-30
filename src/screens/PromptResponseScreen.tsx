@@ -17,6 +17,7 @@ import { CapsuleService } from '../services/capsuleService';
 import { MediaPicker } from '../components/media/MediaPicker';
 import { MediaPreview } from '../components/media/MediaPreview';
 import { AudioRecorder } from '../components/media/AudioRecorder';
+import { MediaFile } from '../services/media';
 import { theme } from '../theme';
 
 // Define the route params type
@@ -40,7 +41,7 @@ const PromptResponseScreen = () => {
   
   const [selectedMediaType, setSelectedMediaType] = useState<MediaType>(null);
   const [textResponse, setTextResponse] = useState('');
-  const [mediaUri, setMediaUri] = useState<string | null>(null);
+  const [mediaFile, setMediaFile] = useState<MediaFile | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   
@@ -49,20 +50,37 @@ const PromptResponseScreen = () => {
     
     // Reset previous responses when changing media type
     if (type === 'text') {
-      setMediaUri(null);
+      setMediaFile(null);
     } else {
       setTextResponse('');
     }
   };
   
-  const handleMediaCaptured = (uri: string, type: 'photo' | 'video') => {
-    setMediaUri(uri);
-    setSelectedMediaType(type);
+  const handleMediaCaptured = (capturedMediaFile: MediaFile) => {
+    setMediaFile(capturedMediaFile);
+    setSelectedMediaType(capturedMediaFile.type === 'image' ? 'photo' : capturedMediaFile.type);
   };
   
   const handleAudioRecorded = (uri: string) => {
-    setMediaUri(uri);
+    // Create a MediaFile object for audio
+    const audioFile: MediaFile = {
+      id: Date.now().toString(),
+      type: 'audio',
+      uri,
+      filename: `audio_${Date.now()}.m4a`,
+      size: 0,
+      mimeType: 'audio/m4a',
+    };
+    setMediaFile(audioFile);
     setSelectedMediaType('audio');
+  };
+
+  const handleRemoveMedia = () => {
+    setMediaFile(null);
+  };
+
+  const handleRetakeMedia = () => {
+    setMediaFile(null);
   };
   
   const handleSaveResponse = async () => {
@@ -72,19 +90,20 @@ const PromptResponseScreen = () => {
       // Validate that we have a response
       if (
         (selectedMediaType === 'text' && !textResponse.trim()) ||
-        (selectedMediaType !== 'text' && !mediaUri)
+        (selectedMediaType !== 'text' && !mediaFile)
       ) {
         // Show error or alert that response is empty
         return;
       }
       
       // Prepare response content based on type
-      const content = selectedMediaType === 'text' ? textResponse : mediaUri || '';
+      const content = selectedMediaType === 'text' ? textResponse : mediaFile?.uri || '';
       
       // Save the response
       const success = await CapsuleService.saveResponse(promptId, {
         type: selectedMediaType as 'text' | 'audio' | 'video' | 'photo',
-        content
+        content,
+        mediaFile: selectedMediaType !== 'text' ? mediaFile : undefined
       });
       
       if (success) {
@@ -222,15 +241,16 @@ const PromptResponseScreen = () => {
     
     return (
       <View style={styles.audioResponseContainer}>
-        {mediaUri ? (
+        {mediaFile ? (
           <View style={styles.audioPreviewContainer}>
-            <MediaPreview uri={mediaUri} type="audio" />
+            <MediaPreview 
+              mediaFile={mediaFile}
+              onRemove={handleRemoveMedia}
+              showControls={true}
+            />
             <TouchableOpacity 
               style={styles.retakeButton}
-              onPress={() => {
-                setMediaUri(null);
-                setIsRecording(false);
-              }}
+              onPress={handleRetakeMedia}
             >
               <Ionicons name="refresh-outline" size={16} color={theme.colors.text.primary} />
               <Text style={styles.retakeButtonText}>Record Again</Text>
@@ -253,15 +273,16 @@ const PromptResponseScreen = () => {
     
     return (
       <View style={styles.mediaResponseContainer}>
-        {mediaUri ? (
+        {mediaFile ? (
           <View style={styles.mediaPreviewContainer}>
             <MediaPreview 
-              uri={mediaUri} 
-              type={selectedMediaType as 'photo' | 'video'} 
+              mediaFile={mediaFile}
+              onRemove={handleRemoveMedia}
+              showControls={true}
             />
             <TouchableOpacity 
               style={styles.retakeButton}
-              onPress={() => setMediaUri(null)}
+              onPress={handleRetakeMedia}
             >
               <Ionicons name="refresh-outline" size={16} color={theme.colors.text.primary} />
               <Text style={styles.retakeButtonText}>Retake</Text>
@@ -270,7 +291,8 @@ const PromptResponseScreen = () => {
         ) : (
           <MediaPicker
             onMediaSelected={handleMediaCaptured}
-            mediaType={selectedMediaType === 'photo' ? 'photo' : 'video'}
+            mediaType={selectedMediaType === 'photo' ? 'image' : 'video'}
+            maxFileSize={100} // 100MB limit for videos
           />
         )}
       </View>
@@ -300,13 +322,13 @@ const PromptResponseScreen = () => {
               styles.saveButton,
               (!selectedMediaType || 
                 (selectedMediaType === 'text' && !textResponse.trim()) ||
-                (selectedMediaType !== 'text' && !mediaUri)) && styles.saveButtonDisabled
+                (selectedMediaType !== 'text' && !mediaFile)) && styles.saveButtonDisabled
             ]}
             onPress={handleSaveResponse}
             disabled={
               !selectedMediaType || 
               (selectedMediaType === 'text' && !textResponse.trim()) ||
-              (selectedMediaType !== 'text' && !mediaUri) ||
+              (selectedMediaType !== 'text' && !mediaFile) ||
               isSaving
             }
           >
@@ -314,7 +336,7 @@ const PromptResponseScreen = () => {
               styles.saveButtonText,
               (!selectedMediaType || 
                 (selectedMediaType === 'text' && !textResponse.trim()) ||
-                (selectedMediaType !== 'text' && !mediaUri)) && styles.saveButtonTextDisabled
+                (selectedMediaType !== 'text' && !mediaFile)) && styles.saveButtonTextDisabled
             ]}>
               {isSaving ? 'Saving...' : 'Save'}
             </Text>
