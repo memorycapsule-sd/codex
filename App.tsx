@@ -1,16 +1,25 @@
+/**
+ * Memory Capsule App Entry Point
+ */
+
+// Import Firebase services from our firebase.js file
+import { Auth } from 'firebase/auth';
+import { auth as firebaseAuth, app as firebaseApp } from './firebase';
+
+// React and React Native imports
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, ActivityIndicator, SafeAreaView, ScrollView, Button, TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { Camera, useCameraPermissions, useMicrophonePermissions } from 'expo-camera';
 
-// Import from our simplified Firebase module
-import { app, auth, saveUserToStorage } from './src/firebase';
+// App imports
 import { AuthProvider } from './src/contexts/AuthContext';
 import AuthNavigationWrapper from './src/navigation/AuthNavigator';
 // We'll add the others back gradually
 
 export default function App() {
+
   // Define proper types for our initialization state
   type InitStatus = 'pending' | 'success' | 'error';
   interface InitState {
@@ -40,7 +49,7 @@ export default function App() {
   useEffect(() => {
     try {
       // Log to confirm Firebase is initialized
-      console.log('Firebase initialized with app:', app.name);
+      console.log('Firebase initialized with app:', firebaseApp.name);
       
       setInitializationSteps(prev => ({
         ...prev,
@@ -59,43 +68,24 @@ export default function App() {
   useEffect(() => {
     if (initializationSteps.firebase.status === 'success') {
       try {
-        // Set up manual auth state listener
+        // Firebase now handles persistence automatically, just verify it's working
+        const auth: Auth = firebaseAuth; // Use the pre-initialized auth instance with proper typing
         if (auth) {
-          const unsubscribe = auth.onAuthStateChanged((user: any) => {
-            if (user) {
-              // Save user to AsyncStorage
-              saveUserToStorage(user);
-            }
-          });
-          
-          // Mark auth as initialized
+          // Mark auth as initialized immediately since Firebase already set it up
           setInitializationSteps(prev => ({
             ...prev,
             auth: { status: 'success', error: null }
           }));
           
-          // Cleanup function
-          return () => {
-            try {
-              unsubscribe();
-            } catch (e) {
-              // Ignore cleanup errors
-            }
-          };
+          // No need for cleanup as Firebase manages the auth state listener
         } else {
-          // Auth not available yet
-          console.log('Auth not initialized yet - using fallback');
-          setInitializationSteps(prev => ({
-            ...prev,
-            auth: { status: 'success', error: null }
-          }));
+          throw new Error('Firebase Auth not available from Firebase');
         }
       } catch (error) {
-        console.log('Error setting up auth persistence:', error);
-        // Don't fail the app - just log the error and continue
+        console.error('Error verifying auth setup:', error);
         setInitializationSteps(prev => ({
           ...prev,
-          auth: { status: 'success', error: null }
+          auth: { status: 'error', error: error instanceof Error ? error.message : 'Unknown error' }
         }));
       }
     }
