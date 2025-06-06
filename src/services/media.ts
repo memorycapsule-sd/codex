@@ -1,17 +1,19 @@
 import * as ImagePicker from 'expo-image-picker';
-import { Audio, Video } from 'expo-av';
+import { Audio } from 'expo-av';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { storage } from '../../app/config/firebase';
 
 export interface MediaFile {
   id: string;
-  type: 'image' | 'video' | 'audio';
-  uri: string;
-  filename: string;
-  size: number;
+  title?: string; // User-defined title for the memory
+  type: 'image' | 'video' | 'audio' | 'text';
+  uri?: string; // Optional: Not applicable for text type
+  filename?: string; // Optional: Not applicable for text type
+  size?: number; // Optional: Not applicable for text type
   duration?: number; // for audio/video
   mimeType?: string;
-  uploadUrl?: string; // Firebase Storage URL
+  uploadUrl?: string; // Firebase Storage URL, may not be applicable for text
+  textContent?: string; // For text type memories
 }
 
 export interface RecordingResult {
@@ -215,6 +217,12 @@ export const MediaService = {
    * Upload media file to Firebase Storage
    */
   async uploadMediaFile(mediaFile: MediaFile, userId: string): Promise<string> {
+    if (mediaFile.type === 'text' || !mediaFile.uri) {
+      // This case should ideally be prevented by the caller (e.g., memoryService)
+      // but as a safeguard:
+      console.error('uploadMediaFile called inappropriately for text memory or media without URI.');
+      throw new Error('Cannot upload text memories or media without a URI to Firebase Storage.');
+    }
     try {
       // Create a reference to the file location
       const fileRef = ref(storage, `media/${userId}/${mediaFile.id}_${mediaFile.filename}`);

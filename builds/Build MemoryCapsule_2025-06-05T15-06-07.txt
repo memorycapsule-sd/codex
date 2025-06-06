@@ -1,0 +1,485 @@
+
+Showing All Issues
+
+Build target gRPC-Core-grpc of project Pods with configuration Debug
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Pods.xcodeproj: warning: The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 11.0, but the range of supported deployment target versions is 12.0 to 18.5.99. (in target 'gRPC-Core-grpc' from project 'Pods')
+
+
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Pods.xcodeproj: The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 11.0, but the range of supported deployment target versions is 12.0 to 18.5.99.
+
+
+Build target gRPC-C++-grpcpp of project Pods with configuration Debug
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Pods.xcodeproj: warning: The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 11.0, but the range of supported deployment target versions is 12.0 to 18.5.99. (in target 'gRPC-C++-grpcpp' from project 'Pods')
+
+
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Pods.xcodeproj: The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 11.0, but the range of supported deployment target versions is 12.0 to 18.5.99.
+
+
+Build target gRPC-C++-gRPCCertificates-Cpp of project Pods with configuration Debug
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Pods.xcodeproj: warning: The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 11.0, but the range of supported deployment target versions is 12.0 to 18.5.99. (in target 'gRPC-C++-gRPCCertificates-Cpp' from project 'Pods')
+
+
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Pods.xcodeproj: The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 11.0, but the range of supported deployment target versions is 12.0 to 18.5.99.
+
+
+Build target BoringSSL-GRPC-openssl_grpc of project Pods with configuration Debug
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Pods.xcodeproj: warning: The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 10.0, but the range of supported deployment target versions is 12.0 to 18.5.99. (in target 'BoringSSL-GRPC-openssl_grpc' from project 'Pods')
+
+
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Pods.xcodeproj: The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 10.0, but the range of supported deployment target versions is 12.0 to 18.5.99.
+
+
+Build target leveldb-library-leveldb_Privacy of project Pods with configuration Debug
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Pods.xcodeproj: warning: The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 11.0, but the range of supported deployment target versions is 12.0 to 18.5.99. (in target 'leveldb-library-leveldb_Privacy' from project 'Pods')
+
+
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Pods.xcodeproj: The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 11.0, but the range of supported deployment target versions is 12.0 to 18.5.99.
+
+
+Build target abseil-xcprivacy of project Pods with configuration Debug
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Pods.xcodeproj: warning: The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 9.0, but the range of supported deployment target versions is 12.0 to 18.5.99. (in target 'abseil-xcprivacy' from project 'Pods')
+
+
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Pods.xcodeproj: The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 9.0, but the range of supported deployment target versions is 12.0 to 18.5.99.
+
+
+Build target hermes-engine of project Pods with configuration Debug
+warning: Run script build phase '[CP-User] [Hermes] Replace Hermes for the right configuration, if needed' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking "Based on dependency analysis" in the script phase. (in target 'hermes-engine' from project 'Pods')
+
+
+Run script build phase '[CP-User] [Hermes] Replace Hermes for the right configuration, if needed' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking "Based on dependency analysis" in the script phase.
+
+
+Build target gRPC-Core of project Pods with configuration Debug
+
+CompileC /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/trees.o /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/trees.c normal x86_64 c com.apple.compilers.llvm.clang.1_0.compiler (in target 'gRPC-Core' from project 'Pods')
+    cd /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods
+    
+    Using response file: /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp
+    
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x c -ivfsstatcache /Users/memoria/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/memoria/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Werror\=deprecated-objc-isa-usage -Werror\=objc-root-class -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-implicit-fallthrough -fstrict-aliasing -Wdeprecated-declarations -Wno-sign-conversion -Winfinite-recursion -Wcomma -Wblock-capture-autoreleasing -Wno-strict-prototypes -Wno-semicolon-before-method-body -Wunguarded-availability -index-store-path /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Index.noindex/DataStore @/Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp -DGRPC_ARES\=0 -Wno-comma -DBORINGSSL_PREFIX\=GRPC -Wno-unreachable-code -Wno-shorten-64-to-32 -fno-objc-arc -include /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Target\ Support\ Files/gRPC-Core/gRPC-Core-prefix.pch -MMD -MT dependencies -MF /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/trees.d --serialize-diagnostics /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/trees.dia -c /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/trees.c -o /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/trees.o -index-unit-output-path /Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/trees.o
+
+In file included from /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/trees.c:37:
+In file included from /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/deflate.h:16:
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: warning: 'OS_CODE' macro redefined [-Wmacro-redefined]
+  170 | #  define OS_CODE 19
+      |           ^
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:141:11: note: previous definition is here
+  141 | #  define OS_CODE  7
+      |           ^
+1 warning generated.
+
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: 'OS_CODE' macro redefined
+
+CompileC /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/zutil.o /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.c normal x86_64 c com.apple.compilers.llvm.clang.1_0.compiler (in target 'gRPC-Core' from project 'Pods')
+    cd /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods
+    
+    Using response file: /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp
+    
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x c -ivfsstatcache /Users/memoria/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/memoria/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Werror\=deprecated-objc-isa-usage -Werror\=objc-root-class -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-implicit-fallthrough -fstrict-aliasing -Wdeprecated-declarations -Wno-sign-conversion -Winfinite-recursion -Wcomma -Wblock-capture-autoreleasing -Wno-strict-prototypes -Wno-semicolon-before-method-body -Wunguarded-availability -index-store-path /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Index.noindex/DataStore @/Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp -DGRPC_ARES\=0 -Wno-comma -DBORINGSSL_PREFIX\=GRPC -Wno-unreachable-code -Wno-shorten-64-to-32 -fno-objc-arc -include /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Target\ Support\ Files/gRPC-Core/gRPC-Core-prefix.pch -MMD -MT dependencies -MF /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/zutil.d --serialize-diagnostics /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/zutil.dia -c /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.c -o /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/zutil.o -index-unit-output-path /Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/zutil.o
+
+In file included from /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.c:8:
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: warning: 'OS_CODE' macro redefined [-Wmacro-redefined]
+  170 | #  define OS_CODE 19
+      |           ^
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:141:11: note: previous definition is here
+  141 | #  define OS_CODE  7
+      |           ^
+1 warning generated.
+
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: 'OS_CODE' macro redefined
+
+CompileC /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/inftrees.o /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/inftrees.c normal x86_64 c com.apple.compilers.llvm.clang.1_0.compiler (in target 'gRPC-Core' from project 'Pods')
+    cd /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods
+    
+    Using response file: /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp
+    
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x c -ivfsstatcache /Users/memoria/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/memoria/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Werror\=deprecated-objc-isa-usage -Werror\=objc-root-class -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-implicit-fallthrough -fstrict-aliasing -Wdeprecated-declarations -Wno-sign-conversion -Winfinite-recursion -Wcomma -Wblock-capture-autoreleasing -Wno-strict-prototypes -Wno-semicolon-before-method-body -Wunguarded-availability -index-store-path /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Index.noindex/DataStore @/Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp -DGRPC_ARES\=0 -Wno-comma -DBORINGSSL_PREFIX\=GRPC -Wno-unreachable-code -Wno-shorten-64-to-32 -fno-objc-arc -include /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Target\ Support\ Files/gRPC-Core/gRPC-Core-prefix.pch -MMD -MT dependencies -MF /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/inftrees.d --serialize-diagnostics /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/inftrees.dia -c /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/inftrees.c -o /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/inftrees.o -index-unit-output-path /Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/inftrees.o
+
+In file included from /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/inftrees.c:6:
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: warning: 'OS_CODE' macro redefined [-Wmacro-redefined]
+  170 | #  define OS_CODE 19
+      |           ^
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:141:11: note: previous definition is here
+  141 | #  define OS_CODE  7
+      |           ^
+1 warning generated.
+
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: 'OS_CODE' macro redefined
+
+CompileC /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/inflate.o /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/inflate.c normal x86_64 c com.apple.compilers.llvm.clang.1_0.compiler (in target 'gRPC-Core' from project 'Pods')
+    cd /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods
+    
+    Using response file: /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp
+    
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x c -ivfsstatcache /Users/memoria/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/memoria/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Werror\=deprecated-objc-isa-usage -Werror\=objc-root-class -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-implicit-fallthrough -fstrict-aliasing -Wdeprecated-declarations -Wno-sign-conversion -Winfinite-recursion -Wcomma -Wblock-capture-autoreleasing -Wno-strict-prototypes -Wno-semicolon-before-method-body -Wunguarded-availability -index-store-path /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Index.noindex/DataStore @/Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp -DGRPC_ARES\=0 -Wno-comma -DBORINGSSL_PREFIX\=GRPC -Wno-unreachable-code -Wno-shorten-64-to-32 -fno-objc-arc -include /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Target\ Support\ Files/gRPC-Core/gRPC-Core-prefix.pch -MMD -MT dependencies -MF /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/inflate.d --serialize-diagnostics /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/inflate.dia -c /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/inflate.c -o /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/inflate.o -index-unit-output-path /Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/inflate.o
+
+In file included from /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/inflate.c:83:
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: warning: 'OS_CODE' macro redefined [-Wmacro-redefined]
+  170 | #  define OS_CODE 19
+      |           ^
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:141:11: note: previous definition is here
+  141 | #  define OS_CODE  7
+      |           ^
+1 warning generated.
+
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: 'OS_CODE' macro redefined
+
+CompileC /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/inffast.o /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/inffast.c normal x86_64 c com.apple.compilers.llvm.clang.1_0.compiler (in target 'gRPC-Core' from project 'Pods')
+    cd /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods
+    
+    Using response file: /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp
+    
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x c -ivfsstatcache /Users/memoria/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/memoria/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Werror\=deprecated-objc-isa-usage -Werror\=objc-root-class -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-implicit-fallthrough -fstrict-aliasing -Wdeprecated-declarations -Wno-sign-conversion -Winfinite-recursion -Wcomma -Wblock-capture-autoreleasing -Wno-strict-prototypes -Wno-semicolon-before-method-body -Wunguarded-availability -index-store-path /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Index.noindex/DataStore @/Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp -DGRPC_ARES\=0 -Wno-comma -DBORINGSSL_PREFIX\=GRPC -Wno-unreachable-code -Wno-shorten-64-to-32 -fno-objc-arc -include /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Target\ Support\ Files/gRPC-Core/gRPC-Core-prefix.pch -MMD -MT dependencies -MF /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/inffast.d --serialize-diagnostics /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/inffast.dia -c /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/inffast.c -o /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/inffast.o -index-unit-output-path /Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/inffast.o
+
+In file included from /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/inffast.c:6:
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: warning: 'OS_CODE' macro redefined [-Wmacro-redefined]
+  170 | #  define OS_CODE 19
+      |           ^
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:141:11: note: previous definition is here
+  141 | #  define OS_CODE  7
+      |           ^
+1 warning generated.
+
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: 'OS_CODE' macro redefined
+
+CompileC /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/infback.o /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/infback.c normal x86_64 c com.apple.compilers.llvm.clang.1_0.compiler (in target 'gRPC-Core' from project 'Pods')
+    cd /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods
+    
+    Using response file: /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp
+    
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x c -ivfsstatcache /Users/memoria/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/memoria/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Werror\=deprecated-objc-isa-usage -Werror\=objc-root-class -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-implicit-fallthrough -fstrict-aliasing -Wdeprecated-declarations -Wno-sign-conversion -Winfinite-recursion -Wcomma -Wblock-capture-autoreleasing -Wno-strict-prototypes -Wno-semicolon-before-method-body -Wunguarded-availability -index-store-path /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Index.noindex/DataStore @/Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp -DGRPC_ARES\=0 -Wno-comma -DBORINGSSL_PREFIX\=GRPC -Wno-unreachable-code -Wno-shorten-64-to-32 -fno-objc-arc -include /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Target\ Support\ Files/gRPC-Core/gRPC-Core-prefix.pch -MMD -MT dependencies -MF /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/infback.d --serialize-diagnostics /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/infback.dia -c /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/infback.c -o /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/infback.o -index-unit-output-path /Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/infback.o
+
+In file included from /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/infback.c:13:
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: warning: 'OS_CODE' macro redefined [-Wmacro-redefined]
+  170 | #  define OS_CODE 19
+      |           ^
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:141:11: note: previous definition is here
+  141 | #  define OS_CODE  7
+      |           ^
+1 warning generated.
+
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: 'OS_CODE' macro redefined
+
+CompileC /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/deflate.o /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/deflate.c normal x86_64 c com.apple.compilers.llvm.clang.1_0.compiler (in target 'gRPC-Core' from project 'Pods')
+    cd /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods
+    
+    Using response file: /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp
+    
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x c -ivfsstatcache /Users/memoria/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/memoria/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Werror\=deprecated-objc-isa-usage -Werror\=objc-root-class -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-implicit-fallthrough -fstrict-aliasing -Wdeprecated-declarations -Wno-sign-conversion -Winfinite-recursion -Wcomma -Wblock-capture-autoreleasing -Wno-strict-prototypes -Wno-semicolon-before-method-body -Wunguarded-availability -index-store-path /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Index.noindex/DataStore @/Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp -DGRPC_ARES\=0 -Wno-comma -DBORINGSSL_PREFIX\=GRPC -Wno-unreachable-code -Wno-shorten-64-to-32 -fno-objc-arc -include /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Target\ Support\ Files/gRPC-Core/gRPC-Core-prefix.pch -MMD -MT dependencies -MF /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/deflate.d --serialize-diagnostics /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/deflate.dia -c /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/deflate.c -o /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/deflate.o -index-unit-output-path /Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/deflate.o
+
+In file included from /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/deflate.c:52:
+In file included from /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/deflate.h:16:
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: warning: 'OS_CODE' macro redefined [-Wmacro-redefined]
+  170 | #  define OS_CODE 19
+      |           ^
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:141:11: note: previous definition is here
+  141 | #  define OS_CODE  7
+      |           ^
+1 warning generated.
+
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: 'OS_CODE' macro redefined
+
+CompileC /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/crc32.o /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/crc32.c normal x86_64 c com.apple.compilers.llvm.clang.1_0.compiler (in target 'gRPC-Core' from project 'Pods')
+    cd /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods
+    
+    Using response file: /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp
+    
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x c -ivfsstatcache /Users/memoria/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/memoria/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Werror\=deprecated-objc-isa-usage -Werror\=objc-root-class -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-implicit-fallthrough -fstrict-aliasing -Wdeprecated-declarations -Wno-sign-conversion -Winfinite-recursion -Wcomma -Wblock-capture-autoreleasing -Wno-strict-prototypes -Wno-semicolon-before-method-body -Wunguarded-availability -index-store-path /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Index.noindex/DataStore @/Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp -DGRPC_ARES\=0 -Wno-comma -DBORINGSSL_PREFIX\=GRPC -Wno-unreachable-code -Wno-shorten-64-to-32 -fno-objc-arc -include /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Target\ Support\ Files/gRPC-Core/gRPC-Core-prefix.pch -MMD -MT dependencies -MF /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/crc32.d --serialize-diagnostics /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/crc32.dia -c /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/crc32.c -o /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/crc32.o -index-unit-output-path /Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/crc32.o
+
+In file included from /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/crc32.c:30:
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: warning: 'OS_CODE' macro redefined [-Wmacro-redefined]
+  170 | #  define OS_CODE 19
+      |           ^
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:141:11: note: previous definition is here
+  141 | #  define OS_CODE  7
+      |           ^
+1 warning generated.
+
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: 'OS_CODE' macro redefined
+
+CompileC /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/adler32.o /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/adler32.c normal x86_64 c com.apple.compilers.llvm.clang.1_0.compiler (in target 'gRPC-Core' from project 'Pods')
+    cd /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods
+    
+    Using response file: /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp
+    
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x c -ivfsstatcache /Users/memoria/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/memoria/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Werror\=deprecated-objc-isa-usage -Werror\=objc-root-class -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-implicit-fallthrough -fstrict-aliasing -Wdeprecated-declarations -Wno-sign-conversion -Winfinite-recursion -Wcomma -Wblock-capture-autoreleasing -Wno-strict-prototypes -Wno-semicolon-before-method-body -Wunguarded-availability -index-store-path /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Index.noindex/DataStore @/Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/7187679823f38a2a940e0043cdf9d637-common-args.resp -DGRPC_ARES\=0 -Wno-comma -DBORINGSSL_PREFIX\=GRPC -Wno-unreachable-code -Wno-shorten-64-to-32 -fno-objc-arc -include /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Target\ Support\ Files/gRPC-Core/gRPC-Core-prefix.pch -MMD -MT dependencies -MF /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/adler32.d --serialize-diagnostics /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/adler32.dia -c /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/adler32.c -o /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/adler32.o -index-unit-output-path /Pods.build/Debug-iphonesimulator/gRPC-Core.build/Objects-normal/x86_64/adler32.o
+
+In file included from /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/adler32.c:8:
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: warning: 'OS_CODE' macro redefined [-Wmacro-redefined]
+  170 | #  define OS_CODE 19
+      |           ^
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:141:11: note: previous definition is here
+  141 | #  define OS_CODE  7
+      |           ^
+1 warning generated.
+
+/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/gRPC-Core/third_party/zlib/zutil.h:170:11: 'OS_CODE' macro redefined
+
+
+Build target gRPC-C++ of project Pods with configuration Debug
+
+ScanDependencies /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-C++.build/Objects-normal/x86_64/gRPC-C++-dummy.o /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Target\ Support\ Files/gRPC-C++/gRPC-C++-dummy.m normal x86_64 objective-c com.apple.compilers.llvm.clang.1_0.compiler (in target 'gRPC-C++' from project 'Pods')
+    cd /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods
+    
+    Using response file: /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-C++.build/Objects-normal/x86_64/e6072d4f65d7061329687fe24e3d63a7-common-args.resp
+    
+    builtin-ScanDependencies -o /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-C++.build/Objects-normal/x86_64/gRPC-C++-dummy.o.scan -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -ivfsstatcache /Users/memoria/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/memoria/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wunreachable-code -Wno-implicit-atomic-properties -Werror\=deprecated-objc-isa-usage -Wno-objc-interface-ivars -Werror\=objc-root-class -Wno-arc-repeated-use-of-weak -Wimplicit-retain-self -Wduplicate-method-match -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wdeprecated-implementations -Wno-implicit-fallthrough -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -Wno-sign-conversion -Winfinite-recursion -Wcomma -Wblock-capture-autoreleasing -Wno-strict-prototypes -Wno-semicolon-before-method-body -Wunguarded-availability -index-store-path /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Index.noindex/DataStore @/Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-C++.build/Objects-normal/x86_64/e6072d4f65d7061329687fe24e3d63a7-common-args.resp -include /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Target\ Support\ Files/gRPC-C++/gRPC-C++-prefix.pch -MMD -MT dependencies -MF /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-C++.build/Objects-normal/x86_64/gRPC-C++-dummy.d --serialize-diagnostics /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-C++.build/Objects-normal/x86_64/gRPC-C++-dummy.dia -c /Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Target\ Support\ Files/gRPC-C++/gRPC-C++-dummy.m -o /Users/memoria/Library/Developer/Xcode/DerivedData/MemoryCapsule-gowvqtvekluiwyetetumdoiscapz/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/gRPC-C++.build/Objects-normal/x86_64/gRPC-C++-dummy.o -index-unit-output-path /Pods.build/Debug-iphonesimulator/gRPC-C++.build/Objects-normal/x86_64/gRPC-C++-dummy.o
+
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+error: module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found (in target 'gRPC-C++' from project 'Pods')
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+module map file '/Users/memoria/CascadeProjects/features-dev-052925/ios/Pods/Headers/Private/grpc/gRPC-Core.modulemap' not found
+
+
+Build target MemoryCapsule of project MemoryCapsule with configuration Debug
+note: Run script build phase '[Expo] Configure project' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'MemoryCapsule' from project 'MemoryCapsule')
+note: Run script build phase 'Bundle React Native code and images' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'MemoryCapsule' from project 'MemoryCapsule')
+warning: Run script build phase '[CP-User] [RNFB] Core Configuration' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking "Based on dependency analysis" in the script phase. (in target 'MemoryCapsule' from project 'MemoryCapsule')
+
+
+Run script build phase '[Expo] Configure project' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked.
+
+Run script build phase 'Bundle React Native code and images' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked.
+
+Run script build phase '[CP-User] [RNFB] Core Configuration' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking "Based on dependency analysis" in the script phase.
+
+
+
+Build failed    6/5/25, 3:12 PM    389.3 seconds

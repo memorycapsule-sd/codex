@@ -14,12 +14,14 @@ import { theme } from '../../theme';
 
 interface AudioRecorderProps {
   onRecordingComplete: (mediaFile: MediaFile) => void;
+  onCancel: () => void; // Added onCancel prop
   maxDuration?: number; // in seconds
   style?: any;
 }
 
 export function AudioRecorder({
   onRecordingComplete,
+  onCancel, // Added onCancel
   maxDuration = 300, // 5 minutes default
   style,
 }: AudioRecorderProps) {
@@ -79,7 +81,7 @@ export function AudioRecorder({
     try {
       const permission = await Audio.requestPermissionsAsync();
       if (!permission.granted) {
-        Alert.alert('Permission Required', 'Please grant microphone permission to record audio.');
+        Alert.alert('Permission Required', 'Please grant microphone permission to record audio.', [{ text: 'OK', onPress: onCancel }]);
         return;
       }
 
@@ -127,6 +129,7 @@ export function AudioRecorder({
       await recording.stopAndUnloadAsync();
       setRecording(null);
       setRecordingDuration(0);
+      onCancel(); // Call onCancel
     } catch (error) {
       console.error('Error canceling recording:', error);
     }

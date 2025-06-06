@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "660630380757",
+    "project_id": "memory-capsule-codex",
+    "storage_bucket": "memory-capsule-codex.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:660630380757:android:3474238bf2b0bfe9dc425c",
+        "android_client_info": {
+          "package_name": "com.memoriafilms.memorycapsule"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "660630380757-8lbivkmrva08alcja5ngrunv4pnsns7p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByaIsU76d2D1Ym1_RU5pBldsPTSgyCg10"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "660630380757-8lbivkmrva08alcja5ngrunv4pnsns7p.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "660630380757-vfjmre294glu0s6dt4l01rq7gnnrb9ki.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.memoriafilms.memorycapsule"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

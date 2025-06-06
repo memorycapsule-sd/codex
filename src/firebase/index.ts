@@ -1,3 +1,4 @@
+console.log('!!! EXECUTING src/firebase/index.ts TOP LEVEL !!!');
 /**
  * Platform-specific Firebase initialization for Memory Capsule
  */
@@ -47,9 +48,9 @@ if (Platform.OS === 'web') {
   // React Native implementation
   try {
     const firebaseApp = require('@react-native-firebase/app').default;
-    const firebaseAuth = require('@react-native-firebase/auth').default;
-    const firebaseFirestore = require('@react-native-firebase/firestore').default;
-    const firebaseStorage = require('@react-native-firebase/storage').default;
+    // const firebaseAuth = require('@react-native-firebase/auth').default;
+    // const firebaseFirestore = require('@react-native-firebase/firestore').default;
+    // const firebaseStorage = require('@react-native-firebase/storage').default;
 
     // Initialize if not already initialized
     if (!firebaseApp.apps.length) {
@@ -58,9 +59,9 @@ if (Platform.OS === 'web') {
       app = firebaseApp.app();
     }
 
-    auth = firebaseAuth();
-    db = firebaseFirestore();
-    storage = firebaseStorage();
+    // auth = firebaseAuth(); // Temporarily commented out
+    // db = firebaseFirestore(); // Temporarily commented out for testing
+    // storage = firebaseStorage(); // Temporarily commented out
   } catch (error) {
     console.log('Firebase native initialization error:', error);
   }

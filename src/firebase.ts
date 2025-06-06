@@ -1,109 +1,61 @@
+console.log('!!! EXECUTING src/firebase.ts TOP LEVEL !!!');
 /**
- * Firebase initialization for Memory Capsule
- * Using lazy initialization to avoid "Component not registered" errors
+ * Consolidated Firebase initialization for Memory Capsule
+ * Works on native platforms using @react-native-firebase modules
  */
-import { Platform } from 'react-native';
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage';
+import app from '@react-native-firebase/app';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
+import type { FirebaseFirestoreTypes } from '@react-native-firebase/firestore'; // Import the type
 
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY || "AIzaSyADZA_39LvezewktuxCUJuEAYbiCEFwzM8",
-  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || "memory-capsule-codex.firebaseapp.com",
-  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || "memory-capsule-codex",
-  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET || "memory-capsule-codex.firebasestorage.app",
-  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "660630380757",
-  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID || "1:660630380757:web:4280b1fbf1243ca0dc425c",
-  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-CY6S95F9EN"
+// Exported instances for use throughout the app
+export let db: FirebaseFirestoreTypes.Module | null = null;
+type User = FirebaseAuthTypes.User;
+
+// Google Auth Configuration
+export const googleAuthConfig = {
+  webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || "660630380757-1vbjdvsq8al3qi0dchc2akmqnl5okcpd.apps.googleusercontent.com",
+  iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID || "660630380757-1vbjdvsq8al3qi0dchc2akmqnl5okcpd.apps.googleusercontent.com",
+  androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID || "660630380757-1vbjdvsq8al3qi0dchc2akmqnl5okcpd.apps.googleusercontent.com"
 };
 
-// Firebase instances - lazy loaded
-let _app: any = null;
-let _auth: any = null;
-let _db: any = null;
-let _storage: any = null;
-let _initialized = false;
-
-// Lazy initialization function
-const initializeFirebase = () => {
-  if (_initialized) return { app: _app, auth: _auth, db: _db, storage: _storage };
-  
+/**
+ * Initialize Firebase if needed
+ * With @react-native-firebase, most initialization is handled automatically
+ * through the native configuration files.
+ */
+export const initializeFirebase = () => {
   try {
-    const firebaseApp = require('firebase/app');
-    const firebaseAuth =
-      Platform.OS === 'web'
-        ? require('firebase/auth')
-        : require('firebase/auth/react-native');
-    const firebaseFirestore = require('firebase/firestore');
-    const firebaseStorage = require('firebase/storage');
+    console.log('[FIREBASE] Starting unified initialization...');
     
-    // Initialize app if not already initialized
-    if (!firebaseApp.getApps().length) {
-      _app = firebaseApp.initializeApp(firebaseConfig);
-    } else {
-      _app = firebaseApp.getApp();
-    }
+    // With React Native Firebase, we don't need to explicitly initialize most services
+    // They are automatically initialized through native configuration files
+    console.log('[FIREBASE] Firebase services available through native modules');
+    console.log('[FIREBASE] Platform:', Platform.OS);
     
-    // For React Native (non-web), we need to initialize Auth with AsyncStorage
-    if (Platform.OS !== 'web') {
-      // Use initializeAuth with AsyncStorage persistence for React Native
-      const { initializeAuth, getReactNativePersistence } = firebaseAuth;
-      
-      try {
-        _auth = initializeAuth(_app, {
-          persistence: getReactNativePersistence(AsyncStorage)
-        });
-        console.log('React Native auth initialized with AsyncStorage persistence');
-      } catch (authError) {
-        // If auth is already initialized, just get the instance
-        console.log('Auth already initialized, using existing instance');
-        _auth = firebaseAuth.getAuth(_app);
-      }
-    } else {
-      // For web, use regular auth
-      _auth = firebaseAuth.getAuth(_app);
-      
-      // Set persistence for web
-      firebaseAuth.setPersistence(_auth, firebaseAuth.browserLocalPersistence)
-        .catch((error: any) => console.log('Web auth persistence error:', error));
-    }
+    // The auth, firestore, and storage services are already initialized
+    // and accessible through their respective imports
+    const firestoreModule = require('@react-native-firebase/firestore').default;
+    db = firestoreModule(); // Initialize Firestore instance here
+    console.log('[FIREBASE] Firestore instance created.');
     
-    // Initialize other services
-    _db = firebaseFirestore.getFirestore(_app);
-    _storage = firebaseStorage.getStorage(_app);
+    console.log('[FIREBASE] All services initialized successfully');
     
-    _initialized = true;
-    console.log('Firebase initialized successfully for platform:', Platform.OS);
   } catch (error) {
-    console.error('Firebase initialization error:', error);
-    // Return null services but don't crash
+    console.error('[FIREBASE] Initialization error:', error);
   }
-  
-  return { app: _app, auth: _auth, db: _db, storage: _storage };
+
+  // No need to return anything here, as the services are already exported
+  // and available through their direct imports
 };
 
-// Getters that initialize on first access
-export const getApp = () => {
-  if (!_app) initializeFirebase();
-  return _app;
-};
-
-export const getAuth = () => {
-  if (!_auth) initializeFirebase();
-  return _auth;
-};
-
-export const getDb = () => {
-  if (!_db) initializeFirebase();
-  return _db;
-};
-
-export const getStorage = () => {
-  if (!_storage) initializeFirebase();
-  return _storage;
-};
+// Initialize Firebase on module import
+initializeFirebase();
 
 // Helper functions for AsyncStorage persistence
-export const saveUserToStorage = async (user: any): Promise<boolean> => {
+export const saveUserToStorage = async (user: FirebaseAuthTypes.User | null) => {
   if (!user) return false;
   
   try {
@@ -116,7 +68,7 @@ export const saveUserToStorage = async (user: any): Promise<boolean> => {
   }
 };
 
-export const clearUserFromStorage = async (): Promise<boolean> => {
+export const clearUserFromStorage = async () => {
   try {
     await AsyncStorage.multiRemove(['userId', 'userEmail']);
     return true;
@@ -126,7 +78,7 @@ export const clearUserFromStorage = async (): Promise<boolean> => {
   }
 };
 
-export const getUserFromStorage = async (): Promise<{ uid: string; email: string | null } | null> => {
+export const getUserFromStorage = async () => {
   try {
     const userId = await AsyncStorage.getItem('userId');
     const userEmail = await AsyncStorage.getItem('userEmail');
@@ -141,12 +93,6 @@ export const getUserFromStorage = async (): Promise<{ uid: string; email: string
   }
 };
 
-// Export getter functions for compatibility
-export const app = getApp();
-export const auth = getAuth();
-export const db = getDb();
-export const storage = getStorage();
-
-// Also export the initialization function for manual initialization
-export { initializeFirebase };
-export default getApp();
+// Export all Firebase instances and the initialization function
+export { auth, storage };
+export default app;
