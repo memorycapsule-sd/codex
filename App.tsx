@@ -3,8 +3,8 @@
  */
 
 // Import Firebase services from our firebase.js file
-import { Auth } from 'firebase/auth';
-import { auth as firebaseAuth, app as firebaseApp } from './firebase';
+import type { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { app as firebaseApp, auth as firebaseAuth } from './src/firebase';
 
 // React and React Native imports
 import React, { useEffect, useState } from 'react';
@@ -69,7 +69,7 @@ export default function App() {
     if (initializationSteps.firebase.status === 'success') {
       try {
         // Firebase now handles persistence automatically, just verify it's working
-        const auth: Auth = firebaseAuth; // Use the pre-initialized auth instance with proper typing
+        const auth: FirebaseAuthTypes.Module = firebaseAuth; // Native Firebase Auth instance
         if (auth) {
           // Mark auth as initialized immediately since Firebase already set it up
           setInitializationSteps(prev => ({

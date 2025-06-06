@@ -1,7 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { Audio } from 'expo-av';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { storage } from '../../app/config/firebase';
+import { storage } from '../firebase';
 
 export interface MediaFile {
   id: string;
@@ -224,19 +223,10 @@ export const MediaService = {
       throw new Error('Cannot upload text memories or media without a URI to Firebase Storage.');
     }
     try {
-      // Create a reference to the file location
-      const fileRef = ref(storage, `media/${userId}/${mediaFile.id}_${mediaFile.filename}`);
-      
-      // Convert URI to blob for upload
-      const response = await fetch(mediaFile.uri);
-      const blob = await response.blob();
-      
-      // Upload the file
-      const snapshot = await uploadBytes(fileRef, blob);
-      
-      // Get the download URL
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      
+      const path = `media/${userId}/${mediaFile.id}_${mediaFile.filename}`;
+      const reference = storage.ref(path);
+      await reference.putFile(mediaFile.uri!);
+      const downloadURL = await reference.getDownloadURL();
       return downloadURL;
     } catch (error) {
       console.error('Error uploading media file:', error);
@@ -249,8 +239,9 @@ export const MediaService = {
    */
   async deleteMediaFile(mediaFile: MediaFile, userId: string): Promise<void> {
     try {
-      const fileRef = ref(storage, `media/${userId}/${mediaFile.id}_${mediaFile.filename}`);
-      await deleteObject(fileRef);
+      const path = `media/${userId}/${mediaFile.id}_${mediaFile.filename}`;
+      const reference = storage.ref(path);
+      await reference.delete();
     } catch (error) {
       console.error('Error deleting media file:', error);
       throw error;

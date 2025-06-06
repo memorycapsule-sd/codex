@@ -1,0 +1,26 @@
+diff --git a/node_modules/@react-native-firebase/app/lib/index.d.ts b/node_modules/@react-native-firebase/app/lib/index.d.ts
+index ec668a2..35f31ed 100644
+--- a/node_modules/@react-native-firebase/app/lib/index.d.ts
++++ b/node_modules/@react-native-firebase/app/lib/index.d.ts
+@@ -613,5 +613,19 @@ export const utils: ReactNativeFirebase.FirebaseModuleWithStatics<Utils.Module,
+ 
+ export * from './modular';
+ 
+-declare const module: ReactNativeFirebase.Module;
+-export default module;
++-declare const module: ReactNativeFirebase.Module;
+++/** 
+++ * The default export is both the Module namespace and a callable factory:
+++ *   const app = firebaseApp();      // defaults to '[DEFAULT]'
+++ *   const same = firebaseApp('[DEFAULT]');
+++ */
+++declare const module: ReactNativeFirebase.Module & {
+++  /**
+++   * Retrieve (or create) a named FirebaseApp instance.
+++   * @param name Optional app name, defaults to '[DEFAULT]'.
+++   */
+++  (name?: string): ReactNativeFirebase.FirebaseApp;
+++  /** The default app’s name (always '[DEFAULT]' for the default). */
+++  name: string;
+++};
++ export default module;
