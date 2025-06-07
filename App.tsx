@@ -2,9 +2,13 @@
  * Memory Capsule App Entry Point
  */
 
-// Import Firebase services from our firebase.js file
-import type { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import { app as firebaseApp, auth as firebaseAuth } from './src/firebase';
+// Firebase initialization
+import type { User } from 'firebase/auth';
+import {
+  initializeFirebaseApp,
+  app as firebaseApp,
+  auth as firebaseAuth,
+} from './src/firebase';
 
 // React and React Native imports
 import React, { useEffect, useState } from 'react';
@@ -43,49 +47,41 @@ export default function App() {
     auth: { status: 'pending', error: null },
   });
   
-  // Firebase Auth is already initialized in our firebase.ts module
-
   // Initialize Firebase on app startup
   useEffect(() => {
-    try {
-      // Log to confirm Firebase is initialized
-      console.log('Firebase initialized with app:', firebaseApp.name);
-      
-      setInitializationSteps(prev => ({
-        ...prev,
-        firebase: { status: 'success', error: null }
-      }));
-    } catch (error) {
-      console.error('Error initializing Firebase:', error);
-      setInitializationSteps(prev => ({
-        ...prev,
-        firebase: { status: 'error', error: error instanceof Error ? error.message : 'Unknown error' }
-      }));
-    }
-  }, []);
-  
-  // Setup auth persistence after Firebase is initialized
-  useEffect(() => {
-    if (initializationSteps.firebase.status === 'success') {
+    (async () => {
       try {
-        // Firebase now handles persistence automatically, just verify it's working
-        const auth: FirebaseAuthTypes.Module = firebaseAuth; // Native Firebase Auth instance
-        if (auth) {
-          // Mark auth as initialized immediately since Firebase already set it up
-          setInitializationSteps(prev => ({
-            ...prev,
-            auth: { status: 'success', error: null }
-          }));
-          
-          // No need for cleanup as Firebase manages the auth state listener
-        } else {
-          throw new Error('Firebase Auth not available from Firebase');
-        }
-      } catch (error) {
-        console.error('Error verifying auth setup:', error);
+        await initializeFirebaseApp();
+        console.log('Firebase initialized with app:', firebaseApp?.name);
         setInitializationSteps(prev => ({
           ...prev,
-          auth: { status: 'error', error: error instanceof Error ? error.message : 'Unknown error' }
+          firebase: { status: 'success', error: null },
+        }));
+      } catch (error) {
+        console.error('Error initializing Firebase:', error);
+        setInitializationSteps(prev => ({
+          ...prev,
+          firebase: {
+            status: 'error',
+            error: error instanceof Error ? error.message : 'Unknown error',
+          },
+        }));
+      }
+    })();
+  }, []);
+  
+  // Setup auth state after Firebase is initialized
+  useEffect(() => {
+    if (initializationSteps.firebase.status === 'success') {
+      if (firebaseAuth) {
+        setInitializationSteps(prev => ({
+          ...prev,
+          auth: { status: 'success', error: null },
+        }));
+      } else {
+        setInitializationSteps(prev => ({
+          ...prev,
+          auth: { status: 'error', error: 'Firebase Auth not available' },
         }));
       }
     }

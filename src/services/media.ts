@@ -1,6 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import { Audio } from 'expo-av';
 import { storage } from '../firebase';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
 export interface MediaFile {
   id: string;
@@ -224,9 +225,11 @@ export const MediaService = {
     }
     try {
       const path = `media/${userId}/${mediaFile.id}_${mediaFile.filename}`;
-      const reference = storage.ref(path);
-      await reference.putFile(mediaFile.uri!);
-      const downloadURL = await reference.getDownloadURL();
+      const storageRef = ref(storage!, path);
+      const response = await fetch(mediaFile.uri!);
+      const blob = await response.blob();
+      await uploadBytes(storageRef, blob);
+      const downloadURL = await getDownloadURL(storageRef);
       return downloadURL;
     } catch (error) {
       console.error('Error uploading media file:', error);
@@ -240,8 +243,8 @@ export const MediaService = {
   async deleteMediaFile(mediaFile: MediaFile, userId: string): Promise<void> {
     try {
       const path = `media/${userId}/${mediaFile.id}_${mediaFile.filename}`;
-      const reference = storage.ref(path);
-      await reference.delete();
+      const storageRef = ref(storage!, path);
+      await deleteObject(storageRef);
     } catch (error) {
       console.error('Error deleting media file:', error);
       throw error;

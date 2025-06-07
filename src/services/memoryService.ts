@@ -1,11 +1,22 @@
 import { MediaFile } from './media';
 import { MediaService } from './media'; // For uploading media before saving memory
-import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-import storage from '@react-native-firebase/storage';
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs,
+  Timestamp,
+} from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { db, storage } from '../firebase';
 
 export interface Memory extends Omit<MediaFile, 'uri' | 'size' | 'filename' | 'mimeType'> {
   userId: string;
-  createdAt: FirebaseFirestoreTypes.Timestamp;
+  createdAt: Timestamp;
   // title is already in MediaFile
   // type is already in MediaFile
   // textContent is already in MediaFile
@@ -50,8 +61,7 @@ export async function saveMemory(memoryData: MediaFile, userId: string): Promise
     userId,
     title: memoryData.title,
     type: memoryData.type,
-    // Use server timestamp for createdAt
-    createdAt: firestore.FieldValue.serverTimestamp() as any,
+    createdAt: serverTimestamp() as any,
     ...(memoryData.textContent && { textContent: memoryData.textContent }),
     ...(mediaUrl && { mediaUrl }),
     ...(memoryData.duration && { duration: memoryData.duration }),
@@ -61,7 +71,7 @@ export async function saveMemory(memoryData: MediaFile, userId: string): Promise
 
   try {
     // Add a new document with a generated ID to the top-level 'memories' collection
-    const docRef = await firestore().collection(MEMORIES_COLLECTION).add(memoryDataToSave);
+    const docRef = await addDoc(collection(db!, MEMORIES_COLLECTION), memoryDataToSave);
     const savedMemory: Memory = {
       id: docRef.id,
       ...memoryDataToSave,
@@ -92,12 +102,13 @@ export async function getRecentMemories(userId: string, limitCount: number = 5):
   }
 
   try {
-    const querySnapshot = await firestore()
-      .collection(MEMORIES_COLLECTION)
-      .where('userId', '==', userId)
-      .orderBy('createdAt', 'desc')
-      .limit(limitCount)
-      .get();
+    const q = query(
+      collection(db!, MEMORIES_COLLECTION),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc'),
+      limit(limitCount),
+    );
+    const querySnapshot = await getDocs(q);
     const memories: Memory[] = [];
     querySnapshot.forEach((docSnapshot) => {
       const data = docSnapshot.data();
@@ -106,7 +117,7 @@ export async function getRecentMemories(userId: string, limitCount: number = 5):
         userId: data.userId,
         title: data.title,
         type: data.type,
-        createdAt: data.createdAt as FirebaseFirestoreTypes.Timestamp, // Ensure createdAt is cast to Timestamp
+        createdAt: data.createdAt as Timestamp,
         ...(data.textContent && { textContent: data.textContent }),
         ...(data.mediaUrl && { mediaUrl: data.mediaUrl }),
         ...(data.duration && { duration: data.duration }),

@@ -28,10 +28,6 @@
       "expo-camera",
       "expo-image-picker",
       "expo-av",
-      "@react-native-firebase/app",
-      "@react-native-firebase/auth",
-      "@react-native-firebase/firestore",
-      "@react-native-firebase/storage",
       [
         "expo-build-properties",
         {

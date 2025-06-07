@@ -1,6 +1,14 @@
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  User,
+} from 'firebase/auth';
+import { auth } from '../firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveUserToStorage, clearUserFromStorage } from '../firebase';
+import googleAuthService from './googleAuth';
 // Import from googleAuth is no longer needed as we'll use the native GoogleAuthProvider
 
 export interface UserProfile {
@@ -13,7 +21,7 @@ export interface UserProfile {
   createdAt: Date;
 }
 
-// Use FirebaseAuthTypes.User instead of User from firebase/auth
+// Firebase Authentication service wrappers
 
 /**
  * Authentication service wrapping Firebase Auth.
@@ -23,7 +31,7 @@ export const AuthService = {
    * Get the current auth instance
    */
   getAuth() {
-    return auth();
+    return auth!;
   },
 
   /**
@@ -31,7 +39,7 @@ export const AuthService = {
    */
   async signUp(email: string, password: string) {
     try {
-      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth!, email, password);
       
       // Store the user data in AsyncStorage for persistence
       await saveUserToStorage(userCredential.user);
@@ -58,7 +66,7 @@ export const AuthService = {
    */
   async signIn(email: string, password: string) {
     try {
-      const userCredential = await auth().signInWithEmailAndPassword(email, password);
+      const userCredential = await signInWithEmailAndPassword(auth!, email, password);
       // Store the user data in AsyncStorage for persistence
       await saveUserToStorage(userCredential.user);
       return userCredential;
@@ -73,15 +81,9 @@ export const AuthService = {
    */
   async signInWithGoogle() {
     try {
-      // Get the Google provider
-      const provider = auth.GoogleAuthProvider;
-      const result = await auth().signInWithProvider(provider);
-      
-      if (result.user) {
-        // Store the user data in AsyncStorage
+      const result = await googleAuthService.signInWithGoogle();
+      if (result.success && result.user) {
         await saveUserToStorage(result.user);
-        
-        // Create user profile from Google data
         const userProfile: UserProfile = {
           uid: result.user.uid,
           email: result.user.email || '',
@@ -89,14 +91,10 @@ export const AuthService = {
           profilePicture: result.user.photoURL || '',
           createdAt: new Date(),
         };
-        
-        // Store user profile in AsyncStorage
         await AsyncStorage.setItem('userProfile', JSON.stringify(userProfile));
-        
         return { user: result.user };
-      } else {
-        throw new Error('Google sign-in failed');
       }
+      throw new Error(result.error || 'Google sign-in failed');
     } catch (error) {
       console.error('Error signing in with Google:', error);
       throw error;
@@ -108,7 +106,7 @@ export const AuthService = {
    */
   async signOut() {
     try {
-      await auth().signOut();
+      await firebaseSignOut(auth!);
       // Clear stored user data
       await clearUserFromStorage();
       await AsyncStorage.removeItem('userProfile');
@@ -124,7 +122,7 @@ export const AuthService = {
   async isAuthenticated() {
     try {
       const userId = await AsyncStorage.getItem('userId');
-      return userId !== null && auth().currentUser !== null;
+      return userId !== null && auth?.currentUser !== null;
     } catch (error) {
       console.error('Error checking authentication:', error);
       return false;
@@ -134,8 +132,8 @@ export const AuthService = {
   /**
    * Get current user
    */
-  getCurrentUser(): FirebaseAuthTypes.User | null {
-    return auth().currentUser;
+  getCurrentUser(): User | null {
+    return auth?.currentUser || null;
   },
 
   /**
@@ -172,8 +170,8 @@ export const AuthService = {
   /**
    * Listen to authentication state changes
    */
-  onAuthStateChanged(callback: (user: FirebaseAuthTypes.User | null) => void) {
-    return auth().onAuthStateChanged(callback);
+  onAuthStateChanged(callback: (user: User | null) => void) {
+    return onAuthStateChanged(auth!, callback);
   },
 
   /**

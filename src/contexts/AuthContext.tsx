@@ -1,11 +1,19 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode, useMemo } from 'react';
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  User,
+} from 'firebase/auth';
+import { auth } from '../firebase';
 import { AuthService } from '../services/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveUserToStorage, getUserFromStorage } from '../firebase';
+import googleAuthService from '../services/googleAuth';
 
 interface AuthContextType {
-  user: FirebaseAuthTypes.User | null;
+  user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   signIn: (email: string, password: string) => Promise<void>;
@@ -22,7 +30,7 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Initialize Firebase on component mount
@@ -75,16 +83,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
         console.log('Found user in AsyncStorage:', storedUser.email);
       }
       
-      // Listen for auth state changes using React Native Firebase
-      const unsubscribe = auth().onAuthStateChanged((user) => {
-        if (user) {
-          console.log('Auth state changed - user signed in:', user.email);
-          // Save user to AsyncStorage whenever auth state changes
-          saveUserToStorage(user);
+      // Listen for auth state changes
+      const unsubscribe = onAuthStateChanged(auth!, (currentUser) => {
+        if (currentUser) {
+          console.log('Auth state changed - user signed in:', currentUser.email);
+          saveUserToStorage(currentUser);
         } else {
           console.log('Auth state changed - user signed out');
         }
-        setUser(user);
+        setUser(currentUser);
         setIsLoading(false);
       });
 
@@ -99,7 +106,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true);
       console.log('Signing in user:', email);
-      const userCredential = await auth().signInWithEmailAndPassword(email, password);
+      const userCredential = await signInWithEmailAndPassword(auth!, email, password);
       setUser(userCredential.user);
     } catch (error) {
       console.error('Sign in error:', error);
@@ -113,7 +120,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true);
       console.log('Creating new user account:', email);
-      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth!, email, password);
       setUser(userCredential.user);
     } catch (error) {
       console.error('Sign up error:', error);
@@ -126,14 +133,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signInWithGoogle = async () => {
     try {
       setIsLoading(true);
-      console.log('Signing in with Google');
-      // Get the Google provider
-      const { googleAuthConfig } = await import('../firebase');
-      const provider = auth.GoogleAuthProvider;
-      const googleCredential = await auth().signInWithProvider(provider);
-      
-      // The user is automatically set by the auth state listener,
-      // no need to manually set it here
+      const result = await googleAuthService.signInWithGoogle();
+      if (!result.success) {
+        throw new Error(result.error || 'Google sign-in failed');
+      }
       console.log('Google sign-in successful');
     } catch (error) {
       console.error('Sign in with Google error:', error);
@@ -147,7 +150,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true);
       console.log('Signing out user');
-      await auth().signOut();
+      await firebaseSignOut(auth!);
       setUser(null);
     } catch (error) {
       console.error('Sign out error:', error);
