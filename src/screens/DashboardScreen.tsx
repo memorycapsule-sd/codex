@@ -90,7 +90,7 @@ export default function DashboardScreen() {
       };
       fetchActivities();
     }
-  }, [user]);
+  }, [user?.uid]);
 
   // Media capture state
   const [showVideoRecorder, setShowVideoRecorder] = useState(false);
@@ -166,7 +166,6 @@ export default function DashboardScreen() {
     }
   };
 
-  const getCurrentGreeting = () => {
   const renderCategoryItem = (category: Category) => (
     <TouchableOpacity
       key={category.id}
@@ -190,6 +189,15 @@ export default function DashboardScreen() {
       </Text>
     </TouchableOpacity>
   );
+
+  const getCurrentGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 5) return "Good Night";
+    if (hour < 12) return "Good Morning";
+    if (hour < 18) return "Good Afternoon";
+    if (hour < 22) return "Good Evening";
+    return "Good Night";
+  };
 
   const renderRecentActivityItem = ({ item }: { item: Memory }) => (
     <TouchableOpacity key={item.id} style={styles.activityItem}>
@@ -472,9 +480,6 @@ export default function DashboardScreen() {
       )}
     </SafeAreaView>
   );
-}
-
-  return getCurrentGreeting();
 }
 
 const styles = StyleSheet.create({

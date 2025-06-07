@@ -28,6 +28,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Initialize Firebase on component mount
   useEffect(() => {
     console.log('AuthProvider mounted - setting up auth state listener');
+    setIsLoading(true); // Set loading true on mount
     let isActive = true; // Flag to prevent state updates if component unmounted
     let unsubscribeFromAuth: (() => void) | undefined;
 
@@ -67,7 +68,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const checkAuthState = async () => {
     try {
-      setIsLoading(true);
       
       // First check AsyncStorage for existing user
       const storedUser = await getUserFromStorage();
@@ -85,13 +85,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
           console.log('Auth state changed - user signed out');
         }
         setUser(user);
-        setIsLoading(false);
+        if (isLoading) { // Only set isLoading false if it's the initial load
+            setIsLoading(false);
+        }
       });
 
       return unsubscribe;
     } catch (error) {
       console.error('Error checking auth state:', error);
-      setIsLoading(false);
+      if (isLoading) { // Ensure isLoading is false if an error occurs during initial check
+          setIsLoading(false);
+      }
     }
   };
 

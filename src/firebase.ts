@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
 // Initialize and export RNFirebase service instances
-export const app = firebaseApp();
+export const app = firebaseApp.app();
 export const auth = firebaseAuth();
 export const db = firestore();
 export const storage = firebaseStorage();

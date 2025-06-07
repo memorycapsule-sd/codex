@@ -19,7 +19,8 @@
     },
     "android": {
       "backgroundColor": "#FFFFFF",
-      "package": "com.memoriafilms.memorycapsule"
+      "package": "com.memoriafilms.memorycapsule",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
     },
