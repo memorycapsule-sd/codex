@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,11 @@ import {
   Alert,
   Dimensions,
   StatusBar,
+  Platform,
 } from 'react-native';
-// Using named import with type assertion to fix TypeScript issues
-import { Camera as ExpoCamera } from 'expo-camera';
-// Needed to make TypeScript understand Camera is a valid JSX component
-const Camera = ExpoCamera as any;
 import { Ionicons } from '@expo/vector-icons';
+import * as ExpoCamera from 'expo-camera';
+import { CameraView } from 'expo-camera';
 import { MediaFile } from '../../services/media';
 import { theme } from '../../theme';
 
@@ -24,93 +23,55 @@ interface VideoRecorderProps {
 
 const { width, height } = Dimensions.get('window');
 
-export function VideoRecorder({
-  onVideoRecorded,
-  onCancel,
-  maxDuration = 300, // 5 minutes default
-}: VideoRecorderProps) {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [cameraType, setCameraType] = useState<'back' | 'front'>('back');
+export function VideoRecorder({ onVideoRecorded, onCancel, maxDuration = 300 }: VideoRecorderProps) {
+  const [hasPermissions, setHasPermissions] = useState<boolean | null>(null);
+  // Use string literals to avoid TypeScript issues with enum imports
+  const [cameraType, setCameraType] = useState<ExpoCamera.CameraType>('back');
+  const [flashMode, setFlashMode] = useState('off');
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
-  // Use any type to avoid TypeScript errors with the Camera ref
-  const cameraRef = useRef<any>(null);
-  const durationIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [durationTimer, setDurationTimer] = useState<NodeJS.Timeout | null>(null);
+  
+  // Use any type to avoid TypeScript issues with Camera ref
+  const cameraRef = useRef<ExpoCamera.CameraView | null>(null);
 
   useEffect(() => {
-    (async () => {
-      const { status } = await ExpoCamera.requestCameraPermissionsAsync();
-      const micStatus = await ExpoCamera.requestMicrophonePermissionsAsync();
-      setHasPermission(status === 'granted' && micStatus.status === 'granted');
-    })();
-  }, []);
-
-  useEffect(() => {
+    // Request camera and microphone permissions
+    const requestPermissions = async () => {
+      try {
+        const { status: cameraStatus } = await ExpoCamera.Camera.requestCameraPermissionsAsync();
+        const { status: micStatus } = await ExpoCamera.Camera.requestMicrophonePermissionsAsync();
+        
+        setHasPermissions(
+          cameraStatus === 'granted' && micStatus === 'granted'
+        );
+        
+        if (cameraStatus !== 'granted' || micStatus !== 'granted') {
+          Alert.alert(
+            'Permission required',
+            'Camera and microphone permissions are needed to record videos.',
+            [{ text: 'OK', onPress: onCancel }]
+          );
+        }
+      } catch (error) {
+        console.error('Error requesting permissions:', error);
+        setHasPermissions(false);
+        Alert.alert('Error', 'Failed to request camera permissions');
+      }
+    };
+    
+    requestPermissions();
+    
+    // Cleanup function to stop recording if component unmounts
     return () => {
-      if (durationIntervalRef.current) {
-        clearInterval(durationIntervalRef.current);
+      if (isRecording && cameraRef.current) {
+        cameraRef.current.stopRecording();
+      }
+      if (durationTimer) {
+        clearInterval(durationTimer);
       }
     };
   }, []);
-
-  const startRecording = async () => {
-    if (cameraRef.current && !isRecording) {
-      try {
-        setIsRecording(true);
-        setRecordingDuration(0);
-
-        // Start duration counter
-        durationIntervalRef.current = setInterval(() => {
-          setRecordingDuration(prev => {
-            const newDuration = prev + 1;
-            if (newDuration >= maxDuration) {
-              stopRecording();
-            }
-            return newDuration;
-          });
-        }, 1000);
-
-        const video = await cameraRef.current.recordAsync({
-          maxDuration: maxDuration,
-          mute: false,
-        });
-
-        if (video && video.uri) {
-          const mediaFile: MediaFile = {
-            id: Date.now().toString(),
-            type: 'video',
-            uri: video.uri,
-            filename: `video_${Date.now()}.mp4`,
-            size: 0, // Will be calculated later
-            mimeType: 'video/mp4',
-          };
-
-          onVideoRecorded(mediaFile);
-        }
-      } catch (error) {
-        console.error('Error recording video:', error);
-        Alert.alert('Error', 'Failed to record video. Please try again.');
-        setIsRecording(false);
-        if (durationIntervalRef.current) {
-          clearInterval(durationIntervalRef.current);
-        }
-      }
-    }
-  };
-
-  const stopRecording = async () => {
-    if (cameraRef.current && isRecording) {
-      try {
-        await cameraRef.current.stopRecording();
-        setIsRecording(false);
-        if (durationIntervalRef.current) {
-          clearInterval(durationIntervalRef.current);
-        }
-      } catch (error) {
-        console.error('Error stopping recording:', error);
-      }
-    }
-  };
 
   const toggleCameraType = () => {
     setCameraType(current => 
@@ -118,89 +79,176 @@ export function VideoRecorder({
     );
   };
 
+  const toggleFlash = () => {
+    setFlashMode(current => 
+      current === 'off' ? 'on' : 'off'
+    );
+  };
+
+  const startRecording = async () => {
+    if (!cameraRef.current || isRecording) return;
+    
+    try {
+      setIsRecording(true);
+      setRecordingDuration(0);
+      
+      // Start a timer to track recording duration
+      const timer = setInterval(() => {
+        setRecordingDuration(prev => {
+          if (prev >= maxDuration - 1) {
+            stopRecording();
+            return maxDuration;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+      
+      setDurationTimer(timer);
+      
+      // Start recording
+      const videoOptions = {
+        maxDuration,
+        quality: '720p', // Use 720p for good quality/size balance
+        mute: false,
+      };
+      
+      const result = await cameraRef.current.recordAsync(videoOptions);
+      
+      // This will only execute after stopRecording is called
+      if (durationTimer) {
+        clearInterval(durationTimer);
+        setDurationTimer(null);
+      }
+      
+      // Process the recorded video
+      if (result && result.uri) {
+        const filename = result.uri.split('/').pop() || `video_${Date.now()}.mp4`;
+        
+        // Create MediaFile object to return
+        const mediaFile: MediaFile = {
+          id: Date.now().toString(),
+          type: 'video',
+          uri: result.uri,
+          filename,
+          size: 0, // We don't know the exact size here
+          mimeType: 'video/mp4',
+        };
+        
+        onVideoRecorded(mediaFile);
+      } else {
+        console.warn('Video recording finished, but no URI was returned or result was invalid.');
+        // Ensure UI consistency if it was still showing recording (this cleanup might already be handled before this block)
+        if (isRecording) setIsRecording(false);
+        if (durationTimer) { clearInterval(durationTimer); setDurationTimer(null); }
+        onCancel(); // Notify calling component that recording was not successful
+      }
+    } catch (error) {
+      console.error('Error recording video:', error);
+      Alert.alert('Recording Error', 'Failed to record video');
+      setIsRecording(false);
+      if (durationTimer) {
+        clearInterval(durationTimer);
+        setDurationTimer(null);
+      }
+    }
+  };
+
+  const stopRecording = () => {
+    if (!cameraRef.current || !isRecording) return;
+    
+    try {
+      cameraRef.current.stopRecording();
+      setIsRecording(false);
+      
+      if (durationTimer) {
+        clearInterval(durationTimer);
+        setDurationTimer(null);
+      }
+    } catch (error) {
+      console.error('Error stopping recording:', error);
+    }
+  };
+
   const formatDuration = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-
-  if (hasPermission === null) {
-    return (
-      <View style={styles.permissionContainer}>
-        <Text style={styles.permissionHeaderText}>Requesting camera permission...</Text>
-      </View>
-    );
-  }
-
-  if (hasPermission === false) {
-    return (
-      <View style={styles.permissionContainer}>
-        <Ionicons name="camera-outline" size={64} color={theme.colors.text.secondary} />
-        <Text style={styles.permissionHeaderText}>No access to camera</Text>
-        <Text style={styles.permissionSubtext}>
-          Please enable camera permissions in your device settings to record videos.
-        </Text>
-        <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
-          <Text style={styles.cancelButtonText}>Go Back</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
-      <StatusBar hidden />
-      
-      <Camera
-        ref={cameraRef}
-        style={styles.camera}
-        type={cameraType}
-        ratio="16:9"
-      >
-        {/* Header with duration and cancel */}
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.cancelIconButton} onPress={onCancel}>
-            <Ionicons name="close" size={24} color="white" />
-          </TouchableOpacity>
-          
-          <View style={styles.durationContainer}>
-            <View style={[styles.recordingIndicator, isRecording && styles.recordingActive]} />
-            <Text style={styles.recordingText}>
-              {formatDuration(recordingDuration)}
-            </Text>
-          </View>
-          
-          <TouchableOpacity style={styles.flipButton} onPress={toggleCameraType}>
-            <Ionicons name="camera-reverse" size={24} color="white" />
+      {!hasPermissions ? (
+        <View style={styles.permissionContainer}>
+          <Text style={styles.permissionHeaderText}>
+            Camera Permission Required
+          </Text>
+          <Text style={styles.permissionSubtext}>
+            Please grant camera and microphone permissions to record video memories.
+          </Text>
+          <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
+            <Text style={styles.cancelButtonText}>Return to App</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Bottom controls */}
-        <View style={styles.controls}>
-          <View style={styles.controlsSpacer} />
+      ) : (
+        <View style={styles.camera}>
+          <StatusBar hidden />
           
-          <TouchableOpacity
-            style={[
-              styles.recordButton,
-              isRecording && styles.recordButtonActive
-            ]}
-            onPress={isRecording ? stopRecording : startRecording}
-          >
-            <View style={[
-              styles.recordButtonInner,
-              isRecording && styles.recordButtonInnerActive
-            ]} />
-          </TouchableOpacity>
+          <ExpoCamera.CameraView
+            ref={cameraRef}
+            style={StyleSheet.absoluteFillObject}
+            facing={cameraType}
+            enableTorch={flashMode === 'torch'}
+            flash={flashMode === 'torch' ? 'off' : flashMode as 'on' | 'off' | 'auto'}
+            // ratio="16:9"
+          />
           
-          <View style={styles.controlsSpacer}>
-            {maxDuration && (
-              <Text style={styles.maxDurationText}>
-                {formatDuration(recordingDuration)} / {formatDuration(maxDuration)}
-              </Text>
+          <View style={styles.header}>
+            <TouchableOpacity style={styles.cancelIconButton} onPress={onCancel}>
+              <Ionicons name="close" size={24} color="white" />
+            </TouchableOpacity>
+            
+            {isRecording ? (
+              <View style={styles.durationContainer}>
+                <View style={[styles.recordingIndicator, styles.recordingActive]} />
+                <Text style={styles.recordingText}>
+                  {formatDuration(recordingDuration)}
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.titleContainer}>
+                <Text style={styles.titleText}>Record Video</Text>
+              </View>
             )}
+            
+            <TouchableOpacity style={styles.flipButton} onPress={toggleCameraType}>
+              <Ionicons name="camera-reverse" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.controls}>
+            <TouchableOpacity style={styles.controlButton} onPress={toggleFlash}>
+              <Ionicons 
+                name={flashMode === 'off' ? "flash-off" : "flash"} 
+                size={24} 
+                color="white" 
+              />
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={[styles.recordButton, isRecording && styles.recordButtonActive]}
+              onPress={isRecording ? stopRecording : startRecording}
+            >
+              <View style={[styles.recordButtonInner, isRecording && styles.recordButtonInnerActive]} />
+            </TouchableOpacity>
+            
+            <View style={styles.controlsSpacer}>
+              <Text style={styles.maxDurationText}>
+                Max: {formatDuration(maxDuration)}
+              </Text>
+            </View>
           </View>
         </View>
-      </Camera>
+      )}
     </View>
   );
 }
@@ -208,127 +256,155 @@ export function VideoRecorder({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: '#000',
   },
   permissionContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: theme.spacing.xl,
+    padding: 20,
     backgroundColor: theme.colors.background,
   },
   permissionHeaderText: {
-    color: '#fff',
-    fontSize: theme.typography.fontSize.lg,
-    fontWeight: theme.typography.fontWeight.bold,
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: theme.colors.text.primary,
+    marginVertical: 10,
+    textAlign: 'center',
   },
   permissionSubtext: {
-    fontSize: theme.typography.fontSize.base,
+    fontSize: 16,
     color: theme.colors.text.secondary,
+    marginBottom: 30,
     textAlign: 'center',
     lineHeight: 22,
-    marginBottom: theme.spacing.xl,
   },
   cancelButton: {
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.xl,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
     backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.md,
   },
   cancelButtonText: {
-    fontSize: theme.typography.fontSize.base,
+    fontSize: 16,
+    fontWeight: 'bold',
     color: theme.colors.white,
-    fontWeight: theme.typography.fontWeight.semibold,
+    textAlign: 'center',
   },
   camera: {
     flex: 1,
-    justifyContent: 'space-between',
+    width: width,
+    height: height,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 50,
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.md,
+    paddingTop: 40,
+    paddingHorizontal: 20,
+    paddingBottom: 10,
   },
   cancelIconButton: {
     width: 40,
     height: 40,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },
+  titleContainer: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+  },
+  titleText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  spacer: {
+    width: 40,
+  },
+
   durationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.md,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+    borderRadius: 20,
   },
   recordingIndicator: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'white',
-    marginRight: theme.spacing.sm,
+    backgroundColor: '#666',
+    marginRight: 8,
   },
   recordingActive: {
-    backgroundColor: '#ff4444',
+    backgroundColor: '#f00',
   },
   recordingText: {
-    color: '#fff',
-    fontSize: theme.typography.fontSize.base,
-    marginLeft: theme.spacing.sm,
+    color: 'white',
+    fontSize: 14,
   },
   flipButton: {
     width: 40,
     height: 40,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  controlButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   controls: {
+    position: 'absolute',
+    bottom: 40,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     alignItems: 'center',
-    paddingBottom: 50,
-    paddingHorizontal: theme.spacing.xl,
+    paddingHorizontal: 20,
   },
   controlsSpacer: {
-    flex: 1,
+    width: 60,
     alignItems: 'center',
-  },
-  maxDurationText: {
-    color: 'rgba(255, 255, 255, 0.7)',
-    fontSize: theme.typography.fontSize.sm,
-    textAlign: 'center',
   },
   recordButton: {
-    width: 80,
-    height: 80,
-    borderRadius: theme.borderRadius.xl,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: 'rgba(255,255,255,0.3)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 4,
-    borderColor: 'white',
   },
   recordButtonActive: {
-    backgroundColor: 'rgba(255, 68, 68, 0.3)',
+    backgroundColor: 'rgba(255,0,0,0.3)',
   },
   recordButtonInner: {
-    width: 60,
-    height: 60,
-    borderRadius: theme.borderRadius.lg,
-    backgroundColor: '#ff4444',
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: '#fff',
   },
   recordButtonInnerActive: {
-    borderRadius: 8,
     width: 30,
     height: 30,
+    borderRadius: 6,
+    backgroundColor: '#f00',
+  },
+  maxDurationText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 12,
+    marginTop: 8,
   },
 });

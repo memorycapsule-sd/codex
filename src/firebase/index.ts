@@ -1,3 +1,4 @@
+console.log('!!! EXECUTING src/firebase/index.ts TOP LEVEL !!!');
 /**
  * Platform-specific Firebase initialization for Memory Capsule
  */
@@ -44,26 +45,10 @@ if (Platform.OS === 'web') {
     console.log('Firebase web initialization error:', error);
   }
 } else {
-  // React Native implementation
-  try {
-    const firebaseApp = require('@react-native-firebase/app').default;
-    const firebaseAuth = require('@react-native-firebase/auth').default;
-    const firebaseFirestore = require('@react-native-firebase/firestore').default;
-    const firebaseStorage = require('@react-native-firebase/storage').default;
-
-    // Initialize if not already initialized
-    if (!firebaseApp.apps.length) {
-      app = firebaseApp.initializeApp(firebaseConfig);
-    } else {
-      app = firebaseApp.app();
-    }
-
-    auth = firebaseAuth();
-    db = firebaseFirestore();
-    storage = firebaseStorage();
-  } catch (error) {
-    console.log('Firebase native initialization error:', error);
-  }
+  // React Native implementation is now handled by src/firebase.ts
+  // This block is intentionally left to ensure app, auth, db, storage are null for native from this file.
+  console.log('[FIREBASE src/firebase/index.ts] Native initialization skipped, handled by src/firebase.ts');
+  // app, auth, db, storage remain null as initialized globally for native platforms from this file's perspective.
 }
 
 // Helper functions for persistence with AsyncStorage

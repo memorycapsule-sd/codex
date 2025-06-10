@@ -5,12 +5,7 @@
     "version": "1.0.0",
     "platforms": ["ios", "android", "web"],
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
+    "backgroundColor": "#ffffff",
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -18,23 +13,35 @@
       "**/*"
     ],
     "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist",
       "supportsTablet": true,
-      "bundleIdentifier": "com.memorycapsule.app"
+      "bundleIdentifier": "com.memoriafilms.memorycapsule"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
-      },
-      "package": "com.memorycapsule.app"
+      "backgroundColor": "#FFFFFF",
+      "package": "com.memoriafilms.memorycapsule",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      "expo-dev-client",
       "expo-camera",
       "expo-image-picker",
-      "expo-av"
+      "expo-av",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      "@react-native-firebase/firestore",
+      "@react-native-firebase/storage",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "useModularHeaders": true
+          }
+        }
+      ]
     ],
     "sdkVersion": "53.0.0",
     "scheme": "memorycapsule"

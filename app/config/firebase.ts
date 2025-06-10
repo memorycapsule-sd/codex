@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { Auth, getAuth, initializeAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { getFirestore, type Firestore } from 'firebase/firestore'; // Firebase JS SDK
+import { getStorage, type FirebaseStorage } from 'firebase/storage';   // Firebase JS SDK
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
@@ -65,9 +65,9 @@ if (isReactNative) {
 }
 
 // Initialize and export Firebase instances
-export const db = getFirestore(app);
-export const storage = getStorage(app);
-export { app, auth };
+export const db: Firestore = getFirestore(app);
+const storageInstance: FirebaseStorage = getStorage(app); // Renamed to avoid conflict with imported module name 'storage'
+export { app, auth, storageInstance as storage };
 
 // Helper function to save user data to AsyncStorage
 export const saveUserToStorage = async (user: any) => {

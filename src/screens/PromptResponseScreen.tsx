@@ -9,20 +9,28 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  StatusBar
+  StatusBar,
+  Alert
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { CapsulesStackParamList } from '../navigation/CapsulesNavigator'; // Import the param list type
 import { Ionicons } from '@expo/vector-icons';
 import { CapsuleService } from '../services/capsuleService';
 import { MediaPicker } from '../components/media/MediaPicker';
 import { MediaPreview } from '../components/media/MediaPreview';
 import { AudioRecorder } from '../components/media/AudioRecorder';
 import { MediaFile } from '../services/media';
+import { CapsuleResponse, CapsuleEntry, MediaMetadata } from '../types/capsule';
 import { theme } from '../theme';
+import { generateUUID } from '../utils/helpers';
+import { useAuth } from '../contexts/AuthContext';
+import { MediaService, MediaFile as LocalMediaFile } from '../services/media'; // Added MediaService import
 
 // Define the route params type
 type PromptResponseRouteParams = {
   PromptResponse: {
+    capsuleId: string; // Added
     promptId: string;
     promptText: string;
     capsuleTitle: string;
@@ -35,14 +43,15 @@ type MediaType = 'text' | 'audio' | 'video' | 'photo' | null;
  * Screen for responding to a capsule prompt with different media types
  */
 const PromptResponseScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<CapsulesStackParamList, 'PromptResponse'>>();
   const route = useRoute<RouteProp<PromptResponseRouteParams, 'PromptResponse'>>();
-  const { promptId, promptText, capsuleTitle } = route.params;
+  const { capsuleId, promptId, promptText, capsuleTitle } = route.params; // Added capsuleId
+  const { user } = useAuth();
   
   const [selectedMediaType, setSelectedMediaType] = useState<MediaType>(null);
   const [textResponse, setTextResponse] = useState('');
   const [mediaFile, setMediaFile] = useState<MediaFile | null>(null);
-  const [isRecording, setIsRecording] = useState(false);
+  const [isRecording, setIsRecording] = useState(false); // This state might become unused after removing from AudioRecorder props
   const [isSaving, setIsSaving] = useState(false);
   
   const handleMediaSelect = (type: MediaType) => {
@@ -61,18 +70,36 @@ const PromptResponseScreen = () => {
     setSelectedMediaType(capturedMediaFile.type === 'image' ? 'photo' : capturedMediaFile.type);
   };
   
-  const handleAudioRecorded = (uri: string) => {
-    // Create a MediaFile object for audio
-    const audioFile: MediaFile = {
-      id: Date.now().toString(),
-      type: 'audio',
-      uri,
-      filename: `audio_${Date.now()}.m4a`,
-      size: 0,
-      mimeType: 'audio/m4a',
-    };
-    setMediaFile(audioFile);
-    setSelectedMediaType('audio');
+  const handleAudioRecordingComplete = async (mediaFile: MediaFile) => {
+    if (mediaFile && mediaFile.uri) {
+      // Ensure mediaFile has an id, if AudioRecorder doesn't provide it
+      const ensuredMediaFile = {
+        ...mediaFile,
+        id: mediaFile.id || generateUUID(), // Ensure ID exists
+      };
+      setMediaFile(ensuredMediaFile);
+      setSelectedMediaType('audio');
+    } else if (mediaFile) {
+      // Handle case where mediaFile is provided but URI might be missing (e.g. error state)
+      // For now, just log it or decide on a specific error handling strategy
+      console.warn('Audio recording complete but URI is missing:', mediaFile);
+      // Potentially set an error state or a default media file indicating an issue
+      const errorMediaFile: MediaFile = {
+        id: mediaFile.id || generateUUID(),
+        type: 'audio',
+        filename: 'error_recording.m4a',
+        // uri: undefined, // Explicitly
+      }
+      setMediaFile(errorMediaFile);
+      setSelectedMediaType('audio');
+    } else {
+      setMediaFile(null);
+    }
+  };
+
+  const handleAudioCancel = () => {
+    setSelectedMediaType(null); // Go back to media type selection
+    setMediaFile(null);
   };
 
   const handleRemoveMedia = () => {
@@ -84,38 +111,137 @@ const PromptResponseScreen = () => {
   };
   
   const handleSaveResponse = async () => {
+    console.log('[PromptResponseScreen] Attempting to save response...');
     try {
       setIsSaving(true);
-      
-      // Validate that we have a response
-      if (
-        (selectedMediaType === 'text' && !textResponse.trim()) ||
-        (selectedMediaType !== 'text' && !mediaFile)
-      ) {
-        // Show error or alert that response is empty
+      console.log('[PromptResponseScreen] isSaving set to true.');
+
+      if (!user) {
+        console.error('User not authenticated, cannot save response.');
+        Alert.alert('Error', 'User not authenticated. Please log in.');
+        setIsSaving(false);
         return;
       }
-      
-      // Prepare response content based on type
-      const content = selectedMediaType === 'text' ? textResponse : mediaFile?.uri || '';
-      
-      // Save the response
-      const success = await CapsuleService.saveResponse(promptId, {
-        type: selectedMediaType as 'text' | 'audio' | 'video' | 'photo',
-        content,
-        mediaFile: selectedMediaType !== 'text' ? mediaFile : undefined
-      });
-      
-      if (success) {
-        // Navigate back to capsule detail
-        navigation.goBack();
+
+      // Validate selectedMediaType and content
+      if (!selectedMediaType) {
+        Alert.alert('Input Error', 'Please select a response type (text, photo, etc.).');
+        setIsSaving(false);
+        return;
+      }
+      if (selectedMediaType === 'text' && !textResponse.trim()) {
+        Alert.alert('Input Error', 'Please enter some text for your response.');
+        setIsSaving(false);
+        return;
+      }
+      if (selectedMediaType !== 'text' && !mediaFile) {
+        Alert.alert('Input Error', `Please select a ${selectedMediaType} file.`);
+        setIsSaving(false);
+        return;
+      }
+
+      const nowTimestamp = Date.now();
+      let entryTypeForCapsule: CapsuleEntry['type'];
+      let actualTextContent: string | undefined = undefined;
+      let finalMediaUri: string | undefined = undefined;
+      let finalThumbnailUri: string | undefined = undefined;
+      let originalFilename: string | undefined = undefined;
+      let dateTakenForMetadata: number = nowTimestamp; // Default to now
+
+      if (selectedMediaType === 'text') {
+        entryTypeForCapsule = 'text';
+        actualTextContent = textResponse.trim();
+      } else if (mediaFile && mediaFile.uri) { // Photo, Video, or Audio
+        // Determine CapsuleEntry type ('photo', 'video', 'audio')
+        if (selectedMediaType === 'photo') entryTypeForCapsule = 'photo'; // selectedMediaType is 'photo'
+        else if (selectedMediaType === 'video') entryTypeForCapsule = 'video';
+        else if (selectedMediaType === 'audio') entryTypeForCapsule = 'audio';
+        else {
+          // Should not happen if validation above is correct
+          console.error('Invalid media type combination');
+          Alert.alert('Error', 'Invalid media type.');
+          setIsSaving(false);
+          return;
+        }
+
+        finalMediaUri = mediaFile.uri; // Start with local URI
+        finalThumbnailUri = mediaFile.type === 'video' ? (mediaFile as any).thumbnailUri : undefined;
+        originalFilename = mediaFile.filename;
+        // dateTakenForMetadata could be extracted from mediaFile if available, e.g., mediaFile.dateTaken (if we add it to LocalMediaFile)
+
+        // Upload to Firebase Storage
+        console.log(`[PromptResponseScreen] Attempting to upload ${mediaFile.type}: ${mediaFile.filename}`);
+        try {
+          const uploadableMediaFile: LocalMediaFile = {
+            id: mediaFile.id || generateUUID(),
+            type: mediaFile.type as 'image' | 'video' | 'audio', // mediaFile.type is 'image', 'video', or 'audio'
+            uri: mediaFile.uri,
+            filename: mediaFile.filename,
+          };
+          const downloadURL = await MediaService.uploadMediaFile(uploadableMediaFile, user.uid);
+          finalMediaUri = downloadURL; // Update with cloud storage URL
+          console.log(`[PromptResponseScreen] Media uploaded successfully. Download URL: ${downloadURL}`);
+        } catch (uploadError) {
+          console.error('[PromptResponseScreen] Error uploading media file:', uploadError);
+          Alert.alert('Upload Error', 'Failed to upload media. Please try again.');
+          setIsSaving(false);
+          return;
+        }
       } else {
-        // Handle error
-        console.error('Failed to save response');
+        // This case should be caught by earlier validation
+        console.error('Inconsistent state: No text and no valid mediaFile for non-text type.');
+        Alert.alert('Error', 'Something went wrong. Please try again.');
+        setIsSaving(false);
+        return;
+      }
+
+      // Prepare MediaMetadata
+      const newEntryMetadata: MediaMetadata = {
+        uploadedAt: nowTimestamp,
+        userDescription: textResponse || '', // User's text input serves as description here
+        dateTaken: dateTakenForMetadata, 
+      };
+      if (originalFilename) {
+        newEntryMetadata.filename = originalFilename;
+      }
+
+      // Construct the new entry
+      const newEntry: CapsuleEntry = {
+        id: generateUUID(),
+        type: entryTypeForCapsule,
+        textContent: actualTextContent,
+        mediaUri: finalMediaUri,
+        thumbnailUri: finalThumbnailUri,
+        metadata: newEntryMetadata,
+        createdAt: nowTimestamp,
+        updatedAt: nowTimestamp,
+      };
+
+      const newCapsuleResponseData: CapsuleResponse = {
+        id: capsuleId,
+        userId: user.uid,
+        promptId: promptId,
+        capsuleTitle: capsuleTitle,
+        entries: [newEntry],
+        createdAt: nowTimestamp,
+        updatedAt: nowTimestamp,
+      };
+
+      console.log('[PromptResponseScreen] Calling CapsuleService.addCapsuleResponse with data:', JSON.stringify(newCapsuleResponseData, null, 2));
+      const saveSuccess = await CapsuleService.addCapsuleResponse(user.uid, newCapsuleResponseData);
+
+      if (saveSuccess) {
+        console.log('[PromptResponseScreen] CapsuleService.addCapsuleResponse successful. Capsule data:', JSON.stringify(newCapsuleResponseData, null, 2));
+        navigation.navigate('CapsulesList', undefined);
+      } else {
+        console.error('[PromptResponseScreen] CapsuleService.addCapsuleResponse returned false.');
+        Alert.alert('Save Error', 'Failed to save capsule. Please try again.');
       }
     } catch (error) {
-      console.error('Error saving response:', error);
+      console.error('[PromptResponseScreen] Error in handleSaveResponse catch block:', error);
+      // Optionally, show an alert to the user here
     } finally {
+      console.log('[PromptResponseScreen] Entering finally block, setting isSaving to false.');
       setIsSaving(false);
     }
   };
@@ -258,10 +384,9 @@ const PromptResponseScreen = () => {
           </View>
         ) : (
           <AudioRecorder
-            onRecordingComplete={handleAudioRecorded}
-            isRecording={isRecording}
-            setIsRecording={setIsRecording}
-            maxDuration={180} // 3 minutes
+            onRecordingComplete={handleAudioRecordingComplete}
+            onCancel={handleAudioCancel}
+            maxDuration={300} // 5 minutes
           />
         )}
       </View>
@@ -383,23 +508,24 @@ const styles = StyleSheet.create({
     padding: theme.spacing.xs,
   },
   headerTitle: {
-    ...theme.typography.h3,
+    fontSize: theme.typography.size.xl,
     color: theme.colors.text.primary,
     textAlign: 'center',
     flex: 1,
     marginLeft: theme.spacing.md,
   },
   saveButton: {
-    paddingVertical: theme.spacing.xs,
-    paddingHorizontal: theme.spacing.md,
     backgroundColor: theme.colors.primary,
+    paddingVertical: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.md,
     borderRadius: theme.spacing.sm,
   },
   saveButtonDisabled: {
     backgroundColor: theme.colors.gray[300],
   },
   saveButtonText: {
-    ...theme.typography.button,
+    fontSize: theme.typography.size.lg,
+    fontWeight: theme.typography.fontWeight.semibold,
     color: theme.colors.text.inverse,
   },
   saveButtonTextDisabled: {
@@ -419,7 +545,8 @@ const styles = StyleSheet.create({
     ...theme.shadows.sm,
   },
   promptText: {
-    ...theme.typography.h2,
+    fontSize: theme.typography.size.xl,
+    fontWeight: theme.typography.fontWeight.semibold,
     color: theme.colors.text.primary,
     textAlign: 'center',
   },
@@ -427,7 +554,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.xl,
   },
   mediaSelectorTitle: {
-    ...theme.typography.subtitle,
+    fontSize: theme.typography.size.sm,
     color: theme.colors.text.secondary,
     marginBottom: theme.spacing.md,
   },
@@ -450,13 +577,13 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.primary,
   },
   mediaTypeText: {
-    ...theme.typography.caption,
+    fontSize: theme.typography.size.base,
     color: theme.colors.text.secondary,
     marginTop: theme.spacing.xs,
   },
   mediaTypeTextSelected: {
     color: theme.colors.primary,
-    fontWeight: theme.typography.fontWeight[600] as any,
+    fontWeight: theme.typography.fontWeight.medium,
   },
   textResponseContainer: {
     backgroundColor: theme.colors.surface,
@@ -466,11 +593,15 @@ const styles = StyleSheet.create({
     ...theme.shadows.sm,
   },
   textInput: {
-    ...theme.typography.body,
+    backgroundColor: theme.colors.background,
+    borderColor: theme.colors.border.medium, // Changed from .main
+    borderWidth: 1,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md,
+    fontSize: theme.typography.size.base,
     color: theme.colors.text.primary,
-    height: 200,
+    minHeight: 150,
     textAlignVertical: 'top',
-    padding: theme.spacing.sm,
   },
   audioResponseContainer: {
     backgroundColor: theme.colors.surface,
@@ -503,7 +634,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   retakeButtonText: {
-    ...theme.typography.button,
+    fontSize: theme.typography.size.base,
+    fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.text.primary,
     marginLeft: theme.spacing.xs,
   },

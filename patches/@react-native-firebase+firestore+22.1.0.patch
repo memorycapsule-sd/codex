@@ -1,0 +1,29 @@
+diff --git a/node_modules/@react-native-firebase/firestore/app.plugin.js b/node_modules/@react-native-firebase/firestore/app.plugin.js
+new file mode 100644
+index 0000000..66d7163
+--- /dev/null
++++ b/node_modules/@react-native-firebase/firestore/app.plugin.js
+@@ -0,0 +1,9 @@
++// node_modules/@react-native-firebase/firestore/app.plugin.js
++const withDummyFirestorePlugin = (config) => {
++    // This plugin currently does nothing specific for Firestore,
++    // relying on @react-native-firebase/app for core setup.
++    // You could add specific iOS/Android modifications here if needed.
++    return config;
++  };
++  
++  module.exports = withDummyFirestorePlugin;
+\ No newline at end of file
+diff --git a/node_modules/@react-native-firebase/firestore/lib/index.js b/node_modules/@react-native-firebase/firestore/lib/index.js
+index e95cb29..de07c58 100644
+--- a/node_modules/@react-native-firebase/firestore/lib/index.js
++++ b/node_modules/@react-native-firebase/firestore/lib/index.js
+@@ -24,7 +24,7 @@ import {
+   isUndefined,
+   isAndroid,
+   createDeprecationProxy,
+-} from '@react-native-firebase/app/lib/common';
++} from '@react-native-firebase/app/lib/common/index.js';
+ import { setReactNativeModule } from '@react-native-firebase/app/lib/internal/nativeModule';
+ import {
+   createModuleNamespace,

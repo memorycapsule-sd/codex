@@ -1,17 +1,19 @@
 import * as ImagePicker from 'expo-image-picker';
-import { Audio, Video } from 'expo-av';
+import { Audio } from 'expo-av';
+import { storage } from '../firebase';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { storage } from '../../app/config/firebase';
 
 export interface MediaFile {
   id: string;
-  type: 'image' | 'video' | 'audio';
-  uri: string;
-  filename: string;
-  size: number;
+  title?: string; // User-defined title for the memory
+  type: 'image' | 'video' | 'audio' | 'text';
+  uri?: string; // Optional: Not applicable for text type
+  filename?: string; // Optional: Not applicable for text type
+  size?: number; // Optional: Not applicable for text type
   duration?: number; // for audio/video
   mimeType?: string;
-  uploadUrl?: string; // Firebase Storage URL
+  uploadUrl?: string; // Firebase Storage URL, may not be applicable for text
+  textContent?: string; // For text type memories
 }
 
 export interface RecordingResult {
@@ -215,20 +217,25 @@ export const MediaService = {
    * Upload media file to Firebase Storage
    */
   async uploadMediaFile(mediaFile: MediaFile, userId: string): Promise<string> {
+    if (mediaFile.type === 'text' || !mediaFile.uri) {
+      // This case should ideally be prevented by the caller (e.g., memoryService)
+      // but as a safeguard:
+      console.error('uploadMediaFile called inappropriately for text memory or media without URI.');
+      throw new Error('Cannot upload text memories or media without a URI to Firebase Storage.');
+    }
     try {
-      // Create a reference to the file location
-      const fileRef = ref(storage, `media/${userId}/${mediaFile.id}_${mediaFile.filename}`);
-      
-      // Convert URI to blob for upload
+      const path = `media/${userId}/${mediaFile.id}_${mediaFile.filename}`;
+      const storageRef = ref(storage, path);
+
+      // Convert file URI to blob
       const response = await fetch(mediaFile.uri);
       const blob = await response.blob();
-      
+
       // Upload the file
-      const snapshot = await uploadBytes(fileRef, blob);
-      
+      await uploadBytes(storageRef, blob);
+
       // Get the download URL
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      
+      const downloadURL = await getDownloadURL(storageRef);
       return downloadURL;
     } catch (error) {
       console.error('Error uploading media file:', error);
@@ -241,8 +248,9 @@ export const MediaService = {
    */
   async deleteMediaFile(mediaFile: MediaFile, userId: string): Promise<void> {
     try {
-      const fileRef = ref(storage, `media/${userId}/${mediaFile.id}_${mediaFile.filename}`);
-      await deleteObject(fileRef);
+      const path = `media/${userId}/${mediaFile.id}_${mediaFile.filename}`;
+      const storageRef = ref(storage, path);
+      await deleteObject(storageRef);
     } catch (error) {
       console.error('Error deleting media file:', error);
       throw error;

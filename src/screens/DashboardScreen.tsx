@@ -1,16 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
   StyleSheet, 
   SafeAreaView, 
-  ScrollView, 
-  TouchableOpacity, 
+  ScrollView,
+  TouchableOpacity,
   Image,
-  Dimensions 
+  Dimensions,
+  Alert,
+  Modal,
+  TextInput,
+  FlatList,
+  ActivityIndicator,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
+import { VideoRecorder } from '../components/media/VideoRecorder';
+import { AudioRecorder } from '../components/media/AudioRecorder';
+import { MediaFile, MediaService } from '../services/media';
+import { MediaPreview } from '../components/media/MediaPreview';
+import { useAuth } from '../contexts/AuthContext';
+import { saveMemory, getRecentMemories, Memory } from '../services/memoryService';
 
 const { width } = Dimensions.get('window');
 
@@ -19,15 +31,6 @@ interface Category {
   name: string;
   icon: keyof typeof Ionicons.glyphMap;
   active?: boolean;
-}
-
-interface ActivityItem {
-  id: string;
-  title: string;
-  description: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  iconColor: string;
-  iconBg: string;
 }
 
 interface TimelineItem {
@@ -45,25 +48,6 @@ const categories: Category[] = [
   { id: '3', name: 'Career', icon: 'briefcase-outline', active: false },
   { id: '4', name: 'Family', icon: 'people-outline', active: false },
   { id: '5', name: 'Travel', icon: 'airplane-outline', active: false },
-];
-
-const recentActivity: ActivityItem[] = [
-  {
-    id: '1',
-    title: 'First Day at College',
-    description: 'Added 3 photos • 2 days ago',
-    icon: 'image-outline',
-    iconColor: theme.colors.secondary,
-    iconBg: theme.colors.secondary + '20',
-  },
-  {
-    id: '2',
-    title: 'My First Job Interview',
-    description: 'Added audio • 4 days ago',
-    icon: 'mic-outline',
-    iconColor: theme.colors.primary,
-    iconBg: theme.colors.primary + '20',
-  },
 ];
 
 const timelineItems: TimelineItem[] = [
@@ -86,11 +70,100 @@ const timelineItems: TimelineItem[] = [
 ];
 
 export default function DashboardScreen() {
-  const getCurrentGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
+  const { user } = useAuth();
+  const [recentActivities, setRecentActivities] = useState<Memory[]>([]);
+  const [isLoadingActivities, setIsLoadingActivities] = useState(false);
+
+  // Effect to fetch recent activities
+  useEffect(() => {
+    if (user?.uid) {
+      const fetchActivities = async () => {
+        setIsLoadingActivities(true);
+        try {
+          const activities = await getRecentMemories(user.uid, 5);
+          setRecentActivities(activities);
+        } catch (error) {
+          console.error('Failed to fetch recent activities:', error);
+          Alert.alert('Error', 'Could not load recent activities.');
+        }
+        setIsLoadingActivities(false);
+      };
+      fetchActivities();
+    }
+  }, [user?.uid]);
+
+  // Media capture state
+  const [showVideoRecorder, setShowVideoRecorder] = useState(false);
+  const [showAudioRecorder, setShowAudioRecorder] = useState(false);
+  const [showTextInput, setShowTextInput] = useState(false);
+  const [capturedMedia, setCapturedMedia] = useState<MediaFile | null>(null);
+  const [showMediaPreview, setShowMediaPreview] = useState(false);
+  const [textMemory, setTextMemory] = useState('');
+  const [memoryTitle, setMemoryTitle] = useState('');
+  const [isSavingMemory, setIsSavingMemory] = useState(false);
+
+  const handleSaveTextMemory = () => {
+    if (textMemory.trim() === '') {
+      Alert.alert('Empty Memory', 'Please write something to save your memory.');
+      return;
+    }
+    const newTextMemory: MediaFile = {
+      id: Date.now().toString(),
+      type: 'text',
+      textContent: textMemory.trim(),
+      // No uri, filename, or size needed for text type
+    };
+    setCapturedMedia(newTextMemory);
+    setShowMediaPreview(true);
+    setTextMemory('');
+    setMemoryTitle(''); // Reset title for new capture
+    setShowTextInput(false);
+  };
+
+  const handleSaveMemory = async () => {
+    if (!user || !capturedMedia) {
+      Alert.alert('Error', 'User or media data is missing. Cannot save memory.');
+      return;
+    }
+    if (!memoryTitle.trim()) {
+      Alert.alert('Title Required', 'Please enter a title for your memory.');
+      return;
+    }
+
+    setIsSavingMemory(true);
+    try {
+      // Add title to the capturedMedia object
+      const mediaToSave: MediaFile = {
+        ...capturedMedia,
+        title: memoryTitle.trim(),
+      };
+
+      await saveMemory(mediaToSave, user.uid);
+      Alert.alert('Success', 'Memory saved successfully!');
+      setShowMediaPreview(false);
+      setCapturedMedia(null);
+      setMemoryTitle('');
+      // Refresh recent activities
+      if (user?.uid) {
+        const fetchActivities = async () => {
+          setIsLoadingActivities(true);
+          try {
+            const activities = await getRecentMemories(user.uid, 5);
+            setRecentActivities(activities);
+          } catch (error) {
+            console.error('Failed to fetch recent activities after save:', error);
+            // Optionally show a less intrusive error or just log
+          }
+          setIsLoadingActivities(false);
+        };
+        fetchActivities();
+      }
+    } catch (error) {
+      console.error('Error saving memory:', error);
+      Alert.alert('Error', 'Failed to save memory. Please try again.');
+    } finally {
+      setIsSavingMemory(false);
+    }
   };
 
   const renderCategoryItem = (category: Category) => (
@@ -117,39 +190,34 @@ export default function DashboardScreen() {
     </TouchableOpacity>
   );
 
-  const renderActivityItem = (item: ActivityItem) => (
+  const getCurrentGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 5) return "Good Night";
+    if (hour < 12) return "Good Morning";
+    if (hour < 18) return "Good Afternoon";
+    if (hour < 22) return "Good Evening";
+    return "Good Night";
+  };
+
+  const renderRecentActivityItem = ({ item }: { item: Memory }) => (
     <TouchableOpacity key={item.id} style={styles.activityItem}>
-      <View style={[styles.activityIcon, { backgroundColor: item.iconBg }]}>
-        <Ionicons name={item.icon} size={24} color={item.iconColor} />
+      <View style={[styles.activityIcon, { backgroundColor: theme.colors.primaryLight } ]}>
+        <Ionicons 
+          name={item.type === 'video' ? 'videocam-outline' : item.type === 'audio' ? 'mic-outline' : item.type === 'text' ? 'document-text-outline' : 'camera-outline'} 
+          size={20} 
+          color={theme.colors.white} // Changed from theme.colors.primary[500]
+        />
       </View>
       <View style={styles.activityContent}>
-        <Text style={styles.activityTitle}>{item.title}</Text>
-        <Text style={styles.activityDescription}>{item.description}</Text>
+        <Text style={styles.activityTitle}>{item.title || 'Untitled Memory'}</Text>
+        <Text style={styles.activityDescription}>
+          {item.createdAt ? new Date(item.createdAt.seconds * 1000).toLocaleDateString() : 'Date unknown'}
+        </Text>
       </View>
       <TouchableOpacity style={styles.activityChevron}>
         <Ionicons name="chevron-forward" size={16} color={theme.colors.gray[400]} />
       </TouchableOpacity>
     </TouchableOpacity>
-  );
-
-  const renderTimelineItem = (item: TimelineItem, index: number) => (
-    <View key={item.id} style={styles.timelineItem}>
-      <View style={[styles.timelineDot, { backgroundColor: item.dotColor }]} />
-      <View style={styles.timelineCard}>
-        <View style={styles.timelineHeader}>
-          <Text style={styles.timelineTitle}>{item.title}</Text>
-          <Text style={styles.timelineYear}>{item.year}</Text>
-        </View>
-        <Text style={styles.timelineDescription}>{item.description}</Text>
-        <View style={styles.timelineTags}>
-          {item.tags.map((tag, tagIndex) => (
-            <View key={tagIndex} style={styles.timelineTag}>
-              <Text style={styles.timelineTagText}>{tag}</Text>
-            </View>
-          ))}
-        </View>
-      </View>
-    </View>
   );
 
   return (
@@ -158,19 +226,47 @@ export default function DashboardScreen() {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Text style={styles.greeting}>{getCurrentGreeting()}</Text>
-          <Text style={styles.userName}>Sarah</Text>
+          <Text style={styles.userName}>{user?.displayName || user?.email || 'User'}</Text>
         </View>
         <TouchableOpacity style={styles.profileButton}>
           <View style={styles.profileAvatar}>
-            <Text style={styles.profileInitial}>S</Text>
+            <Text style={styles.profileInitial}>
+              {user?.displayName ? user.displayName[0].toUpperCase() : user?.email ? user.email[0].toUpperCase() : 'U'}
+            </Text>
           </View>
           <TouchableOpacity style={styles.notificationBadge}>
-            <Ionicons name="notifications" size={16} color="#7C67CB" />
+            <Ionicons name="notifications-outline" size={20} color={theme.colors.dark} />
           </TouchableOpacity>
         </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Record a Memory */}
+        <View style={styles.recordMemorySection}>
+          <Text style={styles.recordMemoryTitle}>Record a Memory</Text>
+          <Text style={styles.recordMemorySubtitle}>Capture and preserve your moments</Text>
+          <View style={styles.recordOptions}>
+            <TouchableOpacity style={styles.recordOption} onPress={() => setShowVideoRecorder(true)}>
+              <LinearGradient colors={['#42275a', '#734b6d']} style={styles.recordIconContainer}>
+                <Ionicons name="videocam" size={24} color={theme.colors.white} />
+              </LinearGradient>
+              <Text style={styles.recordOptionText}>Video</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.recordOption} onPress={() => setShowAudioRecorder(true)}>
+              <LinearGradient colors={['#42275a', '#734b6d']} style={styles.recordIconContainer}>
+                <Ionicons name="mic" size={24} color={theme.colors.white} />
+              </LinearGradient>
+              <Text style={styles.recordOptionText}>Audio</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.recordOption} onPress={() => setShowTextInput(true)}>
+              <LinearGradient colors={['#42275a', '#734b6d']} style={styles.recordIconContainer}>
+                <Ionicons name="create" size={24} color={theme.colors.white} />
+              </LinearGradient>
+              <Text style={styles.recordOptionText}>Text</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* Categories */}
         <View style={styles.categoriesSection}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesScroll}>
@@ -198,15 +294,15 @@ export default function DashboardScreen() {
               Who did you play with and what made it so special?
             </Text>
             <View style={styles.promptActions}>
-              <TouchableOpacity style={styles.promptAction}>
+              <TouchableOpacity style={styles.promptAction} onPress={() => setShowAudioRecorder(true)}>
                 <Ionicons name="mic" size={16} color="#7C67CB" />
                 <Text style={styles.promptActionText}>Record</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.promptAction}>
+              <TouchableOpacity style={styles.promptAction} onPress={() => setShowTextInput(true)}>
                 <Ionicons name="create" size={16} color="#7C67CB" />
                 <Text style={styles.promptActionText}>Write</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.promptAction}>
+              <TouchableOpacity style={styles.promptAction} onPress={() => { Alert.alert("Photo Memory", "Photo capture coming soon!"); }}>
                 <Ionicons name="camera" size={16} color="#7C67CB" />
                 <Text style={styles.promptActionText}>Photo</Text>
               </TouchableOpacity>
@@ -218,37 +314,170 @@ export default function DashboardScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recent Activity</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => Alert.alert("View All", "Viewing all activities coming soon!")}>
               <Text style={styles.viewAllButton}>View All</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.activityList}>
-            {recentActivity.map(renderActivityItem)}
-          </View>
+          {isLoadingActivities ? (
+            <ActivityIndicator size="large" color={theme.colors.primary} style={{ marginTop: 20}} />
+          ) : (
+            <FlatList
+              data={recentActivities}
+              renderItem={renderRecentActivityItem}
+              keyExtractor={(item) => item.id}
+              ListEmptyComponent={
+                <Text style={{ textAlign: 'center', color: theme.colors.gray[500], marginTop: 20, fontSize: theme.typography.size.base }}>
+                  No recent activity yet. Start by recording a memory!
+                </Text>
+              }
+              scrollEnabled={false} // If inside a ScrollView, disable FlatList's own scroll
+            />
+          )}
         </View>
-
-        {/* Timeline Preview */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Your Timeline</Text>
-            <TouchableOpacity>
-              <Text style={styles.viewAllButton}>View All</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.timelineContainer}>
-            <View style={styles.timelineLine} />
-            {timelineItems.map(renderTimelineItem)}
-          </View>
-        </View>
-
-        {/* Bottom spacing for floating button */}
         <View style={styles.bottomSpacing} />
       </ScrollView>
 
-      {/* Floating Action Button */}
-      <TouchableOpacity style={styles.fab}>
-        <Ionicons name="add" size={24} color={theme.colors.white} />
-      </TouchableOpacity>
+      {/* Video Recorder Modal */}
+      {showVideoRecorder && (
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={showVideoRecorder}
+          onRequestClose={() => setShowVideoRecorder(false)}
+        >
+          <VideoRecorder
+            onVideoRecorded={(media: MediaFile) => {
+              setCapturedMedia(media);
+              setShowVideoRecorder(false);
+              setShowMediaPreview(true);
+              setMemoryTitle(''); 
+            }}
+            onCancel={() => setShowVideoRecorder(false)}
+          />
+        </Modal>
+      )}
+
+      {/* Audio Recorder Modal */}
+      {showAudioRecorder && (
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={showAudioRecorder}
+          onRequestClose={() => setShowAudioRecorder(false)}
+        >
+          <AudioRecorder
+            onRecordingComplete={(media: MediaFile) => {
+              setCapturedMedia(media);
+              setShowAudioRecorder(false);
+              setShowMediaPreview(true);
+              setMemoryTitle('');
+            }}
+            onCancel={() => setShowAudioRecorder(false)}
+          />
+        </Modal>
+      )}
+
+      {/* Text Input Modal */}
+      {showTextInput && (
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={showTextInput}
+          onRequestClose={() => setShowTextInput(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Write a Memory</Text>
+                <TouchableOpacity onPress={() => setShowTextInput(false)}>
+                  <Ionicons name="close-circle" size={28} color={theme.colors.gray[400]} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.textInputContainer}>
+                <Text style={styles.textInputLabel}>Title</Text>
+                <TextInput
+                  style={styles.titleInput}
+                  placeholder="Enter a title for your memory"
+                  value={memoryTitle}
+                  onChangeText={setMemoryTitle}
+                  placeholderTextColor={theme.colors.gray[400]}
+                />
+                <Text style={styles.textInputLabel}>Your Memory</Text>
+                <View style={styles.textAreaContainer}>
+                  <TextInput
+                    style={styles.textInputActual}
+                    placeholder="Start writing your memory..."
+                    value={textMemory}
+                    onChangeText={setTextMemory}
+                    multiline
+                    numberOfLines={6}
+                    textAlignVertical="top"
+                    placeholderTextColor={theme.colors.gray[400]}
+                  />
+                </View>
+              </View>
+              <TouchableOpacity 
+                style={[styles.saveButton, (!textMemory.trim() || !memoryTitle.trim()) && styles.disabledButton]} 
+                onPress={handleSaveTextMemory}
+                disabled={!textMemory.trim() || !memoryTitle.trim()}
+              >
+                <Text style={styles.saveButtonText}>Preview & Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      )}
+
+      {/* Media Preview Modal */}
+      {showMediaPreview && capturedMedia && (
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={showMediaPreview}
+          onRequestClose={() => {
+            setShowMediaPreview(false);
+            setCapturedMedia(null);
+            setMemoryTitle('');
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Preview & Save</Text>
+                <TouchableOpacity onPress={() => {
+                  setShowMediaPreview(false);
+                  setCapturedMedia(null);
+                  setMemoryTitle('');
+                }}>
+                  <Ionicons name="close-circle" size={28} color={theme.colors.gray[400]} />
+                </TouchableOpacity>
+              </View>
+              <MediaPreview mediaFile={capturedMedia} />
+              <View style={styles.textInputContainer}>
+                <Text style={styles.textInputLabel}>Memory Title</Text>
+                <TextInput
+                  style={styles.titleInput}
+                  placeholder="Enter a title for your memory"
+                  value={memoryTitle}
+                  onChangeText={setMemoryTitle}
+                  placeholderTextColor={theme.colors.gray[400]}
+                />
+              </View>
+              <TouchableOpacity
+                style={[styles.saveButton, (isSavingMemory || !memoryTitle.trim()) && styles.disabledButton]}
+                onPress={handleSaveMemory}
+                disabled={isSavingMemory || !memoryTitle.trim()}
+              >
+                {isSavingMemory ? (
+                  <ActivityIndicator color={theme.colors.white} />
+                ) : (
+                  <Text style={styles.saveButtonText}>Save Memory</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 }
@@ -539,5 +768,137 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.size.sm,
     fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.primary,
+  },
+  recordMemorySection: {
+    marginBottom: theme.spacing.md,
+    backgroundColor: theme.colors.white,
+    borderRadius: theme.borderRadius.xl,
+    padding: theme.spacing.lg,
+    ...theme.shadows.sm,
+  },
+  recordMemoryTitle: {
+    fontSize: theme.typography.size.xl,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.dark,
+    marginBottom: theme.spacing.xs,
+  },
+  recordMemorySubtitle: {
+    fontSize: theme.typography.size.sm,
+    color: theme.colors.gray[500],
+    marginBottom: theme.spacing.md,
+  },
+  recordOptions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: theme.spacing.sm,
+  },
+  recordOption: {
+    alignItems: 'center',
+    width: (width - theme.spacing.lg * 4) / 3,
+  },
+  recordIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: theme.spacing.sm,
+    ...theme.shadows.md,
+  },
+  recordOptionText: {
+    fontSize: theme.typography.size.sm,
+    fontWeight: theme.typography.fontWeight.medium,
+    color: theme.colors.dark,
+    marginTop: theme.spacing.xs,
+  },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: theme.spacing.lg,
+  },
+  modalContent: {
+    width: '100%',
+    backgroundColor: theme.colors.white,
+    borderRadius: theme.borderRadius.xl,
+    padding: theme.spacing.lg,
+    ...theme.shadows.md,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing.lg,
+  },
+  modalTitle: {
+    fontSize: theme.typography.size.xl,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.dark,
+  },
+  // Text input styles
+  textInputContainer: {
+    marginBottom: theme.spacing.lg,
+  },
+  textInputLabel: {
+    fontSize: theme.typography.size.base,
+    fontWeight: theme.typography.fontWeight.medium,
+    color: theme.colors.dark,
+    marginBottom: theme.spacing.sm,
+  },
+  textAreaContainer: {
+    minHeight: 150,
+    borderWidth: 1,
+    borderColor: theme.colors.gray[300],
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textAreaPlaceholder: {
+    color: theme.colors.gray[400],
+    fontSize: theme.typography.size.base,
+  },
+  textInputActual: {
+    flex: 1, 
+    minHeight: 150, 
+    fontSize: theme.typography.size.base,
+    color: theme.colors.dark,
+    padding: 10,
+  },
+  // Media preview styles
+  previewContainer: {
+    marginTop: theme.spacing.md,
+    alignItems: 'center',
+  },
+  saveButton: {
+    backgroundColor: theme.colors.primary,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.xl,
+    borderRadius: theme.borderRadius.lg,
+    marginTop: theme.spacing.xl,
+    alignSelf: 'center',
+    ...theme.shadows.sm,
+  },
+  saveButtonText: {
+    color: theme.colors.white,
+    fontSize: theme.typography.size.base,
+    fontWeight: theme.typography.fontWeight.medium,
+  },
+  titleInput: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: theme.colors.gray[300],
+    borderRadius: theme.borderRadius.lg,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    fontSize: theme.typography.size.base,
+    color: theme.colors.dark,
+    marginBottom: theme.spacing.md,
+    backgroundColor: theme.colors.white,
+  },
+  disabledButton: {
+    backgroundColor: theme.colors.gray[300],
   },
 });

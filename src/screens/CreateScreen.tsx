@@ -16,6 +16,14 @@ import { MediaPicker, AudioRecorder, MediaPreview } from '../components/media';
 import { MediaFile, MediaService } from '../services/media';
 import { useAuth } from '../contexts/AuthContext';
 
+// Navigation imports
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { CapsulesStackParamList } from '../navigation/CapsulesNavigator';
+
+// Helper imports
+import { generateUUID } from '../utils/helpers';
+
 type ResponseType = 'text' | 'audio' | 'video';
 
 interface PromptData {
@@ -39,6 +47,10 @@ const samplePrompt: PromptData = {
 export default function CreateScreen() {
   const [selectedResponseType, setSelectedResponseType] = useState<ResponseType>('text');
   const [prompt] = useState<PromptData>(samplePrompt);
+  
+  // Initialize navigation
+  // TODO: Replace 'any' with the actual TabParamList type for TabNavigator
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   const handleResponseTypeSelect = (type: ResponseType) => {
     setSelectedResponseType(type);
@@ -53,9 +65,21 @@ export default function CreateScreen() {
   };
 
   const handleStartResponse = () => {
-    const actionText = selectedResponseType === 'text' ? 'Start Writing' : 
-                     selectedResponseType === 'audio' ? 'Start Recording' : 'Start Recording';
-    Alert.alert('Start Response', `${actionText} for: ${prompt.title}`);
+    // const actionText = selectedResponseType === 'text' ? 'Start Writing' : 
+    //                  selectedResponseType === 'audio' ? 'Start Recording' : 'Start Recording';
+    // Alert.alert('Start Response', `${actionText} for: ${prompt.title}`); // Old alert
+
+    const newCapsuleId = generateUUID();
+
+    navigation.navigate('Capsules', { // Navigate to the 'Capsules' tab which hosts CapsulesNavigator
+      screen: 'PromptResponse',       // Then specify the screen within CapsulesNavigator
+      params: { // These are the params for 'PromptResponse'
+        capsuleId: newCapsuleId,
+        promptId: prompt.id,
+        promptText: prompt.description,
+        capsuleTitle: prompt.title,
+      },
+    });
   };
 
   const handlePreviousPrompt = () => {
