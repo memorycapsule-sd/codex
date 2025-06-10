@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -7,72 +7,55 @@ import {
   ScrollView, 
   TouchableOpacity,
   Image,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native'; // Added import
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'; // Added import
 import { theme } from '../theme';
+import { useAuth } from '../contexts/AuthContext';
+import { CapsuleService } from '../services/capsuleService';
+import { CapsuleResponse, CapsuleEntry } from '../types/capsule'; // Added import for CapsuleResponse and CapsuleEntry
+import { CapsulesStackParamList } from '../navigation/CapsulesNavigator'; // Added import
 
-type MediaType = 'video' | 'text' | 'audio' | 'photos';
+type MediaType = 'video' | 'text' | 'audio' | 'photo'; 
+
 type Category = 'All' | 'Childhood' | 'Education' | 'Career' | 'Family' | 'Travel';
 
-interface TimelineEntry {
-  id: string;
-  title: string;
-  category: Category;
-  date: string;
-  description: string;
-  mediaType: MediaType;
-  thumbnail?: string;
-  audioDuration?: string;
-  audioProgress?: number;
-  photoCount?: number;
-}
-
-const sampleEntries: TimelineEntry[] = [
-  {
-    id: '1',
-    title: 'Career Milestone',
-    category: 'Career',
-    date: 'May 15, 2023',
-    description: 'My first day as a team lead was both exciting and nerve-wracking. I remember walking into the office feeling like...',
-    mediaType: 'video',
-    thumbnail: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/e4420d301d-b3866d5ec5f6fac0a2c4.png'
-  },
-  {
-    id: '2',
-    title: 'College Memories',
-    category: 'Education',
-    date: 'May 10, 2023',
-    description: 'The library was always my sanctuary during finals week. I\'d find a quiet corner on the third floor where I could spread out my notes and textbooks. The smell of coffee from my thermos mixed with the musty scent of old books created a strangely comforting atmosphere...',
-    mediaType: 'text'
-  },
-  {
-    id: '3',
-    title: 'Family Vacation',
-    category: 'Family',
-    date: 'April 25, 2023',
-    description: 'The sound of waves crashing on the shore as the kids played in the sand. This moment was everything...',
-    mediaType: 'audio',
-    audioDuration: '3:45',
-    audioProgress: 0.33
-  },
-  {
-    id: '4',
-    title: 'Childhood Home',
-    category: 'Childhood',
-    date: 'April 12, 2023',
-    description: 'I recently found these old photos of our first family home. The backyard tree where we built that treehouse...',
-    mediaType: 'photos',
-    photoCount: 7,
-    thumbnail: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/e4420d301d-b3866d5ec5f6fac0a2c4.png'
-  }
-];
+// Define navigation prop type specific to this screen's place in the CapsulesNavigator
+type TimelineNavigationProp = NativeStackNavigationProp<CapsulesStackParamList, 'CapsulesList'>;
 
 const categories: Category[] = ['All', 'Childhood', 'Education', 'Career', 'Family', 'Travel'];
 
 export default function TimelineScreen() {
+  const navigation = useNavigation<TimelineNavigationProp>(); // Added navigation hook
+  const { user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<Category>('All');
-  const [entries] = useState<TimelineEntry[]>(sampleEntries);
+  const [timelineData, setTimelineData] = useState<CapsuleResponse[]>([]); // Updated type to CapsuleResponse[]
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchCapsules = async () => {
+      if (user?.uid) {
+        setIsLoading(true);
+        try {
+          const responses = await CapsuleService.loadUserCapsuleResponses(user.uid);
+          setTimelineData(responses);
+        } catch (error) {
+          console.error("Error fetching timeline data:", error);
+          Alert.alert("Error", "Could not load timeline data.");
+          setTimelineData([]); 
+        }
+        setIsLoading(false);
+      } else {
+        setTimelineData([]); 
+        setIsLoading(false);
+      }
+    };
+
+    fetchCapsules();
+  }, [user]); 
 
   const handleSearch = () => {
     Alert.alert('Search', 'Search functionality would be implemented here');
@@ -102,7 +85,8 @@ export default function TimelineScreen() {
     Alert.alert('View Photos', `Viewing photo gallery for entry ${entryId}`);
   };
 
-  const getCategoryIcon = (category: Category): keyof typeof Ionicons.glyphMap => {
+  const getCategoryIcon = (categoryTitle: string): keyof typeof Ionicons.glyphMap => {
+    const category = categoryTitle as Category; 
     switch (category) {
       case 'Career':
         return 'briefcase';
@@ -119,7 +103,8 @@ export default function TimelineScreen() {
     }
   };
 
-  const getCategoryColor = (category: Category) => {
+  const getCategoryColor = (categoryTitle: string) => {
+    const category = categoryTitle as Category; 
     switch (category) {
       case 'Career':
         return theme.colors.secondary;
@@ -136,16 +121,18 @@ export default function TimelineScreen() {
     }
   };
 
-  const getMediaTypeIcon = (mediaType: MediaType): keyof typeof Ionicons.glyphMap => {
+  const getMediaTypeIcon = (mediaType: CapsuleEntry['type']): keyof typeof Ionicons.glyphMap => { // Changed to use CapsuleEntry['type']
     switch (mediaType) {
       case 'video':
         return 'videocam';
       case 'audio':
         return 'mic';
-      case 'photos':
-        return 'images';
+      case 'photo':
+        return 'image-outline'; 
       case 'text':
-        return 'document-text';
+        return 'document-text-outline';
+      default:
+        return 'help-circle-outline';
     }
   };
 
@@ -172,137 +159,111 @@ export default function TimelineScreen() {
     );
   };
 
-  const renderMediaContent = (entry: TimelineEntry) => {
-    switch (entry.mediaType) {
+  const renderMediaContent = (capsuleEntry: CapsuleEntry, capsuleResponseId: string) => {
+    // Assuming handlePlayVideo etc. now expect capsuleEntry.id or need to be adapted.
+    // For now, using capsuleEntry.id for media-specific actions.
+    switch (capsuleEntry.type) {
       case 'video':
         return (
-          <TouchableOpacity 
-            style={styles.videoContainer}
-            onPress={() => handlePlayVideo(entry.id)}
-          >
-            <Image source={{ uri: entry.thumbnail }} style={styles.videoThumbnail} />
+          <TouchableOpacity onPress={() => handlePlayVideo(capsuleEntry.id)} style={styles.videoContainer}>
+            <Image source={{ uri: capsuleEntry.mediaUri || undefined }} style={styles.videoThumbnail} resizeMode="cover" />
             <View style={styles.videoOverlay}>
-              <Ionicons name="play" size={24} color={theme.colors.white} />
+              <Ionicons name="play-circle" size={48} color={theme.colors.white} />
             </View>
           </TouchableOpacity>
         );
-      
+      case 'text':
+        return <Text style={styles.entryDescription}>{capsuleEntry.textContent}</Text>; 
       case 'audio':
         return (
-          <View style={styles.audioContainer}>
-            <TouchableOpacity 
-              style={styles.audioPlayButton}
-              onPress={() => handlePlayAudio(entry.id)}
-            >
-              <Ionicons name="play" size={12} color={theme.colors.white} />
-            </TouchableOpacity>
+          <TouchableOpacity onPress={() => handlePlayAudio(capsuleEntry.id)} style={styles.audioContainer}>
+            <View style={styles.audioPlayButton}>
+              <Ionicons name="play" size={18} color={theme.colors.white} />
+            </View>
             <View style={styles.audioProgress}>
-              <View style={styles.audioProgressBar}>
-                <View 
-                  style={[
-                    styles.audioProgressFill, 
-                    { width: `${(entry.audioProgress || 0) * 100}%` }
-                  ]} 
-                />
-              </View>
-              <View style={styles.audioTimeContainer}>
-                <Text style={styles.audioTime}>
-                  {Math.floor(((entry.audioProgress || 0) * 225))}:{Math.floor(((entry.audioProgress || 0) * 225) % 60).toString().padStart(2, '0')}
-                </Text>
-                <Text style={styles.audioTime}>{entry.audioDuration}</Text>
-              </View>
-            </View>
-          </View>
-        );
-      
-      case 'photos':
-        return (
-          <TouchableOpacity 
-            style={styles.photoGrid}
-            onPress={() => handleViewPhotos(entry.id)}
-          >
-            <View style={styles.photoItem}>
-              <Image source={{ uri: entry.thumbnail }} style={styles.photoImage} />
-            </View>
-            <View style={styles.photoItem}>
-              <Image source={{ uri: entry.thumbnail }} style={styles.photoImage} />
-            </View>
-            <View style={styles.photoItem}>
-              <Image source={{ uri: entry.thumbnail }} style={styles.photoImage} />
-              <View style={styles.photoOverlay}>
-                <Text style={styles.photoOverlayText}>+{(entry.photoCount || 1) - 3}</Text>
-              </View>
+              <Text style={styles.audioTime}>{capsuleEntry.metadata?.duration ? `${Math.floor(capsuleEntry.metadata.duration / 60)}:${String(Math.floor(capsuleEntry.metadata.duration % 60)).padStart(2, '0')}` : 'Audio'}</Text>
+              {/* Progress bar can be implemented here */}
             </View>
           </TouchableOpacity>
         );
-      
+      case 'photo': 
+        return (
+          <TouchableOpacity onPress={() => handleViewPhotos(capsuleEntry.id)} style={styles.photoItemSingle}>
+            <Image source={{ uri: capsuleEntry.mediaUri || undefined }} style={styles.photoImage} resizeMode="cover" />
+          </TouchableOpacity>
+        );
       default:
         return null;
     }
   };
 
-  const renderTimelineEntry = (entry: TimelineEntry) => {
-    const categoryColor = getCategoryColor(entry.category);
-    const categoryIcon = getCategoryIcon(entry.category);
-    const mediaIcon = getMediaTypeIcon(entry.mediaType);
+  const renderTimelineEntry = (capsuleResponseItem: CapsuleResponse) => {
+    const entryDate = capsuleResponseItem.createdAt ? new Date(capsuleResponseItem.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Date unknown';
+    // The concept of a single 'description' or 'responseType' at the CapsuleResponse level is removed.
+    // Content is now an array of entries.
 
     return (
-      <View key={entry.id} style={styles.entryCard}>
+      <TouchableOpacity 
+        style={styles.entryCard} 
+        onPress={() => navigation.navigate('CapsuleViewingScreen', { capsuleResponse: capsuleResponseItem })}
+      >
+        {/* Original content of entryCard will be nested here */}
         <View style={styles.entryHeader}>
-          <View style={[styles.categoryIcon, { backgroundColor: categoryColor + '20' }]}>
-            <Ionicons name={categoryIcon} size={20} color={categoryColor} />
+          <View style={[styles.categoryIcon, { backgroundColor: getCategoryColor(capsuleResponseItem.capsuleTitle) }]}>
+            {/* Assuming getCategoryIcon is for the capsule's category/title, not media type */}
+            <Ionicons name={getCategoryIcon(capsuleResponseItem.capsuleTitle)} size={20} color={theme.colors.white} />
           </View>
           <View style={styles.entryInfo}>
-            <Text style={styles.entryTitle}>{entry.title}</Text>
-            <Text style={styles.entryDate}>{entry.date}</Text>
+            <Text style={styles.entryTitle}>{capsuleResponseItem.capsuleTitle}</Text> 
+            <Text style={styles.entryDate}>{entryDate}</Text>
           </View>
-        </View>
-        
-        <Text style={styles.entryDescription}>{entry.description}</Text>
-        
-        {renderMediaContent(entry)}
-        
-        <View style={styles.entryFooter}>
-          <View style={styles.entryTags}>
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>{entry.category}</Text>
-            </View>
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>{entry.mediaType}</Text>
-            </View>
-          </View>
-          <TouchableOpacity 
-            style={styles.entryOptionsButton}
-            onPress={() => handleEntryOptions(entry.id)}
-          >
-            <Ionicons name="ellipsis-vertical" size={16} color={theme.colors.gray[500]} />
+          {/* onPress event for options should likely use capsuleResponse.id */}
+          <TouchableOpacity onPress={() => handleEntryOptions(capsuleResponseItem.id)} style={styles.entryOptionsButton}>
+            <Ionicons name="ellipsis-horizontal" size={18} color={theme.colors.dark} />
           </TouchableOpacity>
         </View>
-      </View>
+        
+        {/* Iterate over entries and render content for each */}
+        {capsuleResponseItem.entries.map((entryItem: CapsuleEntry) => (
+          <View key={entryItem.id} style={styles.entryItemContainer}> {/* Ensure styles.entryItemContainer is defined */}
+            {renderMediaContent(entryItem, capsuleResponseItem.id)}
+          </View>
+        ))}
+        
+        {/* Footer with tags can be adapted if needed */}
+      </TouchableOpacity>
     );
   };
 
-  const groupEntriesByMonth = (entries: TimelineEntry[]) => {
-    const grouped: { [key: string]: TimelineEntry[] } = {};
-    
-    entries.forEach(entry => {
-      const date = new Date(entry.date);
-      const monthKey = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-      
-      if (!grouped[monthKey]) {
-        grouped[monthKey] = [];
+  const groupEntriesByMonth = (entriesToGroup: CapsuleResponse[]) => {
+    if (!entriesToGroup || entriesToGroup.length === 0) return {}; 
+    return entriesToGroup.reduce((acc, entry) => {
+      if (!entry.createdAt) return acc; 
+      const monthYear = new Date(entry.createdAt).toLocaleDateString('en-US', {
+        month: 'long',
+        year: 'numeric',
+      });
+      if (!acc[monthYear]) {
+        acc[monthYear] = [];
       }
-      grouped[monthKey].push(entry);
-    });
-    
-    return grouped;
+      acc[monthYear].push(entry);
+      return acc;
+    }, {} as Record<string, CapsuleResponse[]>); 
   };
 
-  const filteredEntries = selectedCategory === 'All' 
-    ? entries 
-    : entries.filter(entry => entry.category === selectedCategory);
-  
+  const filteredEntries = timelineData.filter(
+    entry => selectedCategory === 'All' || entry.capsuleTitle === selectedCategory
+  );
   const groupedEntries = groupEntriesByMonth(filteredEntries);
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={styles.loadingText}>Loading your timeline...</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -355,7 +316,7 @@ export default function TimelineScreen() {
 
       {/* Timeline Entries */}
       <ScrollView style={styles.timelineContainer} showsVerticalScrollIndicator={false}>
-        {Object.entries(groupedEntries).map(([month, monthEntries]) => (
+        {Object.entries(groupedEntries).map(([month, monthEntries]: [string, CapsuleResponse[]]) => (
           <View key={month}>
             <View style={styles.dateHeader}>
               <View style={styles.dateLine} />
@@ -487,8 +448,11 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.white,
     borderRadius: theme.borderRadius.xl,
     padding: theme.spacing.md,
-    marginBottom: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
     ...theme.shadows.sm,
+  },
+  entryItemContainer: {
+    marginTop: theme.spacing.sm,
   },
   entryHeader: {
     flexDirection: 'row',
@@ -583,35 +547,15 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.size.xs,
     color: theme.colors.gray[500],
   },
-  photoGrid: {
-    flexDirection: 'row',
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.sm,
-  },
-  photoItem: {
-    flex: 1,
-    height: 80,
+  photoItemSingle: {
+    height: 200, 
     borderRadius: theme.borderRadius.lg,
     overflow: 'hidden',
-    position: 'relative',
+    marginBottom: theme.spacing.sm,
   },
   photoImage: {
     width: '100%',
     height: '100%',
-  },
-  photoOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  photoOverlayText: {
-    color: theme.colors.white,
-    fontWeight: theme.typography.fontWeight.medium,
   },
   entryFooter: {
     flexDirection: 'row',
@@ -642,5 +586,16 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: theme.spacing.xl,
+  },
+  loadingContainer: { 
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background,
+  },
+  loadingText: { 
+    marginTop: theme.spacing.md,
+    fontSize: theme.typography.size.base,
+    color: theme.colors.text.secondary,
   },
 });

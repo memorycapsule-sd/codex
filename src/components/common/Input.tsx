@@ -28,7 +28,7 @@ export function Input({
     leftIcon && styles.inputWithLeftIcon,
     rightIcon && styles.inputWithRightIcon,
     style,
-  ];
+  ].filter(Boolean) as any;  // Type assertion to fix the TypeScript error
 
   return (
     <View style={styles.container}>

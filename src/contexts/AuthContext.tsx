@@ -1,16 +1,17 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode, useMemo } from 'react';
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+// Removed: import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+// We will use AuthService for all auth operations and User type from 'firebase/auth' (via AuthService or direct import if needed)
+import { User } from 'firebase/auth'; // Explicitly import User type for clarity
 import { AuthService } from '../services/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveUserToStorage, getUserFromStorage } from '../firebase';
 
 interface AuthContextType {
-  user: FirebaseAuthTypes.User | null;
+  user: User | null; // Use User from 'firebase/auth'
   isLoading: boolean;
   isAuthenticated: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshAuthState: () => Promise<void>;
 }
@@ -22,7 +23,7 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Initialize Firebase on component mount
@@ -75,8 +76,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         console.log('Found user in AsyncStorage:', storedUser.email);
       }
       
-      // Listen for auth state changes using React Native Firebase
-      const unsubscribe = auth().onAuthStateChanged((user) => {
+      // Listen for auth state changes using our AuthService
+      const unsubscribe = AuthService.onAuthStateChanged((user: User | null) => {
         if (user) {
           console.log('Auth state changed - user signed in:', user.email);
           // Save user to AsyncStorage whenever auth state changes
@@ -103,8 +104,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true);
       console.log('Signing in user:', email);
-      const userCredential = await auth().signInWithEmailAndPassword(email, password);
-      setUser(userCredential.user);
+      const firebaseUser = await AuthService.signIn(email, password);
+      setUser(firebaseUser); // AuthService.signIn now returns User | null
     } catch (error) {
       console.error('Sign in error:', error);
       throw error;
@@ -117,30 +118,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true);
       console.log('Creating new user account:', email);
-      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
-      setUser(userCredential.user);
+      const firebaseUser = await AuthService.signUp(email, password);
+      setUser(firebaseUser); // AuthService.signUp now returns User | null
     } catch (error) {
       console.error('Sign up error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const signInWithGoogle = async () => {
-    try {
-      setIsLoading(true);
-      console.log('Signing in with Google');
-      // Get the Google provider
-      const { googleAuthConfig } = await import('../firebase');
-      const provider = auth.GoogleAuthProvider;
-      const googleCredential = await auth().signInWithProvider(provider);
-      
-      // The user is automatically set by the auth state listener,
-      // no need to manually set it here
-      console.log('Google sign-in successful');
-    } catch (error) {
-      console.error('Sign in with Google error:', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -151,8 +132,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true);
       console.log('Signing out user');
-      await auth().signOut();
-      setUser(null);
+      await AuthService.signOut();
+      setUser(null); // Auth state listener should also catch this, but explicit null is fine.
     } catch (error) {
       console.error('Sign out error:', error);
       throw error;
@@ -172,7 +153,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isAuthenticated: !!user,
     signIn,
     signUp,
-    signInWithGoogle,
     signOut,
     refreshAuthState,
   }), [user, isLoading]);

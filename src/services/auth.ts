@@ -1,8 +1,21 @@
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { saveUserToStorage, clearUserFromStorage } from '../firebase';
-// Import from googleAuth is no longer needed as we'll use the native GoogleAuthProvider
+import {
+  auth, // Assuming this is the initialized Firebase Auth instance from ../firebase.ts
+  saveUserToStorage,
+  clearUserFromStorage,
+} from '../firebase';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut as firebaseSignOut, // Alias to avoid conflict if AuthService has a signOut method
+  onAuthStateChanged as firebaseOnAuthStateChanged, // Alias
+  GoogleAuthProvider,
+  signInWithCredential,
+  User, // This is the User type from firebase/auth
+  AuthError
+} from 'firebase/auth';
 
+// UserProfile remains largely the same, stores additional app-specific user details
 export interface UserProfile {
   uid: string;
   email: string;
@@ -13,25 +26,25 @@ export interface UserProfile {
   createdAt: Date;
 }
 
-// Use FirebaseAuthTypes.User instead of User from firebase/auth
+// We now use User directly from 'firebase/auth'
 
 /**
  * Authentication service wrapping Firebase Auth.
  */
 export const AuthService = {
-  /**
-   * Get the current auth instance
-   */
-  getAuth() {
-    return auth();
-  },
+  // The initialized 'auth' instance is imported from '../firebase.ts' and used directly.
+  // If a getter is strictly needed by other parts of the app, it can be:
+  // getAuthInstance() {
+  //   return auth;
+  // },
+
 
   /**
    * Create a new user with email and password.
    */
-  async signUp(email: string, password: string) {
+  async signUp(email: string, password: string): Promise<User | null> {
     try {
-      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
       // Store the user data in AsyncStorage for persistence
       await saveUserToStorage(userCredential.user);
@@ -46,7 +59,7 @@ export const AuthService = {
       // Store user profile in AsyncStorage temporarily
       await AsyncStorage.setItem('userProfile', JSON.stringify(userProfile));
       
-      return userCredential;
+      return userCredential.user;
     } catch (error) {
       console.error('Error signing up:', error);
       throw error;
@@ -56,12 +69,12 @@ export const AuthService = {
   /**
    * Sign in with email and password.
    */
-  async signIn(email: string, password: string) {
+  async signIn(email: string, password: string): Promise<User | null> {
     try {
-      const userCredential = await auth().signInWithEmailAndPassword(email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       // Store the user data in AsyncStorage for persistence
       await saveUserToStorage(userCredential.user);
-      return userCredential;
+      return userCredential.user;
     } catch (error) {
       console.error('Error signing in:', error);
       throw error;
@@ -69,46 +82,19 @@ export const AuthService = {
   },
 
   /**
-   * Sign in with Google
-   */
-  async signInWithGoogle() {
-    try {
-      // Get the Google provider
-      const provider = auth.GoogleAuthProvider;
-      const result = await auth().signInWithProvider(provider);
-      
-      if (result.user) {
-        // Store the user data in AsyncStorage
-        await saveUserToStorage(result.user);
-        
-        // Create user profile from Google data
-        const userProfile: UserProfile = {
-          uid: result.user.uid,
-          email: result.user.email || '',
-          displayName: result.user.displayName || '',
-          profilePicture: result.user.photoURL || '',
-          createdAt: new Date(),
-        };
-        
-        // Store user profile in AsyncStorage
-        await AsyncStorage.setItem('userProfile', JSON.stringify(userProfile));
-        
-        return { user: result.user };
-      } else {
-        throw new Error('Google sign-in failed');
-      }
     } catch (error) {
-      console.error('Error signing in with Google:', error);
-      throw error;
+      // This outer catch handles errors from Firebase credential/sign-in or rethrown Google errors
+      console.error('Overall error in signInWithGoogle (Firebase stage or rethrown):', error);
+      throw error; // Rethrow to be handled by UI and getAuthErrorMessage
     }
   },
 
   /**
    * Sign out the current user
    */
-  async signOut() {
+  async signOut(): Promise<void> {
     try {
-      await auth().signOut();
+      await firebaseSignOut(auth);
       // Clear stored user data
       await clearUserFromStorage();
       await AsyncStorage.removeItem('userProfile');
@@ -124,7 +110,7 @@ export const AuthService = {
   async isAuthenticated() {
     try {
       const userId = await AsyncStorage.getItem('userId');
-      return userId !== null && auth().currentUser !== null;
+      return userId !== null && auth.currentUser !== null;
     } catch (error) {
       console.error('Error checking authentication:', error);
       return false;
@@ -134,8 +120,8 @@ export const AuthService = {
   /**
    * Get current user
    */
-  getCurrentUser(): FirebaseAuthTypes.User | null {
-    return auth().currentUser;
+  getCurrentUser(): User | null {
+    return auth.currentUser;
   },
 
   /**
@@ -163,8 +149,11 @@ export const AuthService = {
         return updatedProfile;
       }
       throw new Error('No current profile found');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating user profile:', error);
+      // Generic error handling for updateUserProfile.
+      // The error will be rethrown and can be handled by the caller,
+      // potentially using getAuthErrorMessage if it's a Firebase Auth error from a related operation.
       throw error;
     }
   },
@@ -172,16 +161,19 @@ export const AuthService = {
   /**
    * Listen to authentication state changes
    */
-  onAuthStateChanged(callback: (user: FirebaseAuthTypes.User | null) => void) {
-    return auth().onAuthStateChanged(callback);
+  onAuthStateChanged(callback: (user: User | null) => void) {
+    return firebaseOnAuthStateChanged(auth, callback);
   },
 
   /**
    * Get authentication error message
    */
   getAuthErrorMessage(error: any): string {
-    if (error?.code) {
-      switch (error.code) {
+    // Check for Firebase AuthError by looking for a 'code' property starting with 'auth/'
+    if (error && typeof error === 'object' && typeof error.code === 'string' && error.code.startsWith('auth/')) {
+      const firebaseError = error as AuthError; // Safe to cast now for type-checking properties
+      // Handle known Firebase Auth errors
+      switch (firebaseError.code) {
         case 'auth/user-not-found':
           return 'No account found with this email address.';
         case 'auth/wrong-password':
@@ -194,10 +186,24 @@ export const AuthService = {
           return 'Please enter a valid email address.';
         case 'auth/network-request-failed':
           return 'Network error. Please check your connection.';
+        // Add other specific AuthError codes as needed
         default:
-          return error.message || 'An error occurred during authentication.';
+          return error.message || 'An authentication error occurred.';
       }
+    } else if (error && typeof error.code === 'string') {
+      // Handle other errors that might have a 'code' property (less common for client-side auth)
+      // This switch is kept for compatibility if other error types with 'code' were expected.
+      switch (error.code) {
+        // Potentially map other error codes if necessary
+        default:
+          return error.message || `An error occurred (code: ${error.code}).`;
+      }
+    } else if (error && error.message) {
+      return error.message;
     }
+    // Fallback for any other type of error or if no specific message could be determined above
+
     return 'An unexpected error occurred.';
-  },
+  } // End of getAuthErrorMessage
+
 };
