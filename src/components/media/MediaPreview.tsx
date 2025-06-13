@@ -54,6 +54,11 @@ export function MediaPreview({
         if (sound) {
           await sound.playAsync();
         } else {
+          if (!mediaFile.uri) {
+            console.warn('Audio URI is undefined, cannot play.');
+            Alert.alert('Error', 'Audio source is missing.');
+            return;
+          }
           const { sound: newSound } = await Audio.Sound.createAsync(
             { uri: mediaFile.uri },
             { shouldPlay: true },
@@ -92,50 +97,70 @@ export function MediaPreview({
     }
   };
 
-  const renderImagePreview = () => (
-    <View style={styles.imageContainer}>
-      <Image
-        source={{ uri: mediaFile.uri }}
-        style={styles.image}
-        resizeMode="cover"
-      />
-      <View style={styles.imageOverlay}>
-        <Ionicons name="image" size={24} color={theme.colors.text.primary} />
-      </View>
-    </View>
-  );
-
-  const renderVideoPreview = () => (
-    <View style={styles.videoContainer}>
-      <Video
-        ref={videoRef}
-        source={{ uri: mediaFile.uri }}
-        style={styles.video}
-        useNativeControls={false}
-        resizeMode={ResizeMode.COVER}
-        onPlaybackStatusUpdate={onPlaybackStatusUpdate}
-      />
-      <TouchableOpacity style={styles.playButton} onPress={handlePlayPause}>
-        <Ionicons
-          name={isPlaying ? 'pause' : 'play'}
-          size={32}
-          color={theme.colors.text.primary}
-        />
-      </TouchableOpacity>
-      {playbackDuration > 0 && (
-        <View style={styles.progressContainer}>
-          <View
-            style={[
-              styles.progressBar,
-              {
-                width: `${(playbackPosition / playbackDuration) * 100}%`,
-              },
-            ]}
-          />
+  const renderImagePreview = () => {
+    if (!mediaFile.uri) {
+      return (
+        <View style={[styles.imageContainer, styles.placeholderContainer]}>
+          <Ionicons name="image-outline" size={48} color={theme.colors.text.secondary} />
+          <Text style={styles.placeholderText}>Image source is missing</Text>
         </View>
-      )}
-    </View>
-  );
+      );
+    }
+    return (
+      <View style={styles.imageContainer}>
+        <Image
+          source={{ uri: mediaFile.uri }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+        <View style={styles.imageOverlay}>
+          <Ionicons name="image" size={24} color={theme.colors.text.primary} />
+        </View>
+      </View>
+    );
+  };
+
+  const renderVideoPreview = () => {
+    if (!mediaFile.uri) {
+      return (
+        <View style={[styles.videoContainer, styles.placeholderContainer]}>
+          <Ionicons name="videocam-outline" size={48} color={theme.colors.text.secondary} />
+          <Text style={styles.placeholderText}>Video source is missing</Text>
+        </View>
+      );
+    }
+    return (
+      <View style={styles.videoContainer}>
+        <Video
+          ref={videoRef}
+          source={{ uri: mediaFile.uri }}
+          style={styles.video}
+          useNativeControls={false}
+          resizeMode={ResizeMode.COVER}
+          onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+        />
+        <TouchableOpacity style={styles.playButton} onPress={handlePlayPause}>
+          <Ionicons
+            name={isPlaying ? 'pause' : 'play'}
+            size={32}
+            color={theme.colors.text.primary}
+          />
+        </TouchableOpacity>
+        {playbackDuration > 0 && (
+          <View style={styles.progressContainer}>
+            <View
+              style={[
+                styles.progressBar,
+                {
+                  width: `${(playbackPosition / playbackDuration) * 100}%`,
+                },
+              ]}
+            />
+          </View>
+        )}
+      </View>
+    );
+  };
 
   const renderAudioPreview = () => (
     <View style={styles.audioContainer}>
@@ -201,7 +226,9 @@ export function MediaPreview({
             {mediaFile.filename}
           </Text>
           <Text style={styles.fileSize}>
-            {MediaService.formatFileSize(mediaFile.size)}
+            {typeof mediaFile.size === 'number'
+              ? MediaService.formatFileSize(mediaFile.size)
+              : 'Size N/A'}
           </Text>
         </View>
 
@@ -227,10 +254,22 @@ export function MediaPreview({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.spacing.md,
+    borderRadius: theme.borderRadius.xl,
     padding: theme.spacing.md,
     marginBottom: theme.spacing.md,
     ...theme.shadows.sm,
+  },
+  placeholderContainer: {
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.gray[100],
+    borderRadius: theme.borderRadius.xl,
+  },
+  placeholderText: {
+    marginTop: theme.spacing.sm,
+    color: theme.colors.text.secondary,
+    fontSize: theme.typography.caption.fontSize,
   },
   imageContainer: {
     position: 'relative',
@@ -239,7 +278,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 200,
-    borderRadius: theme.spacing.md,
+    borderRadius: theme.borderRadius.xl,
   } as ImageStyle,
   imageOverlay: {
     position: 'absolute',
@@ -254,7 +293,7 @@ const styles = StyleSheet.create({
   },
   videoContainer: {
     position: 'relative',
-    borderRadius: theme.spacing.md,
+    borderRadius: theme.borderRadius.xl,
     overflow: 'hidden',
     ...theme.shadows.sm,
   },
@@ -291,7 +330,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: theme.colors.gray[100],
-    borderRadius: theme.spacing.md,
+    borderRadius: theme.borderRadius.xl,
     padding: theme.spacing.md,
   },
   audioIcon: {

@@ -1,6 +1,24 @@
 // Types for Memory Capsule features
 
 /**
+ * Represents a user's profile information.
+ */
+export interface UserProfile {
+  id: string;
+  email: string;
+  name?: string;
+  profilePictureUrl?: string; // This line was already present, ensuring it stays.
+  birthday?: number; // Timestamp
+  gender?: 'male' | 'female' | 'non-binary' | 'prefer-not-to-say';
+  privacySetting: 'public' | 'unlisted' | 'private';
+  username: string; // Crucial for future public URLs
+  usageIntent?: string; // User's goals for using the app
+  createdAt: number;
+  updatedAt: number;
+}
+
+
+/**
  * Represents a prompt within a capsule
  */
 export interface CapsulePrompt {
@@ -22,6 +40,7 @@ export interface MediaMetadata {
     latitude: number;
     longitude: number;
     altitude?: number;
+    address?: string; // Added optional address field
   };
   uploadedAt: number; // Timestamp, when the media was added to the capsule
   userDescription?: string;
@@ -31,6 +50,8 @@ export interface MediaMetadata {
   mimeType?: string;
   width?: number; // for images/videos
   height?: number; // for images/videos
+  people?: string[]; // Names of people in the media
+  tags?: string[]; // Media-specific tags
 }
 
 /**
@@ -49,6 +70,7 @@ export interface CapsuleEntry {
 
 /**
  * Represents a user's collective response to a prompt, which can contain multiple entries.
+ * This is the main "Capsule" object.
  */
 export interface CapsuleResponse {
   id: string; // ID of this response container
@@ -56,6 +78,8 @@ export interface CapsuleResponse {
   promptId: string; // ID of the prompt this response is for
   capsuleTitle: string; // Title of the macro-capsule this response belongs to
   entries: CapsuleEntry[]; // Array of individual content entries
+  tags?: string[]; // User-defined tags
+  category?: string; // Category this capsule belongs to
   createdAt: number; // Timestamp of when the first entry was made for this response
   updatedAt: number; // Timestamp of when the last modification to any entry in this response was made
 }

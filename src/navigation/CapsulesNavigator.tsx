@@ -3,9 +3,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // Import screens
 import CapsulesScreen from '../screens/CapsulesScreen';
-import CapsuleDetailScreen from '../screens/CapsuleDetailScreen';
+import MacroCapsulePromptsScreen from '../screens/MacroCapsulePromptsScreen';
 import PromptResponseScreen from '../screens/PromptResponseScreen';
-import CapsuleViewingScreen from '../screens/CapsuleViewingScreen'; // Added import
+import CapsuleDetailScreen from '../screens/CapsuleDetailScreen';
+import MediaMetadataScreen from '../screens/MediaMetadataScreen';
+import EditCapsuleScreen from '../screens/EditCapsuleScreen';
 
 // Define the types for the stack navigator
 export type CapsulesStackParamList = {
@@ -20,8 +22,16 @@ export type CapsulesStackParamList = {
     capsuleTitle: string;
     capsuleId: string; // Added to identify the capsule
   };
-  CapsuleViewingScreen: {
-    capsuleResponse: import('../types/capsule').CapsuleResponse; // Added screen params
+  CapsuleDetailScreen: {
+    capsuleId: string;
+  };
+  MediaMetadataScreen: {
+    entry: import('../types/capsule').CapsuleEntry;
+    capsule: import('../types/capsule').CapsuleResponse;
+    isEditing?: boolean;
+  };
+  EditCapsuleScreen: {
+    capsuleId: string;
   };
 };
 
@@ -41,9 +51,11 @@ export function CapsulesNavigator() {
       }}
     >
       <Stack.Screen name="CapsulesList" component={CapsulesScreen} />
-      <Stack.Screen name="CapsuleDetail" component={CapsuleDetailScreen} />
+      <Stack.Screen name="CapsuleDetail" component={MacroCapsulePromptsScreen} />
       <Stack.Screen name="PromptResponse" component={PromptResponseScreen} />
-      <Stack.Screen name="CapsuleViewingScreen" component={CapsuleViewingScreen} />
+      <Stack.Screen name="CapsuleDetailScreen" component={CapsuleDetailScreen} />
+      <Stack.Screen name="MediaMetadataScreen" component={MediaMetadataScreen} />
+      <Stack.Screen name="EditCapsuleScreen" component={EditCapsuleScreen} />
     </Stack.Navigator>
   );
 }

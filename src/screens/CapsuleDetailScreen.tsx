@@ -1,215 +1,219 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  FlatList, 
-  TouchableOpacity, 
-  ActivityIndicator,
-  SafeAreaView,
-  StatusBar
-} from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { MacroCapsule, CapsulePrompt } from '../types/capsule';
-import { CapsuleService } from '../services/capsuleService';
+import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Image, ActivityIndicator, Alert, TouchableOpacity, SafeAreaView } from 'react-native';
+import { RouteProp, useRoute, useNavigation, CompositeNavigationProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { CapsulesStackParamList } from '../navigation/CapsulesNavigator';
+import { TabNavigatorParamList } from '../navigation/TabNavigator';
+import * as CapsuleService from '../services/capsuleService';
+import { CapsuleResponse, CapsuleEntry } from '../types/capsule';
 import { theme } from '../theme';
+import { Ionicons } from '@expo/vector-icons';
+import { Video, ResizeMode } from 'expo-av';
+import { LinearGradient } from 'expo-linear-gradient';
 
-// Define the route params type
-type CapsuleDetailRouteParams = {
-  CapsuleDetail: {
-    capsuleId: string;
-    title: string;
-  };
-};
+// Define the type for the route parameters
+type CapsuleDetailScreenRouteProp = RouteProp<CapsulesStackParamList, 'CapsuleDetailScreen'>;
 
-/**
- * Screen that displays the prompts for a selected MacroCapsule
- */
-const CapsuleDetailScreen = () => {
-  const navigation = useNavigation();
-  const route = useRoute<RouteProp<CapsuleDetailRouteParams, 'CapsuleDetail'>>();
-  const { capsuleId, title } = route.params;
-  
-  const [capsule, setCapsule] = useState<MacroCapsule | null>(null);
-  const [loading, setLoading] = useState(true);
+// Create a composite navigation prop type
+type CapsuleDetailScreenNavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<TabNavigatorParamList, 'Capsules'>,
+  NativeStackNavigationProp<CapsulesStackParamList>
+>;
+
+const CapsuleDetailScreen: React.FC = () => {
+  const route = useRoute<CapsuleDetailScreenRouteProp>();
+  console.log('[CapsuleDetailScreen] Initial route.params:', JSON.stringify(route.params)); // Log initial params
+  const navigation = useNavigation<CapsuleDetailScreenNavigationProp>();
+  const { capsuleId } = route.params;
+  console.log('[CapsuleDetailScreen] Extracted capsuleId:', capsuleId); // Log extracted capsuleId
+
+  const [capsule, setCapsule] = useState<CapsuleResponse | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const videoRef = useRef<Video>(null);
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: true,
+      headerTitle: capsule?.capsuleTitle || 'Capsule Details',
+      headerRight: () => (
+        <TouchableOpacity onPress={() => capsule && navigation.navigate('EditCapsuleScreen', { capsuleId: capsule.id! })}>
+          <Ionicons name="pencil-outline" size={24} color={theme.colors.primary} />
+        </TouchableOpacity>
+      ),
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back" size={28} color={theme.colors.primary} />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, capsule]);
 
   useEffect(() => {
-    loadCapsuleDetails();
-  }, [capsuleId]);
-
-  const loadCapsuleDetails = async () => {
-    try {
-      setLoading(true);
-      const capsuleData = await CapsuleService.getCapsuleById(capsuleId);
-      
-      if (!capsuleData) {
-        setError('Capsule not found');
+    const fetchCapsuleData = async () => {
+      console.log('[CapsuleDetailScreen] fetchCapsuleData called with capsuleId:', capsuleId); // Log capsuleId at fetch time
+      if (!capsuleId) {
+        setError('No capsule ID provided.');
+        setLoading(false);
         return;
       }
-      
-      setCapsule(capsuleData);
-      setError(null);
-    } catch (err) {
-      console.error('Error loading capsule details:', err);
-      setError('Failed to load capsule details. Please try again.');
-    } finally {
-      setLoading(false);
+      try {
+        setLoading(true);
+        const fetchedCapsule = await CapsuleService.getCapsuleResponseById(capsuleId);
+        if (fetchedCapsule) {
+          setCapsule(fetchedCapsule);
+          setError(null); // Clear any previous error on successful fetch
+        } else {
+          setError('Capsule not found.');
+        }
+      } catch (err) {
+        setError('Failed to load capsule data.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCapsuleData();
+  }, [capsuleId]);
+
+  const renderEntryContent = (entry: CapsuleEntry) => {
+    const mediaStyle = styles.media;
+    switch (entry.type) {
+      case 'text':
+        console.log('[CapsuleDetailScreen] Rendering text entry:', JSON.stringify(entry));
+        return (
+          <View style={styles.textEntryContainer}>
+            <Text style={styles.entryText}>{entry.textContent || '[No text content]'}</Text>
+          </View>
+        );
+      case 'photo':
+        if (!entry.mediaUri) {
+          return (
+            <View style={[styles.mediaContainer, styles.centered]}>
+              <Ionicons name="image-outline" size={48} color={theme.colors.gray[400]} />
+              <Text style={styles.errorText}>Photo not available</Text>
+            </View>
+          );
+        }
+        return <Image source={{ uri: entry.mediaUri }} style={mediaStyle} resizeMode="cover" />;
+      case 'video':
+        if (!entry.mediaUri) {
+          return (
+            <View style={[styles.mediaContainer, styles.centered]}>
+              <Ionicons name="videocam-outline" size={48} color={theme.colors.gray[400]} />
+              <Text style={styles.errorText}>Video not available</Text>
+            </View>
+          );
+        }
+        const isVideoActive = activeVideoId === entry.id;
+        return (
+          <View style={styles.mediaContainer}>
+            <Video
+              ref={isVideoActive ? videoRef : null}
+              source={{ uri: entry.mediaUri }}
+              style={styles.media}
+              resizeMode={ResizeMode.COVER}
+              isLooping
+              useNativeControls={false}
+              onPlaybackStatusUpdate={status => {
+                if (status.isLoaded && !status.isPlaying && status.didJustFinish) {
+                  setActiveVideoId(null);
+                }
+              }}
+            />
+            {!isVideoActive && (
+              <TouchableOpacity style={styles.videoControls} onPress={() => setActiveVideoId(entry.id)}>
+                <Ionicons name="play-circle" size={64} color="rgba(255,255,255,0.8)" />
+              </TouchableOpacity>
+            )}
+          </View>
+        );
+      case 'audio':
+        if (!entry.mediaUri) {
+          return (
+            <View style={[styles.audioContainer, styles.centered]}>
+              <Ionicons name="mic-outline" size={48} color={theme.colors.gray[400]} />
+              <Text style={styles.errorText}>Audio not available</Text>
+            </View>
+          );
+        }
+        return (
+          <View style={styles.audioContainer}>
+            <TouchableOpacity onPress={() => Alert.alert('Play Audio', 'Audio playback not implemented yet.')}>
+              <Ionicons name="play-circle-outline" size={48} color={theme.colors.primary} />
+            </TouchableOpacity>
+            <Text style={styles.audioText}>Audio Entry</Text>
+          </View>
+        );
+      default:
+        return (
+          <View style={styles.textEntryContainer}>
+            <Text style={styles.errorText}>[Unknown or invalid entry type: {entry.type}]</Text>
+          </View>
+        );
     }
   };
 
-  const handlePromptPress = (prompt: CapsulePrompt) => {
-    navigation.navigate('PromptResponse', { 
-      promptId: prompt.id,
-      promptText: prompt.text,
-      capsuleTitle: capsule?.title || ''
-    });
-  };
-
-  const renderPromptItem = ({ item, index }: { item: CapsulePrompt; index: number }) => {
-    const hasResponse = !!item.response;
-    
-    return (
-      <TouchableOpacity 
-        style={[
-          styles.promptItem,
-          hasResponse && styles.promptItemCompleted
-        ]}
-        onPress={() => handlePromptPress(item)}
-        activeOpacity={0.7}
-      >
-        <View style={styles.promptNumberContainer}>
-          <Text style={styles.promptNumber}>{index + 1}</Text>
-        </View>
-        
-        <View style={styles.promptContent}>
-          <Text style={styles.promptText}>{item.text}</Text>
-          
-          {hasResponse ? (
-            <View style={styles.responseIndicator}>
-              <Ionicons name="checkmark-circle" size={16} color={theme.colors.success} />
-              <Text style={styles.responseText}>Response saved</Text>
-            </View>
-          ) : (
-            <View style={styles.responseIndicator}>
-              <Ionicons name="ellipse-outline" size={16} color={theme.colors.text.secondary} />
-              <Text style={styles.responseText}>Tap to respond</Text>
-            </View>
-          )}
-        </View>
-        
-        <Ionicons 
-          name={hasResponse ? "create-outline" : "chevron-forward-outline"} 
-          size={24} 
-          color={theme.colors.text.secondary} 
-        />
-      </TouchableOpacity>
-    );
-  };
-
-  const renderHeader = () => {
-    if (!capsule) return null;
-    
-    const completedCount = capsule.prompts.filter(p => p.response).length;
-    const totalPrompts = capsule.prompts.length;
-    const progressPercentage = totalPrompts > 0 ? (completedCount / totalPrompts) * 100 : 0;
-    
-    return (
-      <View style={styles.headerContainer}>
-        <View style={styles.iconHeaderContainer}>
-          <View style={styles.iconContainer}>
-            <Ionicons name={capsule.icon as any} size={32} color={theme.colors.primary} />
-          </View>
-          
-          <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{capsule.title}</Text>
-            <Text style={styles.headerSubtitle}>
-              {capsule.description || 'Capture your memories through these prompts'}
-            </Text>
-          </View>
-        </View>
-        
-        <View style={styles.progressSection}>
-          <View style={styles.progressContainer}>
-            <View style={styles.progressBar}>
-              <View 
-                style={[
-                  styles.progressFill, 
-                  { width: `${progressPercentage}%` }
-                ]} 
-              />
-            </View>
-          </View>
-          
-          <Text style={styles.progressText}>
-            {completedCount} of {totalPrompts} completed
-          </Text>
-        </View>
-        
-        <Text style={styles.promptsTitle}>Prompts</Text>
-      </View>
-    );
-  };
+  const renderEntryMetadata = (entry: CapsuleEntry) => (
+    <View style={styles.entryMetadataContainer}>
+      {entry.createdAt && (
+        <Text style={styles.entryDate}>
+          {new Date(entry.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </Text>
+      )}
+      {entry.metadata?.userDescription && (
+        <Text style={styles.entryDescriptionText}>{entry.metadata.userDescription}</Text>
+      )}
+    </View>
+  );
 
   if (loading) {
+    return <ActivityIndicator style={styles.centered} size="large" color={theme.colors.primary} />;
+  }
+
+  if (error) {
     return (
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text style={styles.loadingText}>Loading capsule details...</Text>
-        </View>
-      </SafeAreaView>
+      <View style={styles.centered}>
+        <Ionicons name="alert-circle-outline" size={48} color={theme.colors.error} />
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
     );
   }
 
-  if (error || !capsule) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.centerContainer}>
-          <Ionicons name="alert-circle-outline" size={48} color={theme.colors.error} />
-          <Text style={styles.errorText}>{error || 'Capsule not found'}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={loadCapsuleDetails}>
-            <Text style={styles.retryButtonText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
+  if (!capsule) {
+    return <View style={styles.centered}><Text>Capsule data could not be loaded.</Text></View>;
   }
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" />
-      
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={24} color={theme.colors.text.primary} />
-          </TouchableOpacity>
-          
-          <Text style={styles.headerTitleSmall}>{title}</Text>
-          
-          <View style={styles.headerRight} />
-        </View>
-        
-        <FlatList
-          data={capsule.prompts}
-          renderItem={renderPromptItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-          ListHeaderComponent={renderHeader}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Ionicons name="document-text-outline" size={64} color={theme.colors.text.secondary} />
-              <Text style={styles.emptyText}>No prompts available</Text>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {capsule.entries && capsule.entries.length > 0 ? (
+          capsule.entries.map(entry => (
+            <View key={entry.id} style={styles.entryCard}>
+              {renderEntryContent(entry)}
+              {renderEntryMetadata(entry)}
             </View>
-          }
-        />
-      </View>
+          ))
+        ) : (
+          <View style={styles.centered}>
+            <Text>This capsule has no entries yet.</Text>
+          </View>
+        )}
+      </ScrollView>
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => navigation.navigate('Create', { capsuleId: capsule!.id, existingCapsuleTitle: capsule?.capsuleTitle })}
+      >
+        <LinearGradient
+          colors={['#42275a', '#734b6d']}
+          style={styles.fabGradient}
+        >
+          <Ionicons name="add" size={30} color={theme.colors.white} />
+        </LinearGradient>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -217,171 +221,96 @@ const CapsuleDetailScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.light,
   },
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border.light,
-  },
-  backButton: {
-    padding: theme.spacing.xs,
-  },
-  headerTitleSmall: {
-    ...theme.typography.h3,
-    color: theme.colors.text.primary,
-  },
-  headerRight: {
-    width: 40, // To balance the header
-  },
-  headerContainer: {
-    padding: theme.spacing.lg,
-    paddingTop: theme.spacing.md,
-  },
-  iconHeaderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: theme.spacing.md,
-  },
-  iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: theme.colors.primary + '10', // 10% opacity
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: theme.spacing.md,
-  },
-  headerTextContainer: {
-    flex: 1,
-  },
-  headerTitle: {
-    ...theme.typography.h1,
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.xs,
-  },
-  headerSubtitle: {
-    ...theme.typography.body,
-    color: theme.colors.text.secondary,
-  },
-  progressSection: {
-    marginBottom: theme.spacing.lg,
-  },
-  progressContainer: {
-    marginBottom: theme.spacing.xs,
-  },
-  progressBar: {
-    height: 6,
-    backgroundColor: theme.colors.gray[200],
-    borderRadius: 3,
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: theme.colors.primary,
-    borderRadius: 3,
-  },
-  progressText: {
-    ...theme.typography.caption,
-    color: theme.colors.text.secondary,
-    textAlign: 'right',
-  },
-  promptsTitle: {
-    ...theme.typography.h2,
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.md,
-  },
-  listContainer: {
-    paddingBottom: theme.spacing.xxl,
-  },
-  promptItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.spacing.md,
+  scrollContainer: {
     padding: theme.spacing.md,
-    marginHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
-    ...theme.shadows.sm,
+    paddingBottom: 80, // Space for FAB
   },
-  promptItemCompleted: {
-    borderLeftWidth: 4,
-    borderLeftColor: theme.colors.success,
-  },
-  promptNumberContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: theme.colors.gray[200],
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: theme.spacing.md,
-  },
-  promptNumber: {
-    ...theme.typography.subtitle,
-    color: theme.colors.text.primary,
-  },
-  promptContent: {
-    flex: 1,
-  },
-  promptText: {
-    ...theme.typography.body,
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.xs,
-  },
-  responseIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  responseText: {
-    ...theme.typography.caption,
-    color: theme.colors.text.secondary,
-    marginLeft: theme.spacing.xs,
-  },
-  centerContainer: {
+  centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: theme.spacing.xl,
-  },
-  loadingText: {
-    ...theme.typography.body,
-    color: theme.colors.text.secondary,
-    marginTop: theme.spacing.md,
+    padding: theme.spacing.lg,
   },
   errorText: {
     ...theme.typography.body,
     color: theme.colors.error,
+    marginTop: theme.spacing.md,
     textAlign: 'center',
-    marginTop: theme.spacing.md,
+  },
+  entryCard: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.xl,
     marginBottom: theme.spacing.lg,
+    ...theme.shadows.md,
+    overflow: 'hidden',
   },
-  retryButton: {
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.lg,
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.spacing.sm,
+  media: {
+    width: '100%',
+    height: 250,
   },
-  retryButtonText: {
-    ...theme.typography.button,
-    color: theme.colors.text.inverse,
+  mediaContainer: {
+    width: '100%',
+    height: 250,
+    backgroundColor: '#000',
   },
-  emptyContainer: {
-    alignItems: 'center',
+  videoControls: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: 'center',
-    paddingVertical: theme.spacing.xxl,
-    marginHorizontal: theme.spacing.lg,
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
   },
-  emptyText: {
+  textEntryContainer: {
+    padding: theme.spacing.lg,
+  },
+  entryText: {
+    fontSize: theme.typography.body.fontSize,
+    lineHeight: theme.typography.body.fontSize * theme.typography.body.lineHeight,
+    color: theme.colors.text.primary,
+  },
+  audioContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: theme.spacing.lg,
+  },
+  audioText: {
     ...theme.typography.body,
+    marginLeft: theme.spacing.md,
     color: theme.colors.text.secondary,
-    marginTop: theme.spacing.md,
+  },
+  entryMetadataContainer: {
+    padding: theme.spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border.light,
+  },
+  entryDate: {
+    ...theme.typography.caption,
+    color: theme.colors.text.secondary,
+    marginBottom: theme.spacing.xs,
+  },
+  entryDescriptionText: {
+    ...theme.typography.body,
+    color: theme.colors.text.primary,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    ...theme.shadows.lg,
+  },
+  fabGradient: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 30,
   },
 });
 

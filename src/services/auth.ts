@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   auth, // Assuming this is the initialized Firebase Auth instance from ../firebase.ts
+  db, // Assuming this is the initialized Firestore instance from ../firebase.ts
   saveUserToStorage,
   clearUserFromStorage,
 } from '../firebase';
@@ -12,54 +13,42 @@ import {
   GoogleAuthProvider,
   signInWithCredential,
   User, // This is the User type from firebase/auth
-  AuthError
+  AuthError,
 } from 'firebase/auth';
-
-// UserProfile remains largely the same, stores additional app-specific user details
-export interface UserProfile {
-  uid: string;
-  email: string;
-  displayName?: string;
-  birthYear?: string;
-  interests?: string[];
-  profilePicture?: string;
-  createdAt: Date;
-}
-
-// We now use User directly from 'firebase/auth'
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { UserProfile } from '../types/capsule'; // Import from the single source of truth
 
 /**
- * Authentication service wrapping Firebase Auth.
+ * Authentication service wrapping Firebase Auth and Firestore for user profiles.
  */
-export const AuthService = {
-  // The initialized 'auth' instance is imported from '../firebase.ts' and used directly.
-  // If a getter is strictly needed by other parts of the app, it can be:
-  // getAuthInstance() {
-  //   return auth;
-  // },
-
-
+const AuthService = {
   /**
    * Create a new user with email and password.
    */
   async signUp(email: string, password: string): Promise<User | null> {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
-      // Store the user data in AsyncStorage for persistence
-      await saveUserToStorage(userCredential.user);
-      
-      // Create initial user profile
+      const user = userCredential.user;
+
+      // Store the user auth data in AsyncStorage for persistence
+      await saveUserToStorage(user);
+
+      // Create initial user profile in Firestore
       const userProfile: UserProfile = {
-        uid: userCredential.user.uid,
-        email: userCredential.user.email || '',
-        createdAt: new Date(),
+        id: user.uid,
+        email: user.email || '',
+        name: user.displayName || 'New User',
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        // Default values for new fields
+        privacySetting: 'private',
+        username: '', // Placeholder, will be set during profile setup
       };
-      
-      // Store user profile in AsyncStorage temporarily
-      await AsyncStorage.setItem('userProfile', JSON.stringify(userProfile));
-      
-      return userCredential.user;
+
+      const userDocRef = doc(db, 'users', user.uid);
+      await setDoc(userDocRef, userProfile);
+
+      return user;
     } catch (error) {
       console.error('Error signing up:', error);
       throw error;
@@ -82,14 +71,6 @@ export const AuthService = {
   },
 
   /**
-    } catch (error) {
-      // This outer catch handles errors from Firebase credential/sign-in or rethrown Google errors
-      console.error('Overall error in signInWithGoogle (Firebase stage or rethrown):', error);
-      throw error; // Rethrow to be handled by UI and getAuthErrorMessage
-    }
-  },
-
-  /**
    * Sign out the current user
    */
   async signOut(): Promise<void> {
@@ -97,7 +78,7 @@ export const AuthService = {
       await firebaseSignOut(auth);
       // Clear stored user data
       await clearUserFromStorage();
-      await AsyncStorage.removeItem('userProfile');
+      // No need to remove a separate profile from AsyncStorage anymore
     } catch (error) {
       console.error('Error signing out:', error);
       throw error;
@@ -107,7 +88,7 @@ export const AuthService = {
   /**
    * Check if user is already authenticated
    */
-  async isAuthenticated() {
+  async isAuthenticated(): Promise<boolean> {
     try {
       const userId = await AsyncStorage.getItem('userId');
       return userId !== null && auth.currentUser !== null;
@@ -118,19 +99,25 @@ export const AuthService = {
   },
 
   /**
-   * Get current user
+   * Get current user from Firebase Auth
    */
   getCurrentUser(): User | null {
     return auth.currentUser;
   },
 
   /**
-   * Get stored user profile
+   * Get user profile from Firestore
    */
-  async getUserProfile(): Promise<UserProfile | null> {
+  async getUserProfile(uid: string): Promise<UserProfile | null> {
     try {
-      const profileData = await AsyncStorage.getItem('userProfile');
-      return profileData ? JSON.parse(profileData) : null;
+      const userDocRef = doc(db, 'users', uid);
+      const docSnap = await getDoc(userDocRef);
+      if (docSnap.exists()) {
+        return docSnap.data() as UserProfile;
+      } else {
+        console.log("No such document!");
+        return null;
+      }
     } catch (error) {
       console.error('Error getting user profile:', error);
       return null;
@@ -138,22 +125,17 @@ export const AuthService = {
   },
 
   /**
-   * Update user profile
+   * Update user profile in Firestore
    */
-  async updateUserProfile(profile: Partial<UserProfile>) {
+  async updateUserProfile(uid: string, profile: Partial<UserProfile>): Promise<void> {
     try {
-      const currentProfile = await this.getUserProfile();
-      if (currentProfile) {
-        const updatedProfile = { ...currentProfile, ...profile };
-        await AsyncStorage.setItem('userProfile', JSON.stringify(updatedProfile));
-        return updatedProfile;
-      }
-      throw new Error('No current profile found');
+      const userDocRef = doc(db, 'users', uid);
+      await updateDoc(userDocRef, {
+        ...profile,
+        updatedAt: Date.now(),
+      });
     } catch (error: any) {
       console.error('Error updating user profile:', error);
-      // Generic error handling for updateUserProfile.
-      // The error will be rethrown and can be handled by the caller,
-      // potentially using getAuthErrorMessage if it's a Firebase Auth error from a related operation.
       throw error;
     }
   },
@@ -169,10 +151,8 @@ export const AuthService = {
    * Get authentication error message
    */
   getAuthErrorMessage(error: any): string {
-    // Check for Firebase AuthError by looking for a 'code' property starting with 'auth/'
     if (error && typeof error === 'object' && typeof error.code === 'string' && error.code.startsWith('auth/')) {
-      const firebaseError = error as AuthError; // Safe to cast now for type-checking properties
-      // Handle known Firebase Auth errors
+      const firebaseError = error as AuthError;
       switch (firebaseError.code) {
         case 'auth/user-not-found':
           return 'No account found with this email address.';
@@ -186,24 +166,14 @@ export const AuthService = {
           return 'Please enter a valid email address.';
         case 'auth/network-request-failed':
           return 'Network error. Please check your connection.';
-        // Add other specific AuthError codes as needed
         default:
           return error.message || 'An authentication error occurred.';
-      }
-    } else if (error && typeof error.code === 'string') {
-      // Handle other errors that might have a 'code' property (less common for client-side auth)
-      // This switch is kept for compatibility if other error types with 'code' were expected.
-      switch (error.code) {
-        // Potentially map other error codes if necessary
-        default:
-          return error.message || `An error occurred (code: ${error.code}).`;
       }
     } else if (error && error.message) {
       return error.message;
     }
-    // Fallback for any other type of error or if no specific message could be determined above
-
     return 'An unexpected error occurred.';
-  } // End of getAuthErrorMessage
-
+  }
 };
+
+export default AuthService;

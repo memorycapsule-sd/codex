@@ -16,7 +16,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CapsulesStackParamList } from '../navigation/CapsulesNavigator'; // Import the param list type
 import { Ionicons } from '@expo/vector-icons';
-import { CapsuleService } from '../services/capsuleService';
+import * as CapsuleService from '../services/capsuleService';
 import { MediaPicker } from '../components/media/MediaPicker';
 import { MediaPreview } from '../components/media/MediaPreview';
 import { AudioRecorder } from '../components/media/AudioRecorder';
@@ -209,9 +209,9 @@ const PromptResponseScreen = () => {
       const newEntry: CapsuleEntry = {
         id: generateUUID(),
         type: entryTypeForCapsule,
-        textContent: actualTextContent,
-        mediaUri: finalMediaUri,
-        thumbnailUri: finalThumbnailUri,
+        ...(actualTextContent && { textContent: actualTextContent }),
+        ...(finalMediaUri && { mediaUri: finalMediaUri }),
+        ...(finalThumbnailUri && { thumbnailUri: finalThumbnailUri }),
         metadata: newEntryMetadata,
         createdAt: nowTimestamp,
         updatedAt: nowTimestamp,
@@ -228,7 +228,14 @@ const PromptResponseScreen = () => {
       };
 
       console.log('[PromptResponseScreen] Calling CapsuleService.addCapsuleResponse with data:', JSON.stringify(newCapsuleResponseData, null, 2));
-      const saveSuccess = await CapsuleService.addCapsuleResponse(user.uid, newCapsuleResponseData);
+      const saveSuccess = await CapsuleService.addCapsuleResponse(
+      user.uid,
+      newCapsuleResponseData.promptId,
+      newCapsuleResponseData.capsuleTitle,
+      newCapsuleResponseData.entries[0], // Assuming there's always at least one entry
+      newCapsuleResponseData.tags,       // Pass tags if available
+      newCapsuleResponseData.category    // Pass category if available
+    );
 
       if (saveSuccess) {
         console.log('[PromptResponseScreen] CapsuleService.addCapsuleResponse successful. Capsule data:', JSON.stringify(newCapsuleResponseData, null, 2));
