@@ -1,16 +1,17 @@
-import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, ActivityIndicator, Alert, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, { useEffect, useState, useRef, useLayoutEffect, useMemo } from 'react';
+import { View, Text, StyleSheet, ScrollView, Image, ActivityIndicator, Alert, TouchableOpacity, SafeAreaView, Modal, Share } from 'react-native';
 import { RouteProp, useRoute, useNavigation, CompositeNavigationProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { CapsulesStackParamList } from '../navigation/CapsulesNavigator';
 import { TabNavigatorParamList } from '../navigation/TabNavigator';
-import * as CapsuleService from '../services/capsuleService';
-import { CapsuleResponse, CapsuleEntry } from '../types/capsule';
+import { getCapsuleResponseById, deleteCapsule } from '../services/capsuleService';
+import { CapsuleEntry, CapsuleResponse } from '../types/capsule';
 import { theme } from '../theme';
 import { Ionicons } from '@expo/vector-icons';
 import { Video, ResizeMode } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTheme } from '../context/ThemeContext';
 
 // Define the type for the route parameters
 type CapsuleDetailScreenRouteProp = RouteProp<CapsulesStackParamList, 'CapsuleDetailScreen'>;
@@ -31,15 +32,14 @@ const CapsuleDetailScreen: React.FC = () => {
   const [capsule, setCapsule] = useState<CapsuleResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const videoRef = useRef<Video>(null);
-  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+  const [selectedMedia, setSelectedMedia] = useState<CapsuleEntry | null>(null);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: true,
       headerTitle: capsule?.capsuleTitle || 'Capsule Details',
       headerRight: () => (
-        <TouchableOpacity onPress={() => capsule && navigation.navigate('EditCapsuleScreen', { capsuleId: capsule.id! })}>
+        <TouchableOpacity onPress={() => capsule && navigation.navigate('EditCapsule', { capsuleId: capsule.id! })}>
           <Ionicons name="pencil-outline" size={24} color={theme.colors.primary} />
         </TouchableOpacity>
       ),
@@ -61,7 +61,7 @@ const CapsuleDetailScreen: React.FC = () => {
       }
       try {
         setLoading(true);
-        const fetchedCapsule = await CapsuleService.getCapsuleResponseById(capsuleId);
+        const fetchedCapsule = await getCapsuleResponseById(capsuleId);
         if (fetchedCapsule) {
           setCapsule(fetchedCapsule);
           setError(null); // Clear any previous error on successful fetch
@@ -79,96 +79,112 @@ const CapsuleDetailScreen: React.FC = () => {
     fetchCapsuleData();
   }, [capsuleId]);
 
-  const renderEntryContent = (entry: CapsuleEntry) => {
-    const mediaStyle = styles.media;
-    switch (entry.type) {
-      case 'text':
-        console.log('[CapsuleDetailScreen] Rendering text entry:', JSON.stringify(entry));
-        return (
-          <View style={styles.textEntryContainer}>
-            <Text style={styles.entryText}>{entry.textContent || '[No text content]'}</Text>
-          </View>
-        );
-      case 'photo':
-        if (!entry.mediaUri) {
-          return (
-            <View style={[styles.mediaContainer, styles.centered]}>
-              <Ionicons name="image-outline" size={48} color={theme.colors.gray[400]} />
-              <Text style={styles.errorText}>Photo not available</Text>
-            </View>
-          );
-        }
-        return <Image source={{ uri: entry.mediaUri }} style={mediaStyle} resizeMode="cover" />;
-      case 'video':
-        if (!entry.mediaUri) {
-          return (
-            <View style={[styles.mediaContainer, styles.centered]}>
-              <Ionicons name="videocam-outline" size={48} color={theme.colors.gray[400]} />
-              <Text style={styles.errorText}>Video not available</Text>
-            </View>
-          );
-        }
-        const isVideoActive = activeVideoId === entry.id;
-        return (
-          <View style={styles.mediaContainer}>
-            <Video
-              ref={isVideoActive ? videoRef : null}
-              source={{ uri: entry.mediaUri }}
-              style={styles.media}
-              resizeMode={ResizeMode.COVER}
-              isLooping
-              useNativeControls={false}
-              onPlaybackStatusUpdate={status => {
-                if (status.isLoaded && !status.isPlaying && status.didJustFinish) {
-                  setActiveVideoId(null);
-                }
-              }}
-            />
-            {!isVideoActive && (
-              <TouchableOpacity style={styles.videoControls} onPress={() => setActiveVideoId(entry.id)}>
-                <Ionicons name="play-circle" size={64} color="rgba(255,255,255,0.8)" />
-              </TouchableOpacity>
-            )}
-          </View>
-        );
-      case 'audio':
-        if (!entry.mediaUri) {
-          return (
-            <View style={[styles.audioContainer, styles.centered]}>
-              <Ionicons name="mic-outline" size={48} color={theme.colors.gray[400]} />
-              <Text style={styles.errorText}>Audio not available</Text>
-            </View>
-          );
-        }
-        return (
-          <View style={styles.audioContainer}>
-            <TouchableOpacity onPress={() => Alert.alert('Play Audio', 'Audio playback not implemented yet.')}>
-              <Ionicons name="play-circle-outline" size={48} color={theme.colors.primary} />
-            </TouchableOpacity>
-            <Text style={styles.audioText}>Audio Entry</Text>
-          </View>
-        );
-      default:
-        return (
-          <View style={styles.textEntryContainer}>
-            <Text style={styles.errorText}>[Unknown or invalid entry type: {entry.type}]</Text>
-          </View>
-        );
+  const { featuredMedia, journalEntry, galleryMedia } = useMemo(() => {
+    if (!capsule?.entries) return { featuredMedia: null, journalEntry: null, galleryMedia: [] };
+
+    const mediaEntries = capsule.entries.filter(e => e.type === 'photo' || e.type === 'video');
+    const textEntries = capsule.entries.filter(e => e.type === 'text');
+
+    const featuredMedia = mediaEntries.length > 0 ? mediaEntries[0] : null;
+    const journalEntry = textEntries.length > 0 ? textEntries[0] : null;
+    const galleryMedia = mediaEntries.slice(1); // All media except the first one
+
+    return { featuredMedia, journalEntry, galleryMedia };
+  }, [capsule]);
+
+  const displayDate = useMemo(() => {
+    if (!capsule?.createdAt) return null;
+    const date = new Date(capsule.createdAt);
+    const dateString = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const timeString = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    return `${dateString} ・ ${timeString}`;
+  }, [capsule?.createdAt]);
+
+  const displayLocation = useMemo(() => {
+    const locationEntry = featuredMedia || capsule?.entries.find(e => e.metadata?.location?.address);
+    return locationEntry?.metadata?.location?.address || null;
+  }, [featuredMedia, capsule?.entries]);
+
+  const displayTags = useMemo(() => {
+    const allTags = new Set<string>();
+    if (capsule?.tags) {
+      capsule.tags.forEach(tag => allTags.add(tag));
+    }
+    capsule?.entries?.forEach(entry => {
+      if (entry.metadata?.tags) {
+        entry.metadata.tags.forEach(tag => allTags.add(tag));
+      }
+    });
+    return Array.from(allTags);
+  }, [capsule]);
+
+  const displayPeople = useMemo(() => {
+    const allPeople = new Set<string>();
+    capsule?.entries?.forEach(entry => {
+      if (entry.metadata?.people) {
+        entry.metadata.people.forEach(person => allPeople.add(person));
+      }
+    });
+    return Array.from(allPeople);
+  }, [capsule]);
+
+  const handleShare = async () => {
+    if (!capsule) return;
+    try {
+      await Share.share({
+        message: `Check out this memory capsule: ${capsule.capsuleTitle}`,
+        // In the future, we can add a URL to a web version of the capsule here
+      });
+    } catch (error) {
+      Alert.alert('Error', 'Could not share this capsule.');
     }
   };
 
-  const renderEntryMetadata = (entry: CapsuleEntry) => (
-    <View style={styles.entryMetadataContainer}>
-      {entry.createdAt && (
-        <Text style={styles.entryDate}>
-          {new Date(entry.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-        </Text>
-      )}
-      {entry.metadata?.userDescription && (
-        <Text style={styles.entryDescriptionText}>{entry.metadata.userDescription}</Text>
-      )}
-    </View>
-  );
+  const handleDelete = () => {
+    if (!capsule?.id) return;
+
+    Alert.alert(
+      'Delete Capsule',
+      'Are you sure you want to permanently delete this capsule? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await deleteCapsule(capsule.id!);
+              navigation.goBack();
+            } catch (err) {
+              setLoading(false);
+              setError('Failed to delete the capsule. Please try again.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const renderFeaturedMedia = () => {
+    if (!featuredMedia) {
+      return <View style={styles.featuredMediaPlaceholder} />;
+    }
+    if (featuredMedia.type === 'photo') {
+      return <Image source={{ uri: featuredMedia.mediaUri }} style={styles.featuredMedia} />;
+    }
+    if (featuredMedia.type === 'video') {
+      return (
+        <Video
+          source={{ uri: featuredMedia.mediaUri! }}
+          style={styles.featuredMedia}
+          useNativeControls
+          resizeMode="cover"
+        />
+      );
+    }
+    return <View style={styles.featuredMediaPlaceholder} />;
+  };
 
   if (loading) {
     return <ActivityIndicator style={styles.centered} size="large" color={theme.colors.primary} />;
@@ -190,30 +206,115 @@ const CapsuleDetailScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {capsule.entries && capsule.entries.length > 0 ? (
-          capsule.entries.map(entry => (
-            <View key={entry.id} style={styles.entryCard}>
-              {renderEntryContent(entry)}
-              {renderEntryMetadata(entry)}
-            </View>
-          ))
-        ) : (
-          <View style={styles.centered}>
-            <Text>This capsule has no entries yet.</Text>
+        {renderFeaturedMedia()}
+
+        <View style={styles.contentContainer}>
+          {/* --- METADATA --- */}
+          <View style={styles.metadataContainer}>
+            <Text style={styles.title}>{capsule.capsuleTitle}</Text>
+            {displayDate && <Text style={styles.metadataText}>{displayDate}</Text>}
+            {displayLocation && <Text style={styles.metadataText}>{displayLocation}</Text>}
           </View>
-        )}
+
+          {/* --- JOURNAL ENTRY --- */}
+          {journalEntry && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.journalText}>{journalEntry.textContent}</Text>
+            </View>
+          )}
+
+          {/* --- MEDIA GALLERY --- */}
+          {galleryMedia.length > 0 && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Photos & Media</Text>
+              <View style={styles.galleryContainer}>
+                {galleryMedia.map(item => (
+                  <TouchableOpacity key={item.id} onPress={() => setSelectedMedia(item)}>
+                    <Image source={{ uri: item.mediaUri }} style={styles.galleryItem} />
+                    {item.type === 'video' && (
+                      <View style={styles.playIconContainer}>
+                        <Ionicons name="play-circle" size={48} color="rgba(255,255,255,0.8)" />
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* --- TAGS --- */}
+          {displayTags.length > 0 && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Tags</Text>
+              <View style={styles.tagsContainer}>
+                {displayTags.map(tag => (
+                  <View key={tag} style={styles.tag}><Text style={styles.tagText}>{tag}</Text></View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* --- PEOPLE --- */}
+          {displayPeople.length > 0 && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>People In This Memory</Text>
+              <View style={styles.peopleContainer}>
+                {displayPeople.map(person => (
+                  <View key={person} style={styles.personContainer}>
+                    <View style={styles.avatarPlaceholder}>
+                      <Ionicons name="person" size={24} color={theme.colors.text.secondary} />
+                    </View>
+                    <Text style={styles.personName}>{person}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+        </View>
       </ScrollView>
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => navigation.navigate('Create', { capsuleId: capsule!.id, existingCapsuleTitle: capsule?.capsuleTitle })}
-      >
-        <LinearGradient
-          colors={['#42275a', '#734b6d']}
-          style={styles.fabGradient}
+
+      {/* --- BOTTOM ACTION BAR --- */}
+      <View style={styles.bottomBar}>
+        <TouchableOpacity style={styles.bottomBarButton} onPress={handleShare}>
+          <Ionicons name="share-outline" size={24} color={theme.colors.primary} />
+          <Text style={styles.bottomBarText}>Share</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomBarButton} onPress={() => navigation.navigate('EditCapsule', { capsuleId: capsule.id! })}>
+          <Ionicons name="pencil-outline" size={24} color={theme.colors.primary} />
+          <Text style={styles.bottomBarText}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomBarButton} onPress={handleDelete}>
+          <Ionicons name="trash-outline" size={24} color={theme.colors.error} />
+          <Text style={[styles.bottomBarText, { color: theme.colors.error }]}>Delete</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* --- MEDIA VIEWER MODAL --- */}
+      {selectedMedia && (
+        <Modal
+          visible={true}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setSelectedMedia(null)}
         >
-          <Ionicons name="add" size={30} color={theme.colors.white} />
-        </LinearGradient>
-      </TouchableOpacity>
+          <View style={styles.modalContainer}>
+            <TouchableOpacity style={styles.modalCloseButton} onPress={() => setSelectedMedia(null)}>
+              <Ionicons name="close" size={32} color={theme.colors.white} />
+            </TouchableOpacity>
+            {selectedMedia.type === 'photo' ? (
+              <Image source={{ uri: selectedMedia.mediaUri }} style={styles.modalImage} resizeMode="contain" />
+            ) : (
+              <Video
+                source={{ uri: selectedMedia.mediaUri! }}
+                style={styles.modalVideo}
+                useNativeControls
+                resizeMode={ResizeMode.CONTAIN}
+                shouldPlay
+              />
+            )}
+          </View>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 };
@@ -239,23 +340,43 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.md,
     textAlign: 'center',
   },
-  entryCard: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.xl,
+  contentContainer: {
+    padding: theme.spacing.md,
+  },
+  metadataContainer: {
     marginBottom: theme.spacing.lg,
-    ...theme.shadows.md,
-    overflow: 'hidden',
   },
-  media: {
-    width: '100%',
-    height: 250,
+  title: {
+    ...theme.typography.title,
+    marginBottom: theme.spacing.xs,
   },
-  mediaContainer: {
-    width: '100%',
-    height: 250,
-    backgroundColor: '#000',
+  metadataText: {
+    ...theme.typography.body,
+    color: theme.colors.text.secondary,
   },
-  videoControls: {
+  sectionContainer: {
+    marginBottom: theme.spacing.lg,
+  },
+  sectionTitle: {
+    ...theme.typography.subtitle,
+    marginBottom: theme.spacing.xs,
+  },
+  journalText: {
+    ...theme.typography.body,
+    color: theme.colors.text.primary,
+  },
+  galleryContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  galleryItem: {
+    width: '48%',
+    height: 150,
+    marginBottom: theme.spacing.md,
+    borderRadius: theme.borderRadius.md,
+  },
+  playIconContainer: {
     position: 'absolute',
     top: 0,
     left: 0,
@@ -263,54 +384,99 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    borderRadius: theme.borderRadius.md,
   },
-  textEntryContainer: {
-    padding: theme.spacing.lg,
-  },
-  entryText: {
-    fontSize: theme.typography.body.fontSize,
-    lineHeight: theme.typography.body.fontSize * theme.typography.body.lineHeight,
-    color: theme.colors.text.primary,
-  },
-  audioContainer: {
+  tagsContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: theme.spacing.lg,
+    flexWrap: 'wrap',
   },
-  audioText: {
-    ...theme.typography.body,
-    marginLeft: theme.spacing.md,
-    color: theme.colors.text.secondary,
-  },
-  entryMetadataContainer: {
-    padding: theme.spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border.light,
-  },
-  entryDate: {
-    ...theme.typography.caption,
-    color: theme.colors.text.secondary,
+  tag: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.xs,
+    marginRight: theme.spacing.xs,
     marginBottom: theme.spacing.xs,
   },
-  entryDescriptionText: {
-    ...theme.typography.body,
-    color: theme.colors.text.primary,
+  tagText: {
+    ...theme.typography.caption,
+    color: theme.colors.primary,
+    fontWeight: '500',
   },
-  fab: {
-    position: 'absolute',
-    bottom: 30,
-    right: 30,
+  peopleContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: theme.spacing.lg,
+  },
+  personContainer: {
+    alignItems: 'center',
+    width: 80,
+    gap: theme.spacing.sm,
+  },
+  avatarPlaceholder: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    ...theme.shadows.lg,
-  },
-  fabGradient: {
-    flex: 1,
+    backgroundColor: theme.colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 30,
+  },
+  personName: {
+    ...theme.typography.caption,
+    color: theme.colors.text.primary,
+    textAlign: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalImage: {
+    width: '100%',
+    height: '80%',
+  },
+  modalVideo: {
+    width: '100%',
+    height: '80%',
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 1,
+  },
+  bottomBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border.light,
+  },
+  bottomBarButton: {
+    alignItems: 'center',
+  },
+  bottomBarText: {
+    ...theme.typography.caption,
+    color: theme.colors.text.secondary,
+    marginTop: theme.spacing.xs,
+  },
+  featuredMedia: {
+    width: '100%',
+    height: 250,
+    borderRadius: theme.borderRadius.md,
+  },
+  featuredMediaPlaceholder: {
+    width: '100%',
+    height: 250,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
   },
 });
 

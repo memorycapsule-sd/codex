@@ -8,19 +8,25 @@ import PromptResponseScreen from '../screens/PromptResponseScreen';
 import CapsuleDetailScreen from '../screens/CapsuleDetailScreen';
 import MediaMetadataScreen from '../screens/MediaMetadataScreen';
 import EditCapsuleScreen from '../screens/EditCapsuleScreen';
+import AddEntryScreen from '../screens/AddEntryScreen';
 
 // Define the types for the stack navigator
 export type CapsulesStackParamList = {
   CapsulesList: undefined;
-  CapsuleDetail: {
+  AddEntry: {
     capsuleId: string;
-    title: string;
+    capsuleTitle: string;
+    promptText: string;
   };
   PromptResponse: {
+    capsuleId: string;
     promptId: string;
     promptText: string;
     capsuleTitle: string;
-    capsuleId: string; // Added to identify the capsule
+  };
+  CapsuleDetail: {
+    capsuleId: string;
+    title: string;
   };
   CapsuleDetailScreen: {
     capsuleId: string;
@@ -30,7 +36,7 @@ export type CapsulesStackParamList = {
     capsule: import('../types/capsule').CapsuleResponse;
     isEditing?: boolean;
   };
-  EditCapsuleScreen: {
+  EditCapsule: {
     capsuleId: string;
   };
 };
@@ -55,7 +61,8 @@ export function CapsulesNavigator() {
       <Stack.Screen name="PromptResponse" component={PromptResponseScreen} />
       <Stack.Screen name="CapsuleDetailScreen" component={CapsuleDetailScreen} />
       <Stack.Screen name="MediaMetadataScreen" component={MediaMetadataScreen} />
-      <Stack.Screen name="EditCapsuleScreen" component={EditCapsuleScreen} />
+      <Stack.Screen name="AddEntry" component={AddEntryScreen} />
+      <Stack.Screen name="EditCapsule" component={EditCapsuleScreen} />
     </Stack.Navigator>
   );
 }
