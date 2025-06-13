@@ -7,17 +7,18 @@ import {
   TouchableOpacity, 
   ActivityIndicator 
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { CapsulesStackParamList } from '../navigation/CapsulesNavigator';
 import { Ionicons } from '@expo/vector-icons';
 import { MacroCapsule } from '../types/capsule';
-import { CapsuleService } from '../services/capsuleService';
+import * as CapsuleService from '../services/capsuleService';
 import { theme } from '../theme';
 
 /**
  * Screen that displays the list of available MacroCapsules
  */
 const CapsulesScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<CapsulesStackParamList>>();
   const [capsules, setCapsules] = useState<MacroCapsule[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -137,7 +138,9 @@ const styles = StyleSheet.create({
     padding: theme.spacing.lg,
   },
   headerTitle: {
-    ...theme.typography.h1,
+    fontSize: theme.typography.fontSize['3xl'],
+    fontWeight: theme.typography.fontWeight.bold,
+    fontFamily: theme.typography.fontFamily.primary,
     color: theme.colors.text.primary,
     marginBottom: theme.spacing.xs,
   },
@@ -171,7 +174,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   capsuleTitle: {
-    ...theme.typography.h3,
+    fontSize: theme.typography.fontSize.lg,
+    fontWeight: theme.typography.fontWeight.semibold,
+    fontFamily: theme.typography.fontFamily.primary,
     color: theme.colors.text.primary,
     marginBottom: theme.spacing.xs / 2,
   },
@@ -232,7 +237,7 @@ const styles = StyleSheet.create({
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: theme.spacing.xxl,
+    paddingVertical: theme.spacing['3xl'],
   },
   emptyText: {
     ...theme.typography.body,

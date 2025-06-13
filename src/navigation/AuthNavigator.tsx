@@ -47,78 +47,30 @@ function AppNavigator() {
 }
 
 export default function AuthNavigationWrapper() {
-  const { user, isLoading } = useAuth();
-  
-  // TEMPORARY BYPASS: Skip profile completion check
-  // const [hasCompletedProfile, setHasCompletedProfile] = useState<boolean | null>(null);
-  // const [isCheckingProfile, setIsCheckingProfile] = useState(true);
+  const { user, isLoading, isProfileComplete } = useAuth();
 
-  // Check if user has completed profile setup
-  // useEffect(() => {
-  //   checkProfileCompletion();
-  // }, [user]);
-
-  // const checkProfileCompletion = async () => {
-  //   if (!user) {
-  //     setIsCheckingProfile(false);
-  //     return;
-  //   }
-
-  //   try {
-  //     const profileData = await AsyncStorage.getItem('userProfile');
-  //     if (profileData) {
-  //       const profile = JSON.parse(profileData);
-  //       // Check if profile has required fields (displayName and interests)
-  //       const isComplete = profile.displayName && profile.interests && profile.interests.length > 0;
-  //       setHasCompletedProfile(isComplete);
-  //     } else {
-  //       setHasCompletedProfile(false);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error checking profile completion:', error);
-  //     setHasCompletedProfile(false);
-  //   } finally {
-  //     setIsCheckingProfile(false);
-  //   }
-  // };
-
-  // Show loading screen while checking authentication
   if (isLoading) {
     return (
-      <View style={{ 
-        flex: 1, 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        backgroundColor: '#ffffff'
-      }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>
         <ActivityIndicator size="large" color="#42275a" />
-        <Text style={{ 
-          marginTop: 16, 
-          fontSize: 16, 
-          color: '#666666',
-          fontFamily: 'Inter_400Regular'
-        }}>
+        <Text style={{ marginTop: 16, fontSize: 16, color: '#666666', fontFamily: 'Inter_400Regular' }}>
           Loading...
         </Text>
       </View>
     );
   }
 
-  // If user is not authenticated, show auth flow
   if (!user) {
     return <AuthNavigator />;
   }
 
-  // TEMPORARY BYPASS: Skip profile setup and go directly to main app
-  // If user is authenticated but hasn't completed profile, show profile setup
-  // if (user && hasCompletedProfile === false) {
-  //   return (
-  //     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-  //       <AuthStack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
-  //     </AuthStack.Navigator>
-  //   );
-  // }
+  if (!isProfileComplete) {
+    return (
+      <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+        <AuthStack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
+      </AuthStack.Navigator>
+    );
+  }
 
-  // If user is authenticated, show main app directly (bypassing profile setup)
   return <AppNavigator />;
 }

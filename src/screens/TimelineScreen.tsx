@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -11,11 +11,11 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native'; // Added import
+import { useNavigation, useFocusEffect } from '@react-navigation/native'; // Added import
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'; // Added import
 import { theme } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
-import { CapsuleService } from '../services/capsuleService';
+import * as CapsuleService from '../services/capsuleService';
 import { CapsuleResponse, CapsuleEntry } from '../types/capsule'; // Added import for CapsuleResponse and CapsuleEntry
 import { CapsulesStackParamList } from '../navigation/CapsulesNavigator'; // Added import
 
@@ -24,7 +24,8 @@ type MediaType = 'video' | 'text' | 'audio' | 'photo';
 type Category = 'All' | 'Childhood' | 'Education' | 'Career' | 'Family' | 'Travel';
 
 // Define navigation prop type specific to this screen's place in the CapsulesNavigator
-type TimelineNavigationProp = NativeStackNavigationProp<CapsulesStackParamList, 'CapsulesList'>;
+// TODO: Refine this type. For now, using 'any' to allow navigation to nested screens.
+type TimelineNavigationProp = any; //NativeStackNavigationProp<CapsulesStackParamList, 'CapsulesList'>;
 
 const categories: Category[] = ['All', 'Childhood', 'Education', 'Career', 'Family', 'Travel'];
 
@@ -35,27 +36,29 @@ export default function TimelineScreen() {
   const [timelineData, setTimelineData] = useState<CapsuleResponse[]>([]); // Updated type to CapsuleResponse[]
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    const fetchCapsules = async () => {
-      if (user?.uid) {
-        setIsLoading(true);
-        try {
-          const responses = await CapsuleService.loadUserCapsuleResponses(user.uid);
-          setTimelineData(responses);
-        } catch (error) {
-          console.error("Error fetching timeline data:", error);
-          Alert.alert("Error", "Could not load timeline data.");
-          setTimelineData([]); 
+  useFocusEffect(
+    useCallback(() => {
+      const fetchCapsules = async () => {
+        if (user?.uid) {
+          setIsLoading(true);
+          try {
+            const responses = await CapsuleService.loadUserCapsuleResponses(user.uid);
+            setTimelineData(responses);
+          } catch (error) {
+            console.error("Error fetching timeline data:", error);
+            Alert.alert("Error", "Could not load timeline data.");
+            setTimelineData([]);
+          }
+          setIsLoading(false);
+        } else {
+          setTimelineData([]);
+          setIsLoading(false);
         }
-        setIsLoading(false);
-      } else {
-        setTimelineData([]); 
-        setIsLoading(false);
-      }
-    };
+      };
 
-    fetchCapsules();
-  }, [user]); 
+      fetchCapsules();
+    }, [user])
+  ); 
 
   const handleSearch = () => {
     Alert.alert('Search', 'Search functionality would be implemented here');
@@ -136,32 +139,7 @@ export default function TimelineScreen() {
     }
   };
 
-  const renderCategoryPill = (category: Category) => {
-    const isSelected = selectedCategory === category;
-    return (
-      <TouchableOpacity
-        key={category}
-        style={[
-          styles.categoryPill,
-          isSelected ? styles.categoryPillActive : styles.categoryPillInactive
-        ]}
-        onPress={() => setSelectedCategory(category)}
-      >
-        <Text
-          style={[
-            styles.categoryPillText,
-            isSelected ? styles.categoryPillTextActive : styles.categoryPillTextInactive
-          ]}
-        >
-          {category}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
-
   const renderMediaContent = (capsuleEntry: CapsuleEntry, capsuleResponseId: string) => {
-    // Assuming handlePlayVideo etc. now expect capsuleEntry.id or need to be adapted.
-    // For now, using capsuleEntry.id for media-specific actions.
     switch (capsuleEntry.type) {
       case 'video':
         return (
@@ -173,7 +151,7 @@ export default function TimelineScreen() {
           </TouchableOpacity>
         );
       case 'text':
-        return <Text style={styles.entryDescription}>{capsuleEntry.textContent}</Text>; 
+        return <Text style={styles.entryDescription}>{capsuleEntry.textContent}</Text>;
       case 'audio':
         return (
           <TouchableOpacity onPress={() => handlePlayAudio(capsuleEntry.id)} style={styles.audioContainer}>
@@ -181,12 +159,18 @@ export default function TimelineScreen() {
               <Ionicons name="play" size={18} color={theme.colors.white} />
             </View>
             <View style={styles.audioProgress}>
-              <Text style={styles.audioTime}>{capsuleEntry.metadata?.duration ? `${Math.floor(capsuleEntry.metadata.duration / 60)}:${String(Math.floor(capsuleEntry.metadata.duration % 60)).padStart(2, '0')}` : 'Audio'}</Text>
+              <Text style={styles.audioTime}>
+                {capsuleEntry.metadata?.duration
+                  ? `${Math.floor(capsuleEntry.metadata.duration / 60)}:${String(
+                      Math.floor(capsuleEntry.metadata.duration % 60)
+                    ).padStart(2, '0')}`
+                  : 'Audio'}
+              </Text>
               {/* Progress bar can be implemented here */}
             </View>
           </TouchableOpacity>
         );
-      case 'photo': 
+      case 'photo':
         return (
           <TouchableOpacity onPress={() => handleViewPhotos(capsuleEntry.id)} style={styles.photoItemSingle}>
             <Image source={{ uri: capsuleEntry.mediaUri || undefined }} style={styles.photoImage} resizeMode="cover" />
@@ -198,39 +182,52 @@ export default function TimelineScreen() {
   };
 
   const renderTimelineEntry = (capsuleResponseItem: CapsuleResponse) => {
-    const entryDate = capsuleResponseItem.createdAt ? new Date(capsuleResponseItem.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Date unknown';
-    // The concept of a single 'description' or 'responseType' at the CapsuleResponse level is removed.
-    // Content is now an array of entries.
+    const handlePress = () => {
+      navigation.navigate('CapsuleDetailScreen', { capsuleId: capsuleResponseItem.id });
+    };
+
+    // const entryDate = capsuleResponseItem.createdAt ? new Date(capsuleResponseItem.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Date unknown';
 
     return (
-      <TouchableOpacity 
-        style={styles.entryCard} 
-        onPress={() => navigation.navigate('CapsuleViewingScreen', { capsuleResponse: capsuleResponseItem })}
-      >
-        {/* Original content of entryCard will be nested here */}
+      <TouchableOpacity style={styles.entryCard} onPress={handlePress} activeOpacity={0.7}>
         <View style={styles.entryHeader}>
-          <View style={[styles.categoryIcon, { backgroundColor: getCategoryColor(capsuleResponseItem.capsuleTitle) }]}>
-            {/* Assuming getCategoryIcon is for the capsule's category/title, not media type */}
-            <Ionicons name={getCategoryIcon(capsuleResponseItem.capsuleTitle)} size={20} color={theme.colors.white} />
+          <View style={[styles.categoryIcon, { backgroundColor: getCategoryColor(capsuleResponseItem.category || 'Default') }]}>
+            <Ionicons 
+              name={getCategoryIcon(capsuleResponseItem.category || 'Default')} 
+              size={20} 
+              color={theme.colors.white} 
+            />
           </View>
           <View style={styles.entryInfo}>
-            <Text style={styles.entryTitle}>{capsuleResponseItem.capsuleTitle}</Text> 
-            <Text style={styles.entryDate}>{entryDate}</Text>
+            <Text style={styles.entryTitle}>{capsuleResponseItem.capsuleTitle}</Text>
+            <Text style={styles.entryDate}>
+              {new Date(capsuleResponseItem.createdAt).toLocaleDateString()} - {capsuleResponseItem.entries.length} {capsuleResponseItem.entries.length === 1 ? 'entry' : 'entries'}
+            </Text>
           </View>
-          {/* onPress event for options should likely use capsuleResponse.id */}
-          <TouchableOpacity onPress={() => handleEntryOptions(capsuleResponseItem.id)} style={styles.entryOptionsButton}>
-            <Ionicons name="ellipsis-horizontal" size={18} color={theme.colors.dark} />
+          <TouchableOpacity onPress={(e) => { e.stopPropagation(); handleEntryOptions(capsuleResponseItem.id);}} style={styles.entryOptionsButton}>
+            <Ionicons name="ellipsis-horizontal" size={20} color={theme.colors.dark} />
           </TouchableOpacity>
         </View>
-        
-        {/* Iterate over entries and render content for each */}
-        {capsuleResponseItem.entries.map((entryItem: CapsuleEntry) => (
-          <View key={entryItem.id} style={styles.entryItemContainer}> {/* Ensure styles.entryItemContainer is defined */}
-            {renderMediaContent(entryItem, capsuleResponseItem.id)}
+
+        {/* Render a preview of the first entry, if available */}
+        {capsuleResponseItem.entries.length > 0 && (
+          <View style={styles.entryItemContainer}>
+            {renderMediaContent(capsuleResponseItem.entries[0], capsuleResponseItem.id)}
           </View>
-        ))}
+        )}
         
-        {/* Footer with tags can be adapted if needed */}
+        {/* Add tags or other summary info if desired */}
+        {capsuleResponseItem.tags && capsuleResponseItem.tags.length > 0 && (
+          <View style={styles.entryFooter}>
+            <View style={styles.entryTags}>
+              {capsuleResponseItem.tags.slice(0, 3).map(tag => (
+                <View key={tag} style={styles.tag}>
+                  <Text style={styles.tagText}>{tag}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
       </TouchableOpacity>
     );
   };
@@ -310,21 +307,43 @@ export default function TimelineScreen() {
           style={styles.categoriesContainer}
           contentContainerStyle={styles.categoriesContent}
         >
-          {categories.map(renderCategoryPill)}
+          {categories.map((category, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.categoryPill,
+                selectedCategory === category && styles.categoryPillActive,
+              ]}
+              onPress={() => setSelectedCategory(category)}
+            >
+              <Text
+                style={[
+                  styles.categoryPillText,
+                  selectedCategory === category && styles.categoryPillTextActive,
+                ]}
+              >
+                {category}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       </View>
 
       {/* Timeline Entries */}
       <ScrollView style={styles.timelineContainer} showsVerticalScrollIndicator={false}>
-        {Object.entries(groupedEntries).map(([month, monthEntries]: [string, CapsuleResponse[]]) => (
-          <View key={month}>
+        {Object.entries(groupedEntries).map(([month, monthEntries]: [string, CapsuleResponse[]], index) => (
+          <React.Fragment key={index}>
             <View style={styles.dateHeader}>
               <View style={styles.dateLine} />
               <Text style={styles.dateHeaderText}>{month}</Text>
               <View style={styles.dateLine} />
             </View>
-            {monthEntries.map(renderTimelineEntry)}
-          </View>
+            {monthEntries.map((entry, index) => (
+              <React.Fragment key={index}>
+                {renderTimelineEntry(entry)}
+              </React.Fragment>
+            ))}
+          </React.Fragment>
         ))}
         <View style={styles.bottomSpacing} />
       </ScrollView>

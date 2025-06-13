@@ -3,25 +3,41 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // Import screens
 import CapsulesScreen from '../screens/CapsulesScreen';
-import CapsuleDetailScreen from '../screens/CapsuleDetailScreen';
+import MacroCapsulePromptsScreen from '../screens/MacroCapsulePromptsScreen';
 import PromptResponseScreen from '../screens/PromptResponseScreen';
-import CapsuleViewingScreen from '../screens/CapsuleViewingScreen'; // Added import
+import CapsuleDetailScreen from '../screens/CapsuleDetailScreen';
+import MediaMetadataScreen from '../screens/MediaMetadataScreen';
+import EditCapsuleScreen from '../screens/EditCapsuleScreen';
+import AddEntryScreen from '../screens/AddEntryScreen';
 
 // Define the types for the stack navigator
 export type CapsulesStackParamList = {
   CapsulesList: undefined;
+  AddEntry: {
+    capsuleId: string;
+    capsuleTitle: string;
+    promptText: string;
+  };
+  PromptResponse: {
+    capsuleId: string;
+    promptId: string;
+    promptText: string;
+    capsuleTitle: string;
+  };
   CapsuleDetail: {
     capsuleId: string;
     title: string;
   };
-  PromptResponse: {
-    promptId: string;
-    promptText: string;
-    capsuleTitle: string;
-    capsuleId: string; // Added to identify the capsule
+  CapsuleDetailScreen: {
+    capsuleId: string;
   };
-  CapsuleViewingScreen: {
-    capsuleResponse: import('../types/capsule').CapsuleResponse; // Added screen params
+  MediaMetadataScreen: {
+    entry: import('../types/capsule').CapsuleEntry;
+    capsule: import('../types/capsule').CapsuleResponse;
+    isEditing?: boolean;
+  };
+  EditCapsule: {
+    capsuleId: string;
   };
 };
 
@@ -41,9 +57,12 @@ export function CapsulesNavigator() {
       }}
     >
       <Stack.Screen name="CapsulesList" component={CapsulesScreen} />
-      <Stack.Screen name="CapsuleDetail" component={CapsuleDetailScreen} />
+      <Stack.Screen name="CapsuleDetail" component={MacroCapsulePromptsScreen} />
       <Stack.Screen name="PromptResponse" component={PromptResponseScreen} />
-      <Stack.Screen name="CapsuleViewingScreen" component={CapsuleViewingScreen} />
+      <Stack.Screen name="CapsuleDetailScreen" component={CapsuleDetailScreen} />
+      <Stack.Screen name="MediaMetadataScreen" component={MediaMetadataScreen} />
+      <Stack.Screen name="AddEntry" component={AddEntryScreen} />
+      <Stack.Screen name="EditCapsule" component={EditCapsuleScreen} />
     </Stack.Navigator>
   );
 }

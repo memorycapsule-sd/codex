@@ -2,18 +2,20 @@ import React, { createContext, useContext, useEffect, useState, ReactNode, useMe
 // Removed: import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 // We will use AuthService for all auth operations and User type from 'firebase/auth' (via AuthService or direct import if needed)
 import { User } from 'firebase/auth'; // Explicitly import User type for clarity
-import { AuthService } from '../services/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AuthService from '../services/auth';
+import { UserProfile } from '../types/capsule';
 import { saveUserToStorage, getUserFromStorage } from '../firebase';
 
 interface AuthContextType {
-  user: User | null; // Use User from 'firebase/auth'
+  user: User | null;
+  userProfile: UserProfile | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isProfileComplete: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  refreshAuthState: () => Promise<void>;
+  refreshUserProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,6 +26,7 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Initialize Firebase on component mount
@@ -77,17 +80,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
       
       // Listen for auth state changes using our AuthService
-      const unsubscribe = AuthService.onAuthStateChanged((user: User | null) => {
+      const unsubscribe = AuthService.onAuthStateChanged(async (user: User | null) => {
+        setUser(user);
         if (user) {
           console.log('Auth state changed - user signed in:', user.email);
-          // Save user to AsyncStorage whenever auth state changes
           saveUserToStorage(user);
+          const profile = await AuthService.getUserProfile(user.uid);
+          setUserProfile(profile);
         } else {
           console.log('Auth state changed - user signed out');
+          setUserProfile(null);
         }
-        setUser(user);
-        if (isLoading) { // Only set isLoading false if it's the initial load
-            setIsLoading(false);
+
+        if (isLoading) {
+          setIsLoading(false);
         }
       });
 
@@ -133,7 +139,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsLoading(true);
       console.log('Signing out user');
       await AuthService.signOut();
-      setUser(null); // Auth state listener should also catch this, but explicit null is fine.
+      setUser(null);
+      setUserProfile(null);
     } catch (error) {
       console.error('Sign out error:', error);
       throw error;
@@ -142,20 +149,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const refreshAuthState = async () => {
-    console.log('Refreshing auth state');
-    await checkAuthState();
+  const refreshUserProfile = async () => {
+    if (user) {
+      console.log('Refreshing user profile');
+      const profile = await AuthService.getUserProfile(user.uid);
+      setUserProfile(profile);
+    }
   };
 
-  const value = useMemo(() => ({
-    user,
-    isLoading,
-    isAuthenticated: !!user,
-    signIn,
-    signUp,
-    signOut,
-    refreshAuthState,
-  }), [user, isLoading]);
+  const value = useMemo(() => {
+    const isProfileComplete = !!(userProfile && typeof userProfile.birthday === 'number'); // Profile is complete if birthday is set
+    return {
+      user,
+      userProfile,
+      isLoading,
+      isAuthenticated: !!user,
+      isProfileComplete,
+      signIn,
+      signUp,
+      signOut,
+      refreshUserProfile,
+    };
+  }, [user, userProfile, isLoading]);
 
   return (
     <AuthContext.Provider value={value}>

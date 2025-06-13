@@ -14,7 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { theme } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
-import { AuthService } from '../services/auth';
+import AuthService from '../services/auth';
 import { GradientText } from '../components/ui/GradientText';
 import { GradientButton } from '../components/ui/GradientButton';
 
@@ -28,77 +28,31 @@ type RootStackParamList = {
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-type InterestCategory = {
-  id: string;
-  name: string;
-  icon: string;
-  description: string;
-};
-
 export default function ProfileSetupScreen() {
   const navigation = useNavigation<NavigationProp>();
-  const { user } = useAuth();
+  const { user, refreshUserProfile } = useAuth();
 
   const [displayName, setDisplayName] = useState('');
-  const [birthYear, setBirthYear] = useState('');
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [birthday, setBirthday] = useState('');
+  const [gender, setGender] = useState<'male' | 'female' | 'non-binary' | 'prefer-not-to-say' | null>(null);
+  const [privacySetting, setPrivacySetting] = useState<'public' | 'private'>('private');
+  const [username, setUsername] = useState('');
+  const [usageIntent, setUsageIntent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  const interestCategories: InterestCategory[] = [
-    {
-      id: 'childhood',
-      name: 'Childhood',
-      icon: 'happy',
-      description: 'Early memories and experiences',
-    },
-    {
-      id: 'education',
-      name: 'Education',
-      icon: 'school',
-      description: 'School, college, and learning',
-    },
-    {
-      id: 'career',
-      name: 'Career',
-      icon: 'briefcase',
-      description: 'Work and professional life',
-    },
-    {
-      id: 'family',
-      name: 'Family',
-      icon: 'people',
-      description: 'Relationships and loved ones',
-    },
-    {
-      id: 'travel',
-      name: 'Travel',
-      icon: 'airplane',
-      description: 'Adventures and explorations',
-    },
-    {
-      id: 'hobbies',
-      name: 'Hobbies',
-      icon: 'heart',
-      description: 'Passions and interests',
-    },
-  ];
-
-  const toggleInterest = (id: string) => {
-    setSelectedInterests(prev =>
-      prev.includes(id)
-        ? prev.filter(item => item !== id)
-        : [...prev, id]
-    );
-  };
 
   const handleComplete = async () => {
     if (!displayName.trim()) {
-      Alert.alert('Error', 'Please enter your display name');
+      Alert.alert('Error', 'Please enter your display name.');
       return;
     }
 
-    if (selectedInterests.length === 0) {
-      Alert.alert('Error', 'Please select at least one interest');
+    if (!username.trim()) {
+      Alert.alert('Error', 'Please enter a username.');
+      return;
+    }
+
+    if (!user) {
+      Alert.alert('Error', 'User not authenticated. Please sign in again.');
       return;
     }
 
@@ -106,12 +60,16 @@ export default function ProfileSetupScreen() {
       setIsLoading(true);
 
       // Update user profile with the collected information
-      await AuthService.updateUserProfile({
-        displayName: displayName.trim(),
-        birthYear: birthYear.trim() || undefined,
-        interests: selectedInterests,
+      await AuthService.updateUserProfile(user.uid, {
+        name: displayName.trim(),
+        birthday: birthday.trim() ? new Date(birthday.trim()).getTime() : undefined,
+        gender: gender || 'prefer-not-to-say',
+        privacySetting: privacySetting,
+        username: username.trim(),
+        usageIntent: usageIntent.trim(),
       });
 
+      await refreshUserProfile();
       // Navigation to Main will be handled automatically by AuthNavigationWrapper
       // since the profile is now complete
     } catch (error) {
@@ -171,90 +129,103 @@ export default function ProfileSetupScreen() {
           <Text style={styles.sectionTitle}>Basic Information</Text>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Display Name *</Text>
+            <Text style={styles.label}>Display Name</Text>
             <TextInput
               style={styles.input}
-              placeholder="How should we call you?"
+              placeholder="How you'll appear to others"
+              placeholderTextColor="#999999"
               value={displayName}
               onChangeText={setDisplayName}
-              autoCapitalize="words"
-              autoCorrect={false}
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Birth Year (Optional)</Text>
+            <Text style={styles.label}>Birthday (Optional)</Text>
             <TextInput
               style={styles.input}
-              placeholder="e.g., 1985"
-              value={birthYear}
-              onChangeText={setBirthYear}
-              keyboardType="number-pad"
-              maxLength={4}
+              placeholder="YYYY-MM-DD"
+              placeholderTextColor="#999999"
+              value={birthday}
+              onChangeText={setBirthday}
             />
-            <Text style={styles.inputHint}>
-              This helps us provide age-appropriate memory prompts
-            </Text>
+            <Text style={styles.inputHint}>Your age helps us personalize your experience.</Text>
           </View>
-        </View>
 
-        {/* Interests Section */}
-        <View style={styles.interestsSection}>
-          <Text style={styles.sectionTitle}>Select Your Interests *</Text>
-          <Text style={styles.sectionDescription}>
-            Choose categories that matter to you. We'll use these to personalize your memory prompts.
-          </Text>
-
-          <View style={styles.interestsGrid}>
-            {interestCategories.map((category) => (
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Gender (Optional)</Text>
+            <View style={styles.optionGroup}>
               <TouchableOpacity
-                key={category.id}
-                style={[
-                  styles.interestCard,
-                  !selectedInterests.includes(category.id) && styles.interestCardUnselected,
-                ]}
-                onPress={() => toggleInterest(category.id)}
-              >
-                {selectedInterests.includes(category.id) ? (
-                  <LinearGradient
-                    colors={theme.gradients.purpleTheme as any}
-                    style={styles.interestCardGradient}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                  >
-                    <View style={styles.interestIconContainer}>
-                      <Ionicons
-                        name={category.icon as any}
-                        size={24}
-                        color="#FFFFFF"
-                      />
-                    </View>
-                    <Text style={[styles.interestName, styles.interestNameSelected]}>
-                      {category.name}
-                    </Text>
-                    <Text style={[styles.interestDescription, styles.interestDescriptionSelected]}>
-                      {category.description}
-                    </Text>
-                  </LinearGradient>
-                ) : (
-                  <>
-                    <View style={styles.interestIconContainer}>
-                      <Ionicons
-                        name={category.icon as any}
-                        size={24}
-                        color="#7C67CB"
-                      />
-                    </View>
-                    <Text style={styles.interestName}>
-                      {category.name}
-                    </Text>
-                    <Text style={styles.interestDescription}>
-                      {category.description}
-                    </Text>
-                  </>
-                )}
+                style={[styles.optionButton, gender === 'male' && styles.optionButtonSelected]}
+                onPress={() => setGender('male')}>
+                <Text style={[styles.optionButtonText, gender === 'male' && styles.optionButtonTextSelected]}>Male</Text>
               </TouchableOpacity>
-            ))}
+              <TouchableOpacity
+                style={[styles.optionButton, gender === 'female' && styles.optionButtonSelected]}
+                onPress={() => setGender('female')}>
+                <Text style={[styles.optionButtonText, gender === 'female' && styles.optionButtonTextSelected]}>Female</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.optionButton, gender === 'non-binary' && styles.optionButtonSelected]}
+                onPress={() => setGender('non-binary')}>
+                <Text style={[styles.optionButtonText, gender === 'non-binary' && styles.optionButtonTextSelected]}>Non-binary</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.optionButton,
+                  gender === 'prefer-not-to-say' && styles.optionButtonSelected,
+                ]}
+                onPress={() => setGender('prefer-not-to-say')}>
+                <Text
+                  style={[
+                    styles.optionButtonText,
+                    gender === 'prefer-not-to-say' && styles.optionButtonTextSelected,
+                  ]}>
+                  Prefer not to say
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Default Privacy</Text>
+            <View style={styles.optionGroup}>
+              <TouchableOpacity
+                style={[styles.optionButton, privacySetting === 'private' && styles.optionButtonSelected]}
+                onPress={() => setPrivacySetting('private')}>
+                <Text style={[styles.optionButtonText, privacySetting === 'private' && styles.optionButtonTextSelected]}>Private</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.optionButton, privacySetting === 'public' && styles.optionButtonSelected]}
+                onPress={() => setPrivacySetting('public')}>
+                <Text style={[styles.optionButtonText, privacySetting === 'public' && styles.optionButtonTextSelected]}>Public</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.inputHint}>You can change this for each capsule later.</Text>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Username</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Choose a unique username"
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+            />
+            <Text style={styles.inputHint}>This will be part of your public profile URL. e.g., memorycapsule.app/username</Text>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Your Goals for Memory Capsule (Optional)</Text>
+            <TextInput
+              style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
+              placeholder="e.g., Preserve stories for my kids, consolidate my memories..."
+              value={usageIntent}
+              onChangeText={setUsageIntent}
+              multiline
+              numberOfLines={4}
+            />
+            <Text style={styles.inputHint}>How do you envision using Memory Capsule?</Text>
           </View>
         </View>
       </ScrollView>
@@ -391,6 +362,31 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6B7280',
     marginTop: theme.spacing.xs,
+  },
+  optionGroup: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: theme.spacing.xs,
+  },
+  optionButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  optionButtonSelected: {
+    backgroundColor: '#7C67CB',
+    borderColor: '#7C67CB',
+  },
+  optionButtonText: {
+    color: '#3D3A50',
+    fontWeight: '500',
+  },
+  optionButtonTextSelected: {
+    color: '#FFFFFF',
   },
   interestsSection: {
     marginBottom: theme.spacing.lg,

@@ -58,16 +58,20 @@ export function MediaPicker({
       }
 
       if (mediaFile) {
-        // Check file size
-        const fileSizeMB = mediaFile.size / (1024 * 1024);
-        if (fileSizeMB > maxFileSize) {
-          Alert.alert(
-            'File Too Large',
-            `The selected file is ${MediaService.formatFileSize(mediaFile.size)}. Maximum allowed size is ${maxFileSize}MB.`
-          );
-          return;
+        // Check file size if available
+        if (typeof mediaFile.size === 'number') {
+          const fileSizeMB = mediaFile.size / (1024 * 1024);
+          if (fileSizeMB > maxFileSize) {
+            Alert.alert(
+              'File Too Large',
+              `The selected file is ${MediaService.formatFileSize(mediaFile.size)}. Maximum allowed size is ${maxFileSize}MB.`
+            );
+            return;
+          }
+        } else {
+          // Optional: Log or handle cases where size is not available
+          console.warn(`Media file size for ${mediaFile.uri} is undefined. Skipping size check.`);
         }
-
         onMediaSelected(mediaFile);
       }
     } catch (error) {
@@ -230,7 +234,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: theme.colors.primary,
     borderStyle: 'dashed',
-    borderRadius: theme.spacing.md,
+    borderRadius: theme.borderRadius.xl,
     backgroundColor: theme.colors.primary + '10',
   },
   pickerButtonText: {
@@ -287,7 +291,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     flex: 1,
-    fontSize: theme.typography.size.md,
+    fontSize: theme.typography.size.base,
     fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.text.primary,
     marginBottom: theme.spacing.xs,

@@ -11,7 +11,15 @@ import SettingsScreen from '../screens/SettingsScreen';
 // Import nested navigators
 import { CapsulesNavigator } from './CapsulesNavigator';
 
-const Tab = createBottomTabNavigator();
+export type TabNavigatorParamList = {
+  Home: undefined;
+  Timeline: undefined;
+  Create: { capsuleId?: string; existingCapsuleTitle?: string };
+  Capsules: undefined;
+  Settings: undefined;
+};
+
+const Tab = createBottomTabNavigator<TabNavigatorParamList>();
 
 export function TabNavigator() {
   return (

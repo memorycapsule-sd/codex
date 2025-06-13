@@ -71,13 +71,12 @@ export default function CreateScreen() {
 
     const newCapsuleId = generateUUID();
 
-    navigation.navigate('Capsules', { // Navigate to the 'Capsules' tab which hosts CapsulesNavigator
-      screen: 'PromptResponse',       // Then specify the screen within CapsulesNavigator
-      params: { // These are the params for 'PromptResponse'
+    navigation.navigate('Capsules', {
+      screen: 'AddEntry',
+      params: {
         capsuleId: newCapsuleId,
-        promptId: prompt.id,
-        promptText: prompt.description,
         capsuleTitle: prompt.title,
+        promptText: prompt.description,
       },
     });
   };

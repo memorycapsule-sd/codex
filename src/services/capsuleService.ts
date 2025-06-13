@@ -13,11 +13,13 @@ import {
   Timestamp, 
   arrayUnion, 
   serverTimestamp,
+  updateDoc,
   Transaction, // Added for explicit typing
   QueryDocumentSnapshot, // Added for explicit typing
   DocumentData // Added for explicit typing
 } from 'firebase/firestore';
 import { app } from '../firebase'; // Assuming your firebase.ts exports the initialized 'app'
+import { getStorage, ref, deleteObject } from 'firebase/storage';
 
 import { CapsuleResponse, CapsuleEntry, MediaMetadata, MacroCapsule, CapsulePrompt, CapsuleCollection, BonusCapsules } from '../types/capsule';
 import { generateUUID } from '../utils/helpers';
@@ -87,14 +89,15 @@ const CAPSULE_ICONS: Record<string, string> = {
   Home: 'home-outline'
 };
 
-export class CapsuleService {
+// Capsule Service: Exported Functions
+// Refactored from class to individual exported functions to adhere to project guidelines.
   /**
    * Loads capsule data from the JSON file and transforms it into MacroCapsule objects.
    * This method seems to be from a different feature set (loading predefined capsules from JSON)
    * and might not be directly related to user-generated CapsuleResponses stored in Firestore.
    * Keeping it for now as it was in the original file content provided.
    */
-  static async loadCapsules(): Promise<MacroCapsule[]> {
+  export async function loadCapsules(): Promise<MacroCapsule[]> {
     try {
       const capsuleData = require('../../capsules/capsuledetails.json') as CapsuleCollection;
       const macroCapsules: MacroCapsule[] = [];
@@ -143,86 +146,98 @@ export class CapsuleService {
   /**
    * Gets a specific predefined capsule by ID from JSON data.
    */
-  static async getCapsuleById(id: string): Promise<MacroCapsule | null> {
-    const capsules = await this.loadCapsules();
-    return capsules.find(capsule => capsule.id === id) || null;
+  export async function getCapsuleById(id: string): Promise<MacroCapsule | null> {
+    const capsules = await loadCapsules();
+    return capsules.find((capsule: MacroCapsule) => capsule.id === id) || null;
   }
   /**
    * Adds a new CapsuleResponse document to Firestore.
    * This is used when creating a brand new capsule with its first entry.
    * Includes a timeout mechanism for the Firestore set operation.
    */
-  static async addCapsuleResponse(userId: string, capsuleData: CapsuleResponse): Promise<boolean> {
-    console.log('[CapsuleService] addCapsuleResponse called with userId:', userId, 'and capsuleId:', capsuleData.id);
+  export async function addCapsuleResponse(userId: string, promptId: string, capsuleTitle: string, initialEntry: CapsuleEntry, tags?: string[], category?: string): Promise<string | null> {
+    console.log('[CapsuleService] addCapsuleResponse called for userId:', userId);
+
+    const TIMEOUT_DURATION = 15000; // 15 seconds
+
     try {
       if (!userId) {
         console.error('[CapsuleService] User not authenticated, cannot add capsule response.');
-        return false;
+        return null;
       }
-      if (!capsuleData || !capsuleData.id) {
-        console.error('[CapsuleService] Invalid capsuleData or missing capsuleId.');
-        return false;
+      if (!promptId || !capsuleTitle || !initialEntry) {
+        console.error('[CapsuleService] promptId, capsuleTitle, and initialEntry are required.');
+        return null;
       }
 
-      // Deep clone and convert timestamps using the helper
-      const processedCapsuleData = {
-        ...JSON.parse(JSON.stringify(capsuleData)), // Deep clone to handle potential undefined and complex objects
-        userId: userId, // Ensure userId is part of the document
-        createdAt: convertTimestampToMillis(capsuleData.createdAt),
-        updatedAt: convertTimestampToMillis(capsuleData.updatedAt || Date.now()), // Ensure updatedAt is set
-        entries: (capsuleData.entries || []).map(entry => ({
-          ...JSON.parse(JSON.stringify(entry)), // Deep clone entry
-          id: entry.id || generateUUID(), // Ensure entry has an ID
-          createdAt: convertTimestampToMillis(entry.createdAt),
-          updatedAt: convertTimestampToMillis(entry.updatedAt || Date.now()),
-          metadata: {
-            ...JSON.parse(JSON.stringify(entry.metadata || {})),
-            uploadedAt: convertTimestampToMillis(entry.metadata?.uploadedAt),
-            dateTaken: convertTimestampToMillis(entry.metadata?.dateTaken || entry.createdAt), // Fallback for dateTaken
-          }
-        }))
+      const capsuleId = generateUUID();
+      const capsuleRef = doc(db, 'userCapsules', capsuleId);
+
+      // Prepare the data, ensuring all timestamps are converted correctly
+      const now = Date.now();
+      const preparedEntries = [initialEntry].map(entry => ({
+        ...entry,
+        id: entry.id || generateUUID(),
+        createdAt: convertTimestampToMillis(entry.createdAt || now),
+        updatedAt: convertTimestampToMillis(entry.updatedAt || now),
+        metadata: {
+          ...entry.metadata,
+          uploadedAt: convertTimestampToMillis(entry.metadata.uploadedAt || now),
+          dateTaken: convertTimestampToMillis(entry.metadata.dateTaken || now),
+        }
+      }));
+
+      const preparedCapsuleData = {
+        id: capsuleId,
+        userId: userId,
+        promptId: promptId,
+        capsuleTitle: capsuleTitle,
+        entries: preparedEntries,
+        createdAt: convertTimestampToMillis(now),
+        updatedAt: convertTimestampToMillis(now),
+        tags: tags || [],
+        category: category || 'uncategorized',
       };
-      
-      const capsuleDocRef = doc(db, 'userCapsules', processedCapsuleData.id);
-      console.log('[CapsuleService] Attempting to set document with processedCapsuleData:', processedCapsuleData);
 
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Firestore set operation timed out after 15 seconds')), 15000)
+      // Firestore operation with a timeout
+      const firestorePromise = setDoc(capsuleRef, preparedCapsuleData);
+      
+      // Timeout promise
+      const timeoutPromise = new Promise<void>((_, reject) =>
+        setTimeout(() => reject(new Error('Firestore operation timed out')), TIMEOUT_DURATION)
       );
 
-      await Promise.race([
-        setDoc(capsuleDocRef, processedCapsuleData),
-        timeoutPromise
-      ]);
+      // Race the Firestore operation against the timeout
+      await Promise.race([firestorePromise, timeoutPromise]);
 
-      console.log(`[CapsuleService] Document successfully written! Capsule ID: ${processedCapsuleData.id}`);
-      return true;
+      console.log(`[CapsuleService] Capsule response with ID ${capsuleId} successfully written for user ${userId}.`);
+      return capsuleId;
     } catch (error) {
-      console.error('[CapsuleService] Error writing document or operation timed out:', error);
-      return false;
+      console.error('[CapsuleService] Error writing capsule response:', error);
+      return null;
     }
   }
 
   /**
    * Adds a new entry to an existing CapsuleResponse document in Firestore.
    */
-  static async addEntryToCapsule(userId: string, capsuleId: string, newEntryData: CapsuleEntry): Promise<boolean> {
+  export async function addEntryToCapsule(userId: string, capsuleId: string, entry: CapsuleEntry): Promise<boolean> {
     console.log(`[CapsuleService] addEntryToCapsule called for userId: ${userId}, capsuleId: ${capsuleId}`);
     try {
-      if (!userId || !capsuleId || !newEntryData) {
+      if (!userId || !capsuleId || !entry) {
         console.error('[CapsuleService] Invalid parameters for addEntryToCapsule.');
         return false;
       }
 
       const processedNewEntryData = {
-        ...JSON.parse(JSON.stringify(newEntryData)), // Deep clone
-        id: newEntryData.id || generateUUID(),
-        createdAt: convertTimestampToMillis(newEntryData.createdAt),
-        updatedAt: convertTimestampToMillis(newEntryData.updatedAt || Date.now()),
+        ...JSON.parse(JSON.stringify(entry)), // Deep clone
+        id: entry.id || generateUUID(),
+        createdAt: convertTimestampToMillis(entry.createdAt),
+        updatedAt: convertTimestampToMillis(entry.updatedAt || Date.now()),
         metadata: {
-          ...JSON.parse(JSON.stringify(newEntryData.metadata || {})),
-          uploadedAt: convertTimestampToMillis(newEntryData.metadata?.uploadedAt),
-          dateTaken: convertTimestampToMillis(newEntryData.metadata?.dateTaken || newEntryData.createdAt),
+          ...JSON.parse(JSON.stringify(entry.metadata || {})),
+          uploadedAt: convertTimestampToMillis(entry.metadata?.uploadedAt),
+          dateTaken: convertTimestampToMillis(entry.metadata?.dateTaken || entry.createdAt),
         }
       };
 
@@ -255,10 +270,54 @@ export class CapsuleService {
     }
   }
 
-  /**
-   * Loads all capsule responses for a given user from Firestore.
-   */
-  static async loadUserCapsuleResponses(userId: string): Promise<CapsuleResponse[]> {
+// Gets a specific capsule response by its document ID from Firestore.
+export async function getCapsuleResponseById(capsuleId: string): Promise<CapsuleResponse | null> {
+  console.log(`[CapsuleService] getCapsuleResponseById called for capsuleId: ${capsuleId}`);
+  if (!capsuleId) {
+    console.error('[CapsuleService] getCapsuleResponseById was called with no capsuleId.');
+    return null;
+  }
+
+  try {
+    const capsuleDocRef = doc(db, 'userCapsules', capsuleId);
+    const docSnap = await getDoc(capsuleDocRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const id = docSnap.id;
+
+      // Create a deep copy to avoid issues with readonly Firestore types
+      const processedData = JSON.parse(JSON.stringify(data));
+
+      // Convert top-level timestamps
+      processedData.createdAt = convertTimestampToMillis(data.createdAt);
+      processedData.updatedAt = convertTimestampToMillis(data.updatedAt);
+      processedData.openDate = convertTimestampToMillis(data.openDate);
+
+      // Convert timestamps within entries
+      if (data.entries && Array.isArray(data.entries)) {
+        processedData.entries = data.entries.map((entry: any) => ({
+          ...entry,
+          createdAt: convertTimestampToMillis(entry.createdAt),
+          updatedAt: convertTimestampToMillis(entry.updatedAt),
+        }));
+      }
+
+      const capsuleResponse = { id, ...processedData } as CapsuleResponse;
+      console.log(`[CapsuleService] Found capsule response for ID ${capsuleId}`);
+      return capsuleResponse;
+    } else {
+      console.warn(`[CapsuleService] No capsule response found for ID: ${capsuleId}`);
+      return null;
+    }
+  } catch (error) {
+    console.error(`[CapsuleService] Error fetching capsule response by ID ${capsuleId}:`, error);
+    return null;
+  }
+}
+
+
+  export async function loadUserCapsuleResponses(userId: string): Promise<CapsuleResponse[]> {
     console.log('[CapsuleService] loadUserCapsuleResponses called for userId:', userId);
     try {
       const q = query(
@@ -278,9 +337,8 @@ export class CapsuleService {
         const data = docSnapshot.data();
         
         const entries: CapsuleEntry[] = (data.entries || []).map((entryData: any) => {
-          // Perform a deep clone of entryData and its metadata to avoid issues with frozen objects from Firestore if any
           const clonedEntryData = JSON.parse(JSON.stringify(entryData));
-          const clonedMetadata = JSON.parse(JSON.stringify(clonedEntryData.metadata || {})); 
+          const clonedMetadata = JSON.parse(JSON.stringify(clonedEntryData.metadata || {}));
 
           const metadata: MediaMetadata = {
             ...clonedMetadata,
@@ -300,11 +358,14 @@ export class CapsuleService {
         return {
           ...data,
           id: docSnapshot.id,
-          userId: data.userId || userId, // Ensure userId is present
-          title: data.title || 'Untitled Capsule', // Ensure title is present
+          userId: data.userId || userId,
+          promptId: data.promptId || 'unknown-prompt',
+          capsuleTitle: data.capsuleTitle || 'Untitled Capsule',
           createdAt: convertTimestampToMillis(data.createdAt),
           updatedAt: convertTimestampToMillis(data.updatedAt),
           entries: entries,
+          tags: data.tags || [],
+          category: data.category || 'uncategorized',
         } as CapsuleResponse;
       });
 
@@ -316,26 +377,159 @@ export class CapsuleService {
     }
   }
   
-  // --- Placeholder Methods for future implementation ---
-  static async updateCapsuleEntry(userId: string, capsuleId: string, entryId: string, updatedEntryData: Partial<CapsuleEntry>): Promise<boolean> {
-    console.warn(`[CapsuleService] updateCapsuleEntry called for capsule ${capsuleId}, entry ${entryId} - NOT IMPLEMENTED`);
-    // TODO: Implement logic to find the specific entry within the capsule's entries array and update it.
-    // This will likely involve a transaction to read the document, modify the array, and write it back.
-    return false;
-  }
+  export async function updateCapsuleEntry(userId: string, capsuleId: string, entryId: string, updatedEntryData: Partial<CapsuleEntry>): Promise<boolean> {
+    console.log(`[CapsuleService] updateCapsuleEntry called for user ${userId}, capsule ${capsuleId}, entry ${entryId}`);
+    const capsuleDocRef = doc(db, 'userCapsules', capsuleId);
 
-  static async deleteCapsule(userId: string, capsuleId: string): Promise<boolean> {
-    console.warn(`[CapsuleService] deleteCapsule called for capsule ${capsuleId} - NOT IMPLEMENTED`);
-    // TODO: Implement logic to delete the capsule document from Firestore.
-    // Consider also deleting associated media from Firebase Storage if necessary.
     try {
-      // await db.collection('userCapsules').doc(capsuleId).delete();
-      // console.log(`[CapsuleService] Capsule ${capsuleId} successfully deleted.`);
-      // return true;
-      return false; // Placeholder
+      await runTransaction(db, async (transaction: Transaction) => {
+        const capsuleDoc = await transaction.get(capsuleDocRef);
+
+        if (!capsuleDoc.exists()) {
+          throw new Error(`[CapsuleService] Capsule ${capsuleId} not found.`);
+        }
+
+        const capsuleData = capsuleDoc.data() as CapsuleResponse;
+
+        // Optional: Verify if the capsule belongs to the user if userId is part of capsuleData and crucial for security here
+        // if (capsuleData.userId !== userId) {
+        //   throw new Error(`[CapsuleService] User ${userId} does not have permission to update capsule ${capsuleId}.`);
+        // }
+
+        const entryIndex = capsuleData.entries.findIndex(entry => entry.id === entryId);
+
+        if (entryIndex === -1) {
+          throw new Error(`[CapsuleService] Entry ${entryId} not found in capsule ${capsuleId}.`);
+        }
+
+        const originalEntry = capsuleData.entries[entryIndex];
+
+        // Deep merge metadata if it exists in updatedEntryData
+        let updatedMetadata = originalEntry.metadata;
+        if (updatedEntryData.metadata) {
+          updatedMetadata = {
+            ...originalEntry.metadata,
+            ...updatedEntryData.metadata,
+          };
+        }
+
+        const updatedEntry: CapsuleEntry = {
+          ...originalEntry,
+          ...updatedEntryData,
+          metadata: updatedMetadata,
+          updatedAt: convertTimestampToMillis(Date.now()), // Update entry's timestamp
+        };
+
+        // Create a new entries array with the updated entry
+        const updatedEntries = [...capsuleData.entries];
+        updatedEntries[entryIndex] = updatedEntry;
+
+        transaction.update(capsuleDocRef, {
+          entries: updatedEntries,
+          updatedAt: convertTimestampToMillis(Date.now()), // Update capsule's timestamp
+        });
+      });
+
+      console.log(`[CapsuleService] Entry ${entryId} in capsule ${capsuleId} successfully updated.`);
+      return true;
     } catch (error) {
-      // console.error(`[CapsuleService] Error deleting capsule ${capsuleId}:`, error);
+      console.error(`[CapsuleService] Error updating entry ${entryId} in capsule ${capsuleId}:`, error);
       return false;
     }
   }
+
+export async function updateCapsule(capsuleId: string, data: Partial<CapsuleResponse>): Promise<void> {
+  const capsuleRef = doc(db, 'userCapsules', capsuleId);
+  console.log(`[CapsuleService] Starting transaction to update capsule ${capsuleId}`);
+
+  try {
+    await runTransaction(db, async (transaction) => {
+      const capsuleDoc = await transaction.get(capsuleRef);
+      if (!capsuleDoc.exists()) {
+        throw new Error(`[CapsuleService] Document for capsule ${capsuleId} does not exist!`);
+      }
+
+      // Merge existing data with new data and add the update timestamp
+      const updatedData = {
+        ...capsuleDoc.data(),
+        ...data,
+        updatedAt: serverTimestamp(),
+      };
+
+      transaction.set(capsuleRef, updatedData, { merge: true });
+    });
+
+    console.log(`[CapsuleService] Capsule ${capsuleId} successfully updated via transaction.`);
+  } catch (error) {
+    console.error(`[CapsuleService] Error updating capsule ${capsuleId}:`, error);
+    throw new Error('Failed to update capsule.');
+  }
 }
+
+export async function deleteCapsule(userId: string, capsuleId: string): Promise<boolean> {
+console.log(`[CapsuleService] deleteCapsule called for user ${userId}, capsule ${capsuleId}`);
+const capsuleDocRef = doc(db, 'userCapsules', capsuleId);
+const storage = getStorage(app);
+
+try {
+// Get the capsule document to retrieve media URIs before deleting
+const capsuleDocSnap = await getDoc(capsuleDocRef);
+
+      if (!capsuleDocSnap.exists()) {
+        console.warn(`[CapsuleService] Capsule ${capsuleId} not found. Nothing to delete.`);
+        return false; // Or true if not finding it means it's already 'deleted'
+      }
+
+      const capsuleData = capsuleDocSnap.data() as CapsuleResponse;
+
+      // Optional: Verify ownership if userId is part of capsuleData and crucial for security
+      // if (capsuleData.userId !== userId) {
+      //   console.error(`[CapsuleService] User ${userId} does not have permission to delete capsule ${capsuleId}.`);
+      //   return false;
+      // }
+
+      // Delete associated media from Firebase Storage
+      if (capsuleData.entries && capsuleData.entries.length > 0) {
+        for (const entry of capsuleData.entries) {
+          if (entry.mediaUri) {
+            try {
+              const mediaRef = ref(storage, entry.mediaUri);
+              await deleteObject(mediaRef);
+              console.log(`[CapsuleService] Deleted media from Storage: ${entry.mediaUri}`);
+            } catch (storageError: any) {
+              if (storageError.code === 'storage/object-not-found') {
+                console.warn(`[CapsuleService] Media file not found in Storage, skipping deletion: ${entry.mediaUri}`);
+              } else {
+                console.error(`[CapsuleService] Error deleting media from Storage ${entry.mediaUri}:`, storageError);
+              }
+            }
+          }
+          if (entry.thumbnailUri) {
+            try {
+              const thumbRef = ref(storage, entry.thumbnailUri);
+              await deleteObject(thumbRef);
+              console.log(`[CapsuleService] Deleted thumbnail from Storage: ${entry.thumbnailUri}`);
+            } catch (storageError: any) {
+              if (storageError.code === 'storage/object-not-found') {
+                console.warn(`[CapsuleService] Thumbnail file not found in Storage, skipping deletion: ${entry.thumbnailUri}`);
+              } else {
+                console.error(`[CapsuleService] Error deleting thumbnail from Storage ${entry.thumbnailUri}:`, storageError);
+              }
+            }
+          }
+        }
+      }
+
+      // Delete the Firestore document
+      await runTransaction(db, async (transaction: Transaction) => {
+        transaction.delete(capsuleDocRef);
+      });
+
+      console.log(`[CapsuleService] Capsule ${capsuleId} and associated media successfully deleted.`);
+      return true;
+    } catch (error) {
+      console.error(`[CapsuleService] Error deleting capsule ${capsuleId}:`, error);
+      return false;
+    }
+  }
+
